@@ -10,7 +10,7 @@ This repository contains the Crit web application written in React and Typescrip
 
 ## Table of Contents
 
-- [Crit](# Crit)
+- [Crit](#crit)
   - [Description](#description)
   - [Table of Contents](#table-of-contents)
   - [Prerequisites](#prerequisites)
@@ -19,8 +19,8 @@ This repository contains the Crit web application written in React and Typescrip
   - [Installation](#installation)
   - [Usage](#usage)
   - [VSCode Launch and Task Examples](#vscode-launch-and-task-examples)
-    - [launch.json](#launch.json)
-    - [tasks.json](#tasks.json)
+    - [launch.json](#launchjson)
+    - [tasks.json](#tasksjson)
 
 ## Prerequisites
 
@@ -32,7 +32,8 @@ This repository contains the Crit web application written in React and Typescrip
 
 ### Optional
 
--- *TBD* --
+- Chrome Extension: [React Dev Tools](https://chromewebstore.google.com/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi?hl=en)
+  - Other browsers and device instructions such as mobile device can be found [here](https://react.dev/learn/react-developer-tools).
 
 ## Installation
 
@@ -69,6 +70,7 @@ npm run start
 
 ```json
 {
+    "version": "0.2.0",
     "compounds": [
         {
             "name": "Build and Run Server/Client Debug",
@@ -85,7 +87,7 @@ npm run start
             "request": "launch",
             "type": "chrome",
             "url": "http://localhost:3000",
-            "webRoot": "${workspaceFolder}/crit-web",
+            "webRoot": "${workspaceFolder}/crit-web/",
             "preLaunchTask": "Start Crit Web"
         },
         {
@@ -113,13 +115,22 @@ npm run start
 
 ```json
 {
+    "version": "2.0.0",
     "tasks": [
         {
             "label": "Start Crit Web",
-            "type": "shell",
-            "command": "npm run start",
+            "type": "npm",
+            "script": "start",
             "options": {
                 "cwd": "${workspaceFolder}/crit-web"
+            },
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
+            "isBackground": false,
+            "presentation": {
+                "close": true
             }
         },
         {
@@ -132,7 +143,10 @@ npm run start
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
-            "problemMatcher": "$msCompile"
+            "problemMatcher": "$msCompile",
+            "presentation": {
+                "close": true
+            }
         },
         {
             "label": "Publish Crit Api Debug",
@@ -144,7 +158,10 @@ npm run start
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
-            "problemMatcher": "$msCompile"
+            "problemMatcher": "$msCompile",
+            "presentation": {
+                "close": true
+            }
         },
         {
             "label": "Watch Crit Api Debug",
@@ -159,7 +176,10 @@ npm run start
             "problemMatcher": "$msCompile",
             "dependsOn": [
                 "Build Crit Api Debug"
-            ]
+            ],
+            "presentation": {
+                "close": true
+            }
         }
     ]
 }
