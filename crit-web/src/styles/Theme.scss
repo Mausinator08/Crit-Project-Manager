@@ -1,0 +1,17 @@
+@import './Colors.scss';
+
+html[data-theme="dark"] {
+  --background-color: #{$primary};
+  --color: #{$secondary};
+
+  --primary-color: #{$primary};
+  --secondary-color: #{$secondary};
+}
+
+html[data-theme="light"] {
+  --background-color: #{$light};
+  --color: #{$dark};
+
+  --primary-color: #{$primary};
+  --secondary-color: #{$secondary};
+}

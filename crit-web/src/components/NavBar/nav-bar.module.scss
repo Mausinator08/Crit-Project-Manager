@@ -1,0 +1,45 @@
+@import '../../styles/Custom.scss';
+
+.sidenav {
+    width: 250px;
+    transition: width 0.3s ease-in-out;
+    height: 100%;
+    background-color: $secondary;
+    position: fixed;
+    overflow: auto;
+}
+
+.sidenavClosed {
+    composes: sidenav;
+    transition: width 0.3s ease-in-out;
+    width: 70px;
+}
+
+.sideitem {
+    display: flex;
+    align-items: center;
+    padding-left: 20px;
+    padding-top: 10px;
+    cursor: pointer;
+    color: $primary;
+    text-decoration: none;
+}
+
+.linkText {
+    padding-left: 20px;
+    color: $primary;
+    background-color: transparent;
+}
+
+.linkTextClosed {
+    composes: linkText;
+    visibility: hidden;
+}
+
+.sideitem:hover {
+    background-color: lighten($primary, 50%);
+}
+
+.menuBtn {
+    padding-left: 24px;
+}

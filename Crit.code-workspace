@@ -1,0 +1,21 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"dotnet.defaultSolution": "./crit-api/CritApi.sln",
+		"vssolution.openSolutions.selectedInOmnisharp": true,
+		"vssolution.altSolutionFolders": [
+			"./crit-api"
+		],
+		"editor.formatOnSave": true,
+		"editor.formatOnPaste": true,
+		"editor.formatOnType": true,
+		"editor.formatOnSaveMode": "modificationsIfAvailable",
+		"scss.lint.validProperties": [
+			"composes"
+		]
+	}
+}

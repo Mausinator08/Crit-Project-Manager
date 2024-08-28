@@ -1,0 +1,23 @@
+@import '../../styles/Custom.scss';
+
+.error-text {
+    color: $danger;
+}
+
+.toggle-folding-button {
+    border: none !important;
+    background-color: transparent !important;
+    color: $primary !important;
+}
+
+.expanded {
+    display: block;
+    border-style: solid;
+    border-color: $primary;
+    border-width: 2px;
+    border-radius: 4px;
+}
+
+.folded {
+    display: none;
+}

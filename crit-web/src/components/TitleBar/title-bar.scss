@@ -1,0 +1,19 @@
+@import '../../styles/Custom.scss';
+
+.title-bar {
+    @extend .grid-container;
+    grid-template-columns: 25% 50% 25%;
+    background-color: $secondary;
+    color: $primary;
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    width: 100vw;
+    height: 65px;
+}
+
+.nav-bar {
+    @extend .grid-item;
+    padding-left: 0px;
+    text-align: left;
+}
