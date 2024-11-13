@@ -12,10 +12,11 @@
 		],
 		"editor.formatOnSave": true,
 		"editor.formatOnPaste": true,
-		"editor.formatOnType": true,
-		"editor.formatOnSaveMode": "modificationsIfAvailable",
+		"editor.formatOnType": false,
+		"editor.formatOnSaveMode": "file",
 		"scss.lint.validProperties": [
 			"composes"
-		]
+		],
+		"editor.trimAutoWhitespace": true
 	}
 }

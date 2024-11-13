@@ -1,0 +1,41 @@
+using Microsoft.AspNetCore.Identity;
+using MongoDbGenericRepository.Attributes;
+
+namespace CritDTO.Models;
+
+public enum PhoneNumberType
+{
+    OrganizationPrimary,
+    OrganizationSupport,
+    OrganizationOther,
+    OrganizationOwner,
+    OrganizationAdmin,
+    ProjectOwner,
+    ProjectAdmin,
+    User,
+    Mobile,
+    Office,
+    Work,
+    Personal,
+    Fax,
+    Landline
+}
+
+public class PhoneNumber
+{
+    public PhoneNumber()
+    {
+        Type = new List<PhoneNumberType>();
+        CountryCode = "+1";
+        Number = "000-000-0000";
+    }
+
+    public Guid Id { get; set; }
+    public List<PhoneNumberType> Type { get; set; }
+    [PersonalData]
+    public string CountryCode { get; set; }
+    [PersonalData]
+    public string Number { get; set; }
+    [PersonalData]
+    public string? Extension { get; set; }
+}

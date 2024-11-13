@@ -20,7 +20,9 @@
     "noEmit": true,
     "jsx": "react-jsx",
     "downlevelIteration": true,
-    "sourceMap": true
+    "sourceMap": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true
   },
   "include": [
     "src",

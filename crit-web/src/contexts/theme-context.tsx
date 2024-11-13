@@ -15,7 +15,7 @@ interface Props {
 }
 
 const ThemeProvider: React.FC<Props> = ({ children }) => {
-  const [theme, setTheme] = useState('light');
+  const [theme, setTheme] = useState(localStorage.getItem('theme') ?? 'light');
 
   const toggleThemeHandler = () => {
     setTheme((prevState): string => {

@@ -1,13 +1,13 @@
 import { Outlet } from "react-router-dom";
 
-function Home() {
+function Projects() {
     return (
         <div>
-            <h2>Home</h2>
+            <h2>Projects</h2>
             <hr />
             <Outlet />
         </div>
     );
 }
 
-export default Home;
+export default Projects;

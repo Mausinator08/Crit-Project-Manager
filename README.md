@@ -75,20 +75,19 @@ npm run start
         {
             "name": "Build and Run Server/Client Debug",
             "configurations": [
-                ".NET Core Launch (CritApi) Debug",
-                "Launch Chrome Crit"
+                "Launch Crit Server",
+                ".NET Core Launch (CritApi) Debug"
             ],
             "stopAll": true
         }
     ],
     "configurations": [
         {
-            "name": "Launch Chrome Crit",
+            "name": "Launch Crit Server",
             "request": "launch",
-            "type": "chrome",
-            "url": "http://localhost:3000",
-            "webRoot": "${workspaceFolder}/crit-web/",
-            "preLaunchTask": "Start Crit Web"
+            "type": "node-terminal",
+            "command": "npm start",
+            "cwd": "${workspaceFolder}/crit-web"
         },
         {
             "name": ".NET Core Launch (CritApi) Debug",
@@ -117,22 +116,6 @@ npm run start
 {
     "version": "2.0.0",
     "tasks": [
-        {
-            "label": "Start Crit Web",
-            "type": "npm",
-            "script": "start",
-            "options": {
-                "cwd": "${workspaceFolder}/crit-web"
-            },
-            "group": {
-                "kind": "test",
-                "isDefault": true
-            },
-            "isBackground": false,
-            "presentation": {
-                "close": true
-            }
-        },
         {
             "label": "Build Crit Api Debug",
             "command": "dotnet",
