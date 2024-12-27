@@ -4,7 +4,7 @@ interface Props {
     children: React.ReactNode;
 }
 
-function Error({ children }: Props) {
+function Error({ children }: Props): JSX.Element {
     return (
         <div>
             <h2>Error</h2>

@@ -12,7 +12,7 @@ type Props = {
     title: string;
 }
 
-function TitleBar(props: Props) {
+function TitleBar(props: Props): JSX.Element {
     return (
         <div id='title-bar' className='grid-container title-bar'>
             <div className='nav-bar'><NavBar open={props.open} onToggleOpen={props.onToggleOpen} /></div>

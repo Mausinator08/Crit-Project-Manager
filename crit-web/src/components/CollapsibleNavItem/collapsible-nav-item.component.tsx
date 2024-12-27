@@ -4,7 +4,6 @@ import { useState } from "react";
 import { icon } from "@fortawesome/fontawesome-svg-core/import.macro";
 
 import { Link } from "../../constants/nav-bar-links";
-
 import './collapsible-nav-item.scss';
 import styles from "../NavBar/nav-bar.module.scss";
 
@@ -13,7 +12,7 @@ type Props = {
     link: Link
 };
 
-function CreateLinks(
+export function CreateLinks(
     link: Link,
     open: string,
 ): JSX.Element {
@@ -37,7 +36,7 @@ function CreateLinks(
     })();
 }
 
-function CollapsibleNavItem(props: Props) {
+function CollapsibleNavItem(props: Props): JSX.Element {
     const link: Link = props.link;
     const [collapsed, setCollapsed] = useState<boolean>(true);
 

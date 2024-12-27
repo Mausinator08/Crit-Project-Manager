@@ -37,7 +37,7 @@ public class Task : AuditInformation
     public Guid? AssignedUserId { get; set; }
     public Guid? StatusId { get; set; }
     public Guid? PriorityId { get; set; }
-    public int? Risk { get; set; }
+    public int? Complexity { get; set; }
     public DateTime? DueDate { get; set; }
     public List<Guid> TaskDependencyIds { get; set; }
     public List<Task> SubTasks { get; set; }

@@ -1,24 +1,39 @@
-import { Outlet } from "react-router-dom";
+import { Outlet, useParams } from "react-router-dom";
 import { GetEnvValues } from "../../constants/environment";
-import { useState } from "react";
-import { Project } from "../../models/project.model";
+import { useEffect, useState } from "react";
+import { Project } from '../../models/project.model';
+import Tasks from "../../components/Tasks/tasks.component";
 
-export interface Props {
-    projectId: string;
+async function getProject(projectId: string | undefined): Promise<Project | null> {
+    return new Promise(async (resolve, reject): Promise<void> => {
+        const response = await fetch(new URL(`${GetEnvValues()?.critApiUrl}/Project/${projectId}`), {
+            method: 'GET',
+        });
+
+        if (response.status !== 200) {
+            reject(await response.text());
+            return;
+        }
+
+        const data: Project = await response.json() as Project;
+        resolve(data);
+    });
 }
 
-function ProjectOptions(props: Props) {
-    const [project, setProject] = useState<Project | undefined>();
-
-    const getProject = async () => {
-
-    }
+function ProjectOptions(): JSX.Element {
+    const { projectId } = useParams();
+    const [project, setProject] = useState<Project | null>(null);
+    useEffect(() => {
+        getProject(projectId).then(value => {
+            setProject(value);
+        });
+    }, [projectId]);
 
     return (
         <div>
-            <h2></h2>
+            <h2>{project?.name ?? '<no project name>'}</h2>
             <hr />
-            <Outlet />
+            {project && (<Tasks selectedProjectId={project.id} tasks={project?.tasks ?? []} customFieldTypes={project?.customFieldTypes ?? []} statuses={project?.statuses ?? []} />)}
         </div>
     );
 }

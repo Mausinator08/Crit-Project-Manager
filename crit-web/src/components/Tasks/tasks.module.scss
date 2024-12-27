@@ -1,0 +1,19 @@
+@import '../../styles/Custom.scss';
+
+.taskWrapper {
+    display: flex;
+    flex-direction: row;
+
+}
+
+.taskList {
+    flex: 2;
+}
+
+.taskListCondensed {
+    flex: 1;
+}
+
+.taskDetails {
+    flex: 2;
+}

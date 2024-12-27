@@ -10,7 +10,7 @@ export class Task {
         this.assignedUserId = task?.assignedUserId ?? null;
         this.statusId = task?.statusId ?? null;
         this.priorityId = task?.priorityId ?? null;
-        this.risk = task?.risk ?? null;
+        this.complexity = task?.complexity ?? null;
         this.dueDate = task?.dueDate ?? null;
         this.taskDependencyIds = task?.taskDependencyIds ?? [];
         this.subTasks = task?.subTasks ?? [];
@@ -25,7 +25,7 @@ export class Task {
     public assignedUserId?: string;
     public statusId?: string;
     public priorityId?: string;
-    public risk?: number;
+    public complexity?: number;
     public dueDate?: Date;
     public taskDependencyIds: string[];
     public subTasks: Task[];

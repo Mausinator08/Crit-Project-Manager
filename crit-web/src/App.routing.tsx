@@ -1,16 +1,40 @@
 import {
-    createBrowserRouter,
-    RouteObject,
+    createBrowserRouter
 } from 'react-router-dom';
-import { LinkChildren, links } from './constants/nav-bar-links';
+
 import App from './App';
+import Home from './pages/Home/home.page';
+import Projects from './pages/Projects/projects.page';
+import ProjectOptions from './pages/Project/project-options.page';
+import TaskDetails from './components/TaskDetails/task-details.component';
 
 const appRouter = createBrowserRouter([
     {
         path: '/',
         element: (<App />),
-        children: links.map<RouteObject>(LinkChildren),
-    }
+        children: [
+            {
+                path: "/",
+                element: (<Home />),
+            },
+            {
+                path: "/Projects",
+                element: (<Projects />),
+                children: [
+                    {
+                        path: '/Projects/:projectId',
+                        element: (<ProjectOptions />),
+                        children: [
+                            {
+                                path: '/Projects/:projectId/:taskId',
+                                element: (<TaskDetails />),
+                            }
+                        ],
+                    }
+                ],
+            }
+        ],
+    },
 ]);
 
 export default appRouter;

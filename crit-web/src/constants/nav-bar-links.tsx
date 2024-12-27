@@ -4,51 +4,62 @@ import { IndexRouteObject, NonIndexRouteObject, RouteObject } from "react-router
 
 import Home from "../pages/Home/home.page";
 import Projects from "../pages/Projects/projects.page";
+import ProjectOptions from "../pages/Project/project-options.page";
+import Tasks from "../components/Tasks/tasks.component";
 import { GetEnvValues } from "./environment";
 import { Project } from "../models/project.model";
-import Tasks from "../pages/Tasks/tasks.page";
-import ProjectOptions from "../pages/Project/project-options.page";
+import { Task } from "../models/task.model";
+import TaskDetails from "../components/TaskDetails/task-details.component";
 
-export type Link = { title: string, path: string, icon: IconDefinition, element: JSX.Element, children?: Link[], index?: boolean };
+export type Link = { title: string, path: string, icon: IconDefinition, children?: Link[], index?: boolean, showInNavBar?: boolean, data?: any };
+
+const createSubtaskLinks: (task: Task) => Link[] | undefined = (task: Task): Link[] | undefined => {
+    return task.subTasks.map<Link>(subTask => {
+        return {
+            title: subTask?.title ? subTask?.title as string : '<no task title>',
+            path: `/Project/${subTask.projectId}/${subTask.id}`,
+            icon: icon({ name: 'list-check' }),
+            children: createSubtaskLinks(subTask),
+            showInNavBar: false,
+        };
+    });
+};
 
 export const links: Link[] = [
     {
         title: 'Home',
         path: "/",
         icon: icon({ name: 'house' }),
-        element: (<Home />),
     },
     {
         title: "Projects",
         path: "/Projects",
-        icon: icon({ name: 'list-check' }),
-        element: (<Projects />),
+        icon: icon({ name: 'bars-progress' }),
         index: true,
         children: await (async (): Promise<Link[]> => {
             return new Promise<Link[]>(async (resolve, reject): Promise<void> => {
                 const response = await fetch(new URL(`${GetEnvValues()?.critApiUrl}/Project/GetAllProjects`), {
                     method: 'GET',
                 });
-                const data: Project[] = await response.json();
-                resolve(data.map<Link>(project => { return { title: project.name, path: `/Project/${project.id}`, icon: icon({ name: 'list-check' }), element: (<ProjectOptions />) } }));
-            });
-        })()
+                const data: Project[] = await response.json() as Project[];
+                resolve(data.map<Link>(project => {
+                    return {
+                        title: project.name,
+                        path: `/Project/${project.id}`,
+                        icon: icon({ name: 'bars-progress' }),
+                        children: project.tasks.map<Link>(task => {
+                            return {
+                                title: task.title ? task.title : '<no task title>',
+                                path: `/Project/${project.id}/${task.id}`,
+                                icon: icon({ name: 'list-check' }),
+                                children: createSubtaskLinks(task),
+                                showInNavBar: false,
+                                data: task,
+                            };
+                        })
+                    };
+                }))
+            })
+        })(),
     }
 ];
-
-export function LinkChildren(link: Link): RouteObject {
-    if (link.index === true) {
-        return {
-            path: link.path,
-            element: link.element,
-            children: link.children && link.children.length > 0 ? link.children.map<RouteObject>(LinkChildren) : undefined,
-            index: true,
-        } as IndexRouteObject;
-    }
-
-    return {
-        path: link.path,
-        element: link.element,
-        children: link.children && link.children.length > 0 ? link.children.map<RouteObject>(LinkChildren) : undefined,
-    } as NonIndexRouteObject;
-}

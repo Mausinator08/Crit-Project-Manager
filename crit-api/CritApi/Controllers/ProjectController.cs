@@ -18,6 +18,8 @@ public class ProjectController : ControllerBase
 
     [HttpGet]
     [Route("GetAllProjects")]
+    [ProducesResponseType<List<Project>>(StatusCodes.Status200OK)]
+    [ProducesErrorResponseType(typeof(string))]
     public async Task<IActionResult> GetAllProjects()
     {
         try
@@ -32,11 +34,13 @@ public class ProjectController : ControllerBase
 
     [HttpGet]
     [Route("{projectId}")]
+    [ProducesResponseType<Project>(StatusCodes.Status200OK)]
+    [ProducesErrorResponseType(typeof(string))]
     public async Task<IActionResult> GetProject([FromRoute] Guid projectId)
     {
         try
         {
-            return Ok(new List<Project>([new Project("Test", "Testing out this project!", Guid.NewGuid(), Guid.NewGuid())]));
+            return Ok(new Project("Test", "Testing out this project!", Guid.NewGuid(), Guid.NewGuid()));
         }
         catch (Exception ex)
         {
