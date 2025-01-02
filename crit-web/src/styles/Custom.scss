@@ -39,3 +39,8 @@ body {
     background-color: var(--background-color);
     color: var(--color);
 }
+
+a {
+    background-color: transparent;
+    color: var(--secondary-color);
+}

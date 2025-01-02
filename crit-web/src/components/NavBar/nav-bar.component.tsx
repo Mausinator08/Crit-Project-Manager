@@ -21,7 +21,7 @@ function NavBar(props: Props): JSX.Element {
 			/>
 			<div>
 				{links.map<JSX.Element | undefined>((link) => {
-					if (link.showInNavBar && link?.showInNavBar.valueOf() === true) {
+					if (!link?.showInNavBar || (link?.showInNavBar && link?.showInNavBar.valueOf() === true)) {
 						return CreateLinks(link, props.open);
 					}
 

@@ -27,12 +27,12 @@ export const links: Link[] = [
                 resolve(data.map<Link>(project => {
                     return {
                         title: project.name,
-                        path: `/Project/${project.id}`,
-                        icon: icon({ name: 'bars-progress' }),
+                        path: `/Projects/${project.id}`,
+                        icon: icon({ name: 'check' }),
                         children: project.tasks.map<Link>(task => {
                             return {
                                 title: task.title ? task.title : '<no task title>',
-                                path: `/Project/${project.id}/${task.id}`,
+                                path: `/Projects/${project.id}/${task.id}`,
                                 icon: icon({ name: 'list-check' }),
                                 children: createSubtaskLinks(task),
                                 showInNavBar: false,

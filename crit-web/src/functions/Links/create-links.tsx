@@ -17,7 +17,7 @@ export function CreateLinks(
         return (
             <div key={link.path}>
                 <h2 className={styles.sideitem}>
-                    <NavLink to={link.path} key={link.path + '-icon'}>
+                    <NavLink className={styles.navBarLink} to={link.path} key={link.path + '-icon'}>
                         <FontAwesomeIcon icon={link.icon} />
                     </NavLink>
                     <NavLink to={link.path} className={open === "true" ? styles.linkText : styles.linkTextClosed} key={link.path + '-text'}>

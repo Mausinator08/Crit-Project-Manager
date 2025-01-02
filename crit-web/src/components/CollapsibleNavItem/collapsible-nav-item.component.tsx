@@ -22,7 +22,7 @@ function CollapsibleNavItem(props: Props): JSX.Element {
                 <Collapsible.Label>
                     <h2 className={styles.sideitem}>
                         <Collapsible.Toggle>
-                            <NavLink to={link.path} key={link.path + '-icon'}>
+                            <NavLink className={styles.navBarLink} to={link.path} key={link.path + '-icon'}>
                                 <FontAwesomeIcon icon={link.icon} />
                             </NavLink>
                             <NavLink to={link.path} className={props.open === "true" ? styles.linkText : styles.linkTextClosed} key={link.path + '-text'}>
