@@ -7,7 +7,7 @@ namespace CritApi.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize]
+// [Authorize]
 public class ProjectController : ControllerBase
 {
     private readonly CritDbContext _critContext;
