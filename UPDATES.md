@@ -29,8 +29,10 @@
 * Moved task details component to Tasks folder in components.
 * Moved Projects Component to Project folder with the Project Options Component.
 
-## 2025/01/02 16:07 CST
+## 2025/01/02 17:38 CST
 
 ### Enhancements
 
 * Updated README.md
+* Temporarily removed Authorize attribute from Project Controller for testing.
+* Fixed styling/coloring issues.
