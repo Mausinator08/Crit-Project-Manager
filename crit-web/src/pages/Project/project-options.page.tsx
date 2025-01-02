@@ -1,6 +1,6 @@
-import { Outlet, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { GetEnvValues } from "../../constants/environment";
-import { useEffect, useState } from "react";
+import { JSX, useEffect, useState } from "react";
 import { Project } from '../../models/project.model';
 import Tasks from "../../components/Tasks/tasks.component";
 
@@ -33,7 +33,7 @@ function ProjectOptions(): JSX.Element {
         <div>
             <h2>{project?.name ?? '<no project name>'}</h2>
             <hr />
-            {project && (<Tasks selectedProjectId={project.id} tasks={project?.tasks ?? []} customFieldTypes={project?.customFieldTypes ?? []} statuses={project?.statuses ?? []} />)}
+            {project && (<Tasks selectedProjectId={project.id} tasks={project?.tasks ?? []} customFieldTypes={project?.customFieldTypes ?? []} statuses={project?.statuses ?? []} hiddenCustomFieldTypeIds={project?.hiddenCustomFieldTypeIds} />)}
         </div>
     );
 }

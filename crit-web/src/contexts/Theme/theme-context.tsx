@@ -1,20 +1,20 @@
 import React, { createContext, useState } from "react";
 
-interface ContextProps {
+interface ThemeContextProps {
   theme: string;
   toggleTheme: () => void;
 }
 
-export const ThemeContext = createContext<ContextProps>({
+export const ThemeContext = createContext<ThemeContextProps>({
   theme: "light",
   toggleTheme: () => { },
 });
 
-interface Props {
+interface ThemeProviderProps {
   children?: React.ReactNode;
 }
 
-const ThemeProvider: React.FC<Props> = ({ children }) => {
+const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   const [theme, setTheme] = useState(localStorage.getItem('theme') ?? 'light');
 
   const toggleThemeHandler = () => {
@@ -30,14 +30,14 @@ const ThemeProvider: React.FC<Props> = ({ children }) => {
   };
 
   return (
-    <ThemeContext.Provider
+    <ThemeContext
       value={{
         theme: theme,
         toggleTheme: toggleThemeHandler,
       }}
     >
       {children}
-    </ThemeContext.Provider>
+    </ThemeContext>
   );
 };
 

@@ -1,16 +1,16 @@
-import { Outlet } from "react-router-dom";
+import { JSX } from "react";
 
-interface Props {
+interface ErrorProps {
     children: React.ReactNode;
 }
 
-function Error({ children }: Props): JSX.Element {
+function Error({ children }: ErrorProps): JSX.Element {
     return (
-        <div>
-            <h2>Error</h2>
+        <>
+            <h1>Error</h1>
             <hr />
             {children}
-        </div>
+        </>
     );
 }
 

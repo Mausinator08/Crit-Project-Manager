@@ -1,6 +1,6 @@
 import React, { createContext, useState } from "react";
-import { Container } from "../dependencies/container";
-import Error from "../pages/Error/error.page";
+import { Container } from "../../dependencies/container";
+import Error from "../../pages/Error/error.page";
 import { NavLink } from "react-router-dom";
 
 interface ContextProps {
@@ -37,13 +37,13 @@ const ModuleProvider: React.FC<Props> = ({ services, children }) => {
     }
 
     return (
-        <ModuleContext.Provider
+        <ModuleContext
             value={{
                 getService: getService,
             }}
         >
             {children}
-        </ModuleContext.Provider>
+        </ModuleContext>
     );
 };
 

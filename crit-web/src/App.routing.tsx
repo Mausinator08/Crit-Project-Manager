@@ -7,6 +7,7 @@ import Home from './pages/Home/home.page';
 import Projects from './pages/Projects/projects.page';
 import ProjectOptions from './pages/Project/project-options.page';
 import TaskDetails from './components/TaskDetails/task-details.component';
+import Error from './pages/Error/error.page';
 
 const appRouter = createBrowserRouter([
     {
@@ -35,6 +36,15 @@ const appRouter = createBrowserRouter([
             }
         ],
     },
+    {
+        path: '*',
+        element: (
+            <Error>
+                <h2>404 - Page Not Found</h2>
+                <p>This is not the page you are looking for.</p>
+            </Error>
+        )
+    }
 ]);
 
 export default appRouter;

@@ -1,29 +1,11 @@
 import { icon } from "@fortawesome/fontawesome-svg-core/import.macro";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
-import { IndexRouteObject, NonIndexRouteObject, RouteObject } from "react-router-dom";
 
-import Home from "../pages/Home/home.page";
-import Projects from "../pages/Projects/projects.page";
-import ProjectOptions from "../pages/Project/project-options.page";
-import Tasks from "../components/Tasks/tasks.component";
 import { GetEnvValues } from "./environment";
 import { Project } from "../models/project.model";
-import { Task } from "../models/task.model";
-import TaskDetails from "../components/TaskDetails/task-details.component";
+import { createSubtaskLinks } from "../functions/Tasks/create-subtask-links";
 
 export type Link = { title: string, path: string, icon: IconDefinition, children?: Link[], index?: boolean, showInNavBar?: boolean, data?: any };
-
-const createSubtaskLinks: (task: Task) => Link[] | undefined = (task: Task): Link[] | undefined => {
-    return task.subTasks.map<Link>(subTask => {
-        return {
-            title: subTask?.title ? subTask?.title as string : '<no task title>',
-            path: `/Project/${subTask.projectId}/${subTask.id}`,
-            icon: icon({ name: 'list-check' }),
-            children: createSubtaskLinks(subTask),
-            showInNavBar: false,
-        };
-    });
-};
 
 export const links: Link[] = [
     {

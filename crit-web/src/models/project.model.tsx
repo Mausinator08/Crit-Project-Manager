@@ -15,6 +15,7 @@ export class Project {
         this.projectUserIds = project?.projectUserIds ?? [];
         this.organizationIds = project?.organizationIds ?? [];
         this.customFieldTypes = project?.customFieldTypes ?? [];
+        this.hiddenCustomFieldTypeIds = project?.hiddenCustomFieldTypeIds ?? [];
         this.statuses = project?.statuses ?? [];
         this.priorities = project?.priorities ?? [];
     }
@@ -29,6 +30,7 @@ export class Project {
     public projectUserIds: string[];
     public organizationIds: string[];
     public customFieldTypes: CustomFieldType[];
+    public hiddenCustomFieldTypeIds: string[];
     public statuses: Status[];
     public priorities: Priority[];
 }

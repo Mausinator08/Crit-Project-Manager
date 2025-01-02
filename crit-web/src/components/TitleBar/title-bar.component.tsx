@@ -1,5 +1,6 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { icon } from '@fortawesome/fontawesome-svg-core/import.macro';
+import { JSX } from 'react';
 
 import NavBar from '../NavBar/nav-bar.component';
 import './title-bar.scss';

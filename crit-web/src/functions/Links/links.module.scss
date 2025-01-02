@@ -1,0 +1,22 @@
+@import '../../styles/Custom.scss';
+
+.sideitem {
+    display: flex;
+    align-items: center;
+    padding-left: 20px;
+    padding-top: 10px;
+    cursor: pointer;
+    color: $primary;
+    text-decoration: none;
+}
+
+.linkText {
+    padding-left: 20px;
+    color: $primary;
+    background-color: transparent;
+}
+
+.linkTextClosed {
+    composes: linkText;
+    visibility: hidden;
+}

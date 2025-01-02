@@ -1,9 +1,10 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { icon } from "@fortawesome/fontawesome-svg-core/import.macro";
+import { JSX } from "react";
 
 import { links } from "../../constants/nav-bar-links";
 import styles from "./nav-bar.module.scss";
-import { CreateLinks } from "../CollapsibleNavItem/collapsible-nav-item.component";
+import { CreateLinks } from "../../functions/Links/create-links";
 
 type Props = {
 	open: string;

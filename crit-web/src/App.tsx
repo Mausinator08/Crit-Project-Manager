@@ -1,12 +1,14 @@
-import { useContext, useEffect, useState } from 'react';
+import { JSX, useContext, useEffect, useState } from 'react';
 import { Outlet } from 'react-router-dom';
+import { ErrorBoundary } from "react-error-boundary";
 
 import TitleBar from './components/TitleBar/title-bar.component';
-import { ThemeContext } from "./contexts/theme-context";
+import { ThemeContext } from "./contexts/Theme/theme-context";
 
 import './styles/App.scss';
+import ErrorFallback from './components/Error/error-fallback.component';
 
-function App() {
+function App(): JSX.Element {
   const { theme, toggleTheme } = useContext(ThemeContext);
 
   const [open, setOpen] = useState(
@@ -35,12 +37,12 @@ function App() {
 
   return (
     <div className={`body`} data-theme={theme}>
-      <div>
+      <ErrorBoundary FallbackComponent={ErrorFallback}>
         <TitleBar theme={theme} onToggleTheme={toggleTheme} open={open} onToggleOpen={toggleOpen} title='Crit' />
         <main className={open === 'true' ? 'main-content' : 'main-content-closed'}>
           <Outlet />
         </main>
-      </div>
+      </ErrorBoundary>
     </div>
   );
 }

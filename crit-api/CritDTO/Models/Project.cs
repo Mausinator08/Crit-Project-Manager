@@ -13,6 +13,7 @@ public class Project : AuditInformation
         ProjectUserIds = new List<Guid>();
         OrganizationIds = new List<Guid>();
         CustomFieldTypes = new List<CustomFieldType>();
+        HiddenCustomFieldTypeIds = new List<string>();
         Statuses = new List<Status>();
         Priorities = new List<Priority>();
         DateTime now = DateTime.Now;
@@ -31,6 +32,7 @@ public class Project : AuditInformation
         ProjectUserIds = new List<Guid>([projectOwnerUserId]);
         OrganizationIds = new List<Guid>([owningOrganizationId]);
         CustomFieldTypes = new List<CustomFieldType>();
+        HiddenCustomFieldTypeIds = new List<string>();
         Statuses = new List<Status>();
         Priorities = new List<Priority>();
         DateTime now = DateTime.Now;
@@ -50,6 +52,7 @@ public class Project : AuditInformation
     public List<Guid> ProjectUserIds { get; set; }
     public List<Guid> OrganizationIds { get; set; }
     public List<CustomFieldType> CustomFieldTypes { get; set; }
+    public List<string> HiddenCustomFieldTypeIds { get; set; }
     public List<Status> Statuses { get; set; }
     public List<Priority> Priorities { get; set; }
 }

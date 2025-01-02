@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { JSX, useEffect, useState } from "react";
 import { NavLink, Outlet } from "react-router-dom";
 
 import { GetEnvValues } from "../../constants/environment";

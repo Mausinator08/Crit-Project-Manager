@@ -1,25 +1,32 @@
 import { Table } from "react-bootstrap";
-import { useContext, useState } from "react";
+import { JSX, useContext } from "react";
 import { Outlet, useParams } from "react-router-dom";
 
 import { Task } from "../../models/task.model";
-import { ThemeContext } from "../../contexts/theme-context";
+import { ThemeContext } from "../../contexts/Theme/theme-context";
 import styles from "./tasks.module.scss";
-import TaskDetails from "../TaskDetails/task-details.component";
-import { CustomField } from "../../models/custom-field.model";
 import { CustomFieldType } from '../../models/custom-field-type.model';
 import { Link, links } from "../../constants/nav-bar-links";
-import { CreateLinks } from '../CollapsibleTaskItem/collapsible-task-item.component';
 import { Status } from "../../models/status.model";
+import { CreateTasks } from "../../functions/Tasks/create-tasks";
 
 export interface TasksProps {
     tasks: Task[];
     customFieldTypes: CustomFieldType[];
+    hiddenCustomFieldTypeIds: string[];
     statuses: Status[];
     selectedProjectId: string;
 }
 
-function createTaskListCustomColumn(fieldType: CustomFieldType): JSX.Element {
+function createTaskListCustomColumn(fieldType: CustomFieldType, hiddenCustomFieldTypeIds: string[]): JSX.Element {
+    if (hiddenCustomFieldTypeIds.find(typeId => typeId === fieldType.id)) {
+        return (
+            <>
+                {null}
+            </>
+        );
+    }
+
     return (
         <th>
             {fieldType.name}
@@ -27,18 +34,18 @@ function createTaskListCustomColumn(fieldType: CustomFieldType): JSX.Element {
     );
 }
 
-function createTaskListItem(task: Task, statuses: Status[]): JSX.Element | undefined {
+function createTaskRow(task: Task, statuses: Status[]): JSX.Element | undefined {
     const link: Link | undefined = links.find(link => (link.data as Task | undefined)?.id === task.id);
 
     if (link) {
-        return (
-            <tr>
-                {CreateLinks(link, task, statuses)}
-            </tr>
-        );
+        return CreateTasks(link, task, statuses);
     }
 
-    return undefined;
+    return (
+        <>
+            {null}
+        </>
+    );
 }
 
 function Tasks(props: TasksProps): JSX.Element {
@@ -71,11 +78,11 @@ function Tasks(props: TasksProps): JSX.Element {
                             <th>
                                 Due Date
                             </th>
-                            {props.customFieldTypes?.map<JSX.Element>(createTaskListCustomColumn)}
+                            {props.customFieldTypes?.map<JSX.Element>(fieldType => createTaskListCustomColumn(fieldType, props.hiddenCustomFieldTypeIds))}
                         </tr>
                     </thead>
                     <tbody>
-                        {props.tasks.map<JSX.Element | undefined>(task => createTaskListItem(task, props.statuses))}
+                        {props.tasks.map<JSX.Element | undefined>(task => createTaskRow(task, props.statuses))}
                     </tbody>
                 </Table>
                 {selectedTaskId && (<Outlet />)}
