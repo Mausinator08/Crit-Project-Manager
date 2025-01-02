@@ -28,7 +28,7 @@ This repository contains the Crit web application written in React and Typescrip
 
 - NodeJS >= v20.17.0 and NodeJS <= LTS
 - Npm >= 10.8.2
-- SQL Server 2022 Instance (version requirement not yet available; see the [installation section](#installation) for more details)
+- MongoDB v7.x Instance 
 
 ### Optional
 
@@ -45,11 +45,14 @@ This repository contains the Crit web application written in React and Typescrip
 npm install
 ```
 
-4. Install SQL Server 2022. (minimum version not defined yet)
-5. Set appsettings.Development.json variable for `SQLServerInstanceName` to your SQL Server instance.
-6. Set appsettings.Development.json variable for `SQLDatabaseName` to the database that will house Crit's tables/views/stored procedures/etc...
+4. Install MongoDB v7.
+5. Set appsettings.Development.json variable for `MongoDB:ServerName` to your MongoDB server instance. (eg. localhost)
+6. Set appsettings.Development.json variable for `MongoDB:Database` to the database that will house Crit's collections. (eg. crit)
 7. Set an environment variable for `APP_CONTEXT_USER` to the user that will be used for authorizing SQL calls.
 8. Set an environment variable for `APP_CONTEXT_PASSWORD` to the password for the `APP_CONTEXT_USER`.
+9. Set appsettings.Development.json variable for `MongoDB:Port` to the port used for your server instance. (eg. default is `27017`)
+10. Set appsettings.Development.json variable for `MongoDB:UserName` to the `APP_CONTEXT_USER` environment variable name.
+11. Set appsettings.Development.json variable for `MongoDB:Password` to the `APP_CONTEXT_PASSWORD` environment variable name.
 
 ## Usage
 
