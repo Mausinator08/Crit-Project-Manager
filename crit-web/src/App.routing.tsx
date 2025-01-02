@@ -4,7 +4,7 @@ import {
 
 import App from './App';
 import Home from './pages/Home/home.page';
-import Projects from './pages/Projects/projects.page';
+import Projects from './pages/Project/projects.page';
 import ProjectOptions from './pages/Project/project-options.page';
 import TaskDetails from './components/Tasks/task-details.component';
 import Error from './pages/Error/error.page';
