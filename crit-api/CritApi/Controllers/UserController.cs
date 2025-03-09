@@ -4,6 +4,7 @@ using CritDTO.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace CritApi.Controllers;
 
@@ -12,11 +13,13 @@ namespace CritApi.Controllers;
 [Authorize()]
 public class UserController : ControllerBase
 {
+    private readonly Logging.ILogger _logger;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly RoleManager<ApplicationRole> _roleManager;
 
-    public UserController(UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager)
+    public UserController(UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager, Logging.ILogger logger)
     {
+        _logger = logger;
         _userManager = userManager;
         _roleManager = roleManager;
     }
@@ -39,7 +42,7 @@ public class UserController : ControllerBase
                 return StatusCode(StatusCodes.Status400BadRequest, new ApiResult("Could not create user.", new List<string>([$"{role} role does not exist."]), user));
             }
 
-            IdentityResult result = await _userManager.CreateAsync(appUser, user.Password);
+            IdentityResult result = await _userManager.CreateAsync(appUser, user.Password ?? string.Empty);
             IdentityResult roleResult = await _userManager.AddToRoleAsync(appUser, role);
 
             if (result.Succeeded && roleResult.Succeeded)
@@ -64,6 +67,7 @@ public class UserController : ControllerBase
         }
         catch (Exception ex)
         {
+            _logger.LogException(ex);
             return StatusCode(StatusCodes.Status500InternalServerError, "Server Error: Failed to create user.");
         }
     }
@@ -105,6 +109,7 @@ public class UserController : ControllerBase
         }
         catch (Exception ex)
         {
+            _logger.LogException(ex);
             return StatusCode(StatusCodes.Status500InternalServerError, "Server Error: Failed to update user.");
         }
     }
@@ -149,6 +154,7 @@ public class UserController : ControllerBase
         }
         catch (Exception ex)
         {
+            _logger.LogException(ex);
             return StatusCode(StatusCodes.Status500InternalServerError, "Server Error: Failed to delete user.");
         }
     }
@@ -185,6 +191,7 @@ public class UserController : ControllerBase
         }
         catch (Exception ex)
         {
+            _logger.LogException(ex);
             return StatusCode(StatusCodes.Status500InternalServerError, "Server Error: Failed to get user.");
         }
     }
@@ -221,6 +228,7 @@ public class UserController : ControllerBase
         }
         catch (Exception ex)
         {
+            _logger.LogException(ex);
             return StatusCode(StatusCodes.Status500InternalServerError, "Server Error: Failed to get user.");
         }
     }
@@ -232,7 +240,7 @@ public class UserController : ControllerBase
     {
         try
         {
-            List<ApplicationUser> appUsers = _userManager.Users.ToList();
+            List<ApplicationUser> appUsers = await _userManager.Users.ToListAsync();
 
             if (appUsers.Any())
             {
@@ -267,6 +275,7 @@ public class UserController : ControllerBase
         }
         catch (Exception ex)
         {
+            _logger.LogException(ex);
             return StatusCode(StatusCodes.Status500InternalServerError, "Server Error: Failed to get all users.");
         }
     }
@@ -313,6 +322,7 @@ public class UserController : ControllerBase
         }
         catch (Exception ex)
         {
+            _logger.LogException(ex);
             return StatusCode(StatusCodes.Status500InternalServerError, $"Server Error: Failed to get all users for {role} role.");
         }
     }

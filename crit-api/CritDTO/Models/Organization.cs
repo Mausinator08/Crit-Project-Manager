@@ -2,7 +2,6 @@ using MongoDbGenericRepository.Attributes;
 
 namespace CritDTO.Models;
 
-[CollectionName("Organizations")]
 public class Organization
 {
     public Organization()
@@ -13,6 +12,7 @@ public class Organization
         ProjectIds = new List<Guid>();
         AdminUserIds = new List<Guid>();
         MemberUserIds = new List<Guid>();
+        affiliatedUserIds = new List<Guid>();
     }
 
     public Organization(string name, Guid ownerUserId)
@@ -24,6 +24,7 @@ public class Organization
         ProjectIds = new List<Guid>();
         AdminUserIds = new List<Guid>([ownerUserId]);
         MemberUserIds = new List<Guid>([ownerUserId]);
+        affiliatedUserIds = new List<Guid>([ownerUserId]);
     }
 
     public Guid Id { get; set; }
@@ -34,4 +35,6 @@ public class Organization
     public List<Guid> ProjectIds { get; set; }
     public List<Guid> AdminUserIds { get; set; }
     public List<Guid> MemberUserIds { get; set; }
+    public List<Guid> affiliatedUserIds { get; set; }
+    public string DatabaseName { get => $"crit_{Id}"; }
 }

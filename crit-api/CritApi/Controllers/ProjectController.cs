@@ -1,4 +1,5 @@
-using CritDataAccess.Contexts;
+using CritBusinessLogic.Models;
+using CritBusinessLogic.RepositoryInterfaces;
 using CritDTO.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -7,27 +8,29 @@ namespace CritApi.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-// [Authorize]
+[Authorize]
 public class ProjectController : ControllerBase
 {
-    private readonly CritDbContext _critContext;
-    public ProjectController(CritDbContext critContext)
+    private readonly Logging.ILogger _logger;
+    private readonly IProjectsRepository _projectsRepository;
+    public ProjectController(Logging.ILogger logger, IProjectsRepository projectsRepository)
     {
-        _critContext = critContext;
+        _logger = logger;
+        _projectsRepository = projectsRepository;
     }
 
     [HttpGet]
-    [Route("GetAllProjects")]
     [ProducesResponseType<List<Project>>(StatusCodes.Status200OK)]
     [ProducesErrorResponseType(typeof(string))]
     public async Task<IActionResult> GetAllProjects()
     {
         try
         {
-            return Ok(new List<Project>([new Project("Test", "Testing out this project!", Guid.NewGuid(), Guid.NewGuid())]));
+            return Ok(await _projectsRepository.GetAllProjects());
         }
         catch (Exception ex)
         {
+            _logger.LogException(ex);
             return StatusCode(StatusCodes.Status500InternalServerError, "Could not get all projects.");
         }
     }
@@ -40,11 +43,64 @@ public class ProjectController : ControllerBase
     {
         try
         {
-            return Ok(new Project("Test", "Testing out this project!", Guid.NewGuid(), Guid.NewGuid()));
+            return Ok(await _projectsRepository.GetProject(projectId));
         }
         catch (Exception ex)
         {
-            return StatusCode(StatusCodes.Status500InternalServerError, "Could not get all projects.");
+            _logger.LogException(ex);
+            return StatusCode(StatusCodes.Status500InternalServerError, $"Could not get project {projectId}.");
+        }
+    }
+
+    [HttpPost]
+    [ProducesResponseType<Project>(StatusCodes.Status201Created)]
+    [ProducesErrorResponseType(typeof(string))]
+    public async Task<IActionResult> CreateProject([FromBody] ProjectRequest project)
+    {
+        try
+        {
+            Project createdProject = await _projectsRepository.CreateProject(project);
+            return CreatedAtAction(nameof(CreateProject), new { id = createdProject.Id }, createdProject);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogException(ex);
+            return StatusCode(StatusCodes.Status500InternalServerError, $"Could not get project {project.Name}.");
+        }
+    }
+
+    [HttpPut]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesErrorResponseType(typeof(string))]
+    public async Task<IActionResult> UpdateProject([FromBody] Project project)
+    {
+        try
+        {
+            await _projectsRepository.UpdateProject(project);
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogException(ex);
+            return StatusCode(StatusCodes.Status500InternalServerError, $"Could not update project {project.Name}.");
+        }
+    }
+
+    [HttpDelete]
+    [Route("{projectId}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesErrorResponseType(typeof(string))]
+    public async Task<IActionResult> DeleteProject([FromRoute] Guid projectId)
+    {
+        try
+        {
+            await _projectsRepository.DeleteProject(projectId);
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogException(ex);
+            return StatusCode(StatusCodes.Status500InternalServerError, $"Could not delete project {projectId}.");
         }
     }
 }

@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CritDTO", "CritDTO\CritDTO.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CritDataAccess", "CritDataAccess\CritDataAccess.csproj", "{C3F5C987-92FC-4228-ABAD-B2C7BC4A6B42}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CritBusinessLogic", "CritBusinessLogic\CritBusinessLogic.csproj", "{10EC706F-F499-40BC-BA0F-782E2F8346B1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +32,9 @@ Global
 		{C3F5C987-92FC-4228-ABAD-B2C7BC4A6B42}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C3F5C987-92FC-4228-ABAD-B2C7BC4A6B42}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C3F5C987-92FC-4228-ABAD-B2C7BC4A6B42}.Release|Any CPU.Build.0 = Release|Any CPU
+		{10EC706F-F499-40BC-BA0F-782E2F8346B1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{10EC706F-F499-40BC-BA0F-782E2F8346B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{10EC706F-F499-40BC-BA0F-782E2F8346B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{10EC706F-F499-40BC-BA0F-782E2F8346B1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

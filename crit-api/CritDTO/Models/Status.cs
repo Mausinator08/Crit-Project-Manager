@@ -9,11 +9,13 @@ public class Status
         BackgroundColor = backgroundColor;
         Color = color;
         ProjectId = projectId;
+        Tasks = new List<Task>();
     }
 
     private Status()
     {
         Name = "";
+        Tasks = new List<Task>();
     }
 
     public Guid Id { get; set; }
@@ -22,4 +24,8 @@ public class Status
     public string? BackgroundColor { get; set; }
     public string? Color { get; set; }
     public Guid ProjectId { get; set; }
+    public Guid TaskId { get; set; }
+
+    public Project? Project { get; set; }
+    public List<Task> Tasks { get; set; }
 }

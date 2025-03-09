@@ -8,11 +8,13 @@ public class Priority
         BackgroundColor = backgroundColor;
         Color = color;
         ProjectId = projectId;
+        Tasks = new List<Task>();
     }
 
     private Priority()
     {
         Name = "";
+        Tasks = new List<Task>();
     }
 
     public Guid Id { get; set; }
@@ -20,4 +22,8 @@ public class Priority
     public string? BackgroundColor { get; set; }
     public string? Color { get; set; }
     public Guid ProjectId { get; set; }
+    public Guid TaskId { get; set; }
+
+    public Project? Project { get; set; }
+    public List<Task> Tasks { get; set; }
 }

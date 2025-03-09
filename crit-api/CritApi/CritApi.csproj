@@ -10,6 +10,6 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.7.2" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CritDataAccess\CritDataAccess.csproj" />
+    <ProjectReference Include="..\CritBusinessLogic\CritBusinessLogic.csproj" />
   </ItemGroup>
 </Project>

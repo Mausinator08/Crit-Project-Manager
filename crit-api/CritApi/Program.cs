@@ -1,8 +1,13 @@
-using Microsoft.EntityFrameworkCore;
-using CritDataAccess.Contexts;
 using System.Text;
-using CritDTO.Identity;
+using CritBusinessLogic;
+using CritBusinessLogic.Repositories;
+using CritBusinessLogic.RepositoryInterfaces;
+using CritDataAccess.Contexts;
 using CritDataAccess.Services;
+using CritDTO.Identity;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -58,9 +63,6 @@ builder.Services.AddDbContext<CritDbContext>(options =>
     options.UseMongoDB(connectionString.ToString(), database);
 });
 
-builder.Services.AddSingleton<ITenantDbContextService, TenantDbContextService>(x => new TenantDbContextService(connectionString.ToString()));
-builder.Services.AddSingleton<CritApi.Logging.ILogger, CritApi.Logging.Logger>(x => new CritApi.Logging.Logger(null));
-
 builder.Services.AddSwaggerGen();
 builder.Services.AddCors(options =>
 {
@@ -79,6 +81,25 @@ builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(setup =>
     setup.Password.RequireNonAlphanumeric = true;
 })
 .AddMongoDbStores<ApplicationUser, ApplicationRole, Guid>(connectionString.ToString(), database);
+
+builder.Services.AddSingleton<ITenantDbContextService, TenantDbContextService>(x => new TenantDbContextService(connectionString.ToString(),
+x.GetService<UserManager<ApplicationUser>>(),
+x.GetService<CritDbContext>()));
+string? logPath = builder.Configuration.GetValue<string>("Logging:File:Path");
+
+if (logPath == null)
+{
+    throw new Exception("Logging path was not configured.");
+}
+
+builder.Services.AddSingleton<CritApi.Logging.ILogger, CritApi.Logging.Logger>(x => new CritApi.Logging.Logger(logPath));
+
+builder.Services.AddSingleton<IUserRepository, UserRepository>();
+builder.Services.AddSingleton<IProjectsRepository, ProjectsRepository>();
+builder.Services.AddSingleton<ITasksRepository, TasksRepository>();
+
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(IdentityConstants.ApplicationScheme);
 
 builder.Services.AddAuthorization();
 

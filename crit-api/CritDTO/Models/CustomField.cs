@@ -21,4 +21,7 @@ public class CustomField
     public string Name { get; set; }
     public object Value { get; set; }
     public Guid TaskId { get; set; }
+
+    public Task? Task { get; set; }
+    public CustomFieldType? CustomFieldType { get; set; }
 }
