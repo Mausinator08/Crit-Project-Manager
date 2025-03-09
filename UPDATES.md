@@ -36,3 +36,10 @@
 * Updated README.md
 * Temporarily removed Authorize attribute from Project Controller for testing.
 * Fixed styling/coloring issues.
+
+## 2025/03/08 20:04 CST
+
+### Enhancements
+
+* Restored Authorize attribute for Controllers that needed it.
+* Implemented API endpoints for Login/Logout, Organizations, Projects, and Tasks.
