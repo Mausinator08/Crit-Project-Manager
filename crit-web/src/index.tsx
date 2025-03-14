@@ -5,6 +5,8 @@ import reportWebVitals from './reportWebVitals';
 import { RouterProvider } from 'react-router-dom';
 import appRouter from './App.routing';
 import ThemeProvider from "./contexts/Theme/theme-context";
+import { ErrorBoundary } from 'react-error-boundary';
+import ErrorFallback from './components/Error/error-fallback.component';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -12,9 +14,11 @@ const root = ReactDOM.createRoot(
 
 root.render(
   <React.StrictMode>
-    <ThemeProvider>
-      <RouterProvider router={appRouter} />
-    </ThemeProvider>
+    <ErrorBoundary FallbackComponent={ErrorFallback}>
+      <ThemeProvider>
+        <RouterProvider router={appRouter} />
+      </ThemeProvider>
+    </ErrorBoundary>
   </React.StrictMode>
 );
 

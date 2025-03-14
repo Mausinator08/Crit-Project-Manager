@@ -311,7 +311,7 @@ public class LoginController : ControllerBase
                     return Unauthorized(result.ToString());
                 }
 
-                return Ok(new { userName = applicationUser.UserName, message = "User logged in." });
+                return Ok(new { userName = applicationUser.UserName, message = "You have logged in." });
             }
             else
             {
@@ -376,7 +376,7 @@ public class LoginController : ControllerBase
                 }
 
                 await _signInManager.SignOutAsync().ConfigureAwait(false);
-                return Ok();
+                return Ok("You have logged out successfully.");
             }
 
             return Unauthorized("User is not logged in.");

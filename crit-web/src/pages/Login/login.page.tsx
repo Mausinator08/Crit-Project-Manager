@@ -1,4 +1,4 @@
-import { JSX, useContext } from "react";
+import { JSX, useContext, useRef } from "react";
 import { GetEnvValues } from "../../constants/environment";
 import { Button, Form } from "react-bootstrap";
 import { navigate } from "../../functions/Utils/navigation-utils";
@@ -23,12 +23,16 @@ function Login(): JSX.Element {
                 },
                 credentials: 'include',
             }).then(async (response) => {
-                authService.CheckAuthentication();
-                alert(await response.text());
+                if (authService) {
+                    authService.CheckAuthentication();
+                }
                 if (response.status === 200) {
+                    const result = await response.json();
+                    console.log(result.message);
                     resolve();
-                    navigate(`/`);
+                    navigate(`/Home`);
                 } else {
+                    alert(await response.text());
                     resolve();
                 }
             }).catch((error) => {

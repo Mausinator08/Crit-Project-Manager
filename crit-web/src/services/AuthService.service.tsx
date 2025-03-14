@@ -5,7 +5,11 @@ import { Injectable } from '../functions/Dependencies/injectable';
 export class AuthService {
     private isAuthenticated: boolean = false;
 
-    private constructor() { }
+    private constructor() {
+        CheckIsAuthenticated().then((result) => {
+            this.isAuthenticated = result.result;
+        })
+    }
 
     public IsAuthenticated(): boolean {
         return this.isAuthenticated;

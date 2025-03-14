@@ -1,18 +1,21 @@
 import { JSX, useContext, useEffect, useState } from 'react';
-import { Outlet } from 'react-router-dom';
-import { ErrorBoundary } from "react-error-boundary";
+import { Outlet, useNavigate } from 'react-router-dom';
 
 import TitleBar from './components/TitleBar/title-bar.component';
 import { ThemeContext } from "./contexts/Theme/theme-context";
 
 import './styles/App.scss';
-import ErrorFallback from './components/Error/error-fallback.component';
-import { useNavigation } from './functions/Utils/navigation-utils';
+import { setUseNavigation } from './functions/Utils/navigation-utils';
 import ModuleContext from './contexts/Module/module-context';
 import { AuthService } from './services/AuthService.service';
 
 function App(): JSX.Element {
-  useNavigation();
+  const navFn = useNavigate();
+
+  useEffect(() => {
+    setUseNavigation(navFn);
+  }, [navFn]);
+
   const { theme, toggleTheme } = useContext(ThemeContext);
 
   const [open, setOpen] = useState(
@@ -41,14 +44,12 @@ function App(): JSX.Element {
 
   return (
     <div className={`body`} data-theme={theme}>
-      <ErrorBoundary FallbackComponent={ErrorFallback}>
-        <ModuleContext services={[AuthService]}>
-          <TitleBar theme={theme} onToggleTheme={toggleTheme} open={open} onToggleOpen={toggleOpen} title='Crit' />
-          <main className={open === 'true' ? 'main-content' : 'main-content-closed'}>
-            <Outlet />
-          </main>
-        </ModuleContext>
-      </ErrorBoundary>
+      <ModuleContext services={[AuthService]}>
+        <TitleBar theme={theme} onToggleTheme={toggleTheme} open={open} onToggleOpen={toggleOpen} title='Crit' />
+        <main className={open === 'true' ? 'main-content' : 'main-content-closed'}>
+          <Outlet />
+        </main>
+      </ModuleContext>
     </div>
   );
 }

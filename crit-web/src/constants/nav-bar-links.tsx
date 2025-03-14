@@ -12,7 +12,7 @@ export const GetLinks = async () => {
         const links: Link[] = [
             {
                 title: 'Home',
-                path: "/",
+                path: "/Home",
                 icon: faHouse,
                 roles: ['OrganizationOwner', 'OrganizationAdmin', 'ProjectOwner', 'ProjectAdmin', 'User'],
             },

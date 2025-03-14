@@ -2,8 +2,9 @@ import 'reflect-metadata';
 
 export class Container {
     dependencies: any = [];
+    isInitialized: boolean = false;
 
-    init(deps: any[]) {
+    public init(deps: any[]) {
         deps.map((target) => {
             const isInjectable = Reflect.getMetadata('injectable', target);
             if (!isInjectable) return;
@@ -29,13 +30,14 @@ export class Container {
             }
         });
 
+        this.isInitialized = true;
         return this;
     }
 
     public get<T extends new (...args: any[]) => any>(
         serviceClass: T,
     ): InstanceType<T> {
-        if (this.dependencies[serviceClass.name]) {
+        if (this.isInitialized && this.dependencies[serviceClass.name]) {
             return this.dependencies[serviceClass.name];
         }
 

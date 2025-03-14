@@ -87,8 +87,6 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
-    options.LoginPath = "/Login";
-    options.LogoutPath = "/Logout";
 });
 
 builder.Services.Configure<CookiePolicyOptions>(options =>

@@ -1,22 +1,32 @@
 
-import { JSX, useEffect } from "react";
+import { JSX, useContext, useEffect, useRef } from "react";
 import { Outlet } from "react-router-dom";
 import { navigate } from "../../functions/Utils/navigation-utils";
 import { GetEnvValues } from "../../constants/environment";
+import { ModuleContext } from "../../contexts/Module/module-context";
+import { AuthService } from "../../services/AuthService.service";
 
 function Logout(): JSX.Element {
+    const { getService } = useContext(ModuleContext);
+    const authService: AuthService = getService(AuthService);
+
     useEffect(() => {
         fetch(new URL(`${GetEnvValues()?.critApiUrl}/Logout`), {
             method: "POST",
             mode: 'cors',
             credentials: 'include',
         }).then(async (response) => {
-            alert(await response.text());
             if (response.status === 200) {
+                console.log(await response.text());
+                if (authService) {
+                    authService.CheckAuthentication();
+                }
                 navigate(`/Login`);
+            } else {
+                alert(await response.text());
             }
         });
-    }, [navigate]);
+    }, []);
 
     return (
         <p>Logout</p>

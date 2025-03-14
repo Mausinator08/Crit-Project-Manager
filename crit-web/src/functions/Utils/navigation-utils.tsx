@@ -2,10 +2,8 @@ import { useNavigate, NavigateFunction } from 'react-router-dom';
 
 let navigateFn: NavigateFunction;
 
-export const useNavigation = () => {
-    const navigate = useNavigate();
-    navigateFn = navigate;
-    return navigate;
+export const setUseNavigation = (navFn: NavigateFunction) => {
+    navigateFn = navFn;
 };
 
 export const navigate = (path: string) => {

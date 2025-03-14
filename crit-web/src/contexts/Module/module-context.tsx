@@ -1,7 +1,8 @@
-import React, { createContext, useState } from "react";
+import React, { createContext, useCallback, useEffect, useRef, useState } from "react";
 import { Container } from "../../dependencies/container";
 import Error from "../../pages/Error/error.page";
 import { NavLink } from "react-router-dom";
+import { Effect } from "../../functions/Utils/effect";
 
 interface ContextProps {
     getService: (service: any) => any;
@@ -18,12 +19,22 @@ interface Props {
     children?: React.ReactNode;
 }
 
+const defaultContainer = new Container();
+
 const ModuleProvider: React.FC<Props> = ({ services, children }) => {
-    const container: Container = new Container().init(services);
+    const container = useRef<Container>(defaultContainer);
+    const [isValidContainer, setIsValidContainer] = useState<boolean>(false);
+
+    const initContainer = useCallback(() => {
+        if (!container.current?.isInitialized) {
+            container.current = defaultContainer.init(services);
+            setIsValidContainer(true);
+        }
+    }, []);
 
     const getService = (service: any): any => {
         try {
-            return container.get(service);
+            return container.current?.get(service);
         } catch (ex: any) {
             return (
                 <Error>
@@ -42,7 +53,8 @@ const ModuleProvider: React.FC<Props> = ({ services, children }) => {
                 getService: getService,
             }}
         >
-            {children}
+            <Effect callback={initContainer} />
+            {isValidContainer && children}
         </ModuleContext>
     );
 };

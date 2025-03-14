@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMinus, faBars } from "@fortawesome/free-solid-svg-icons";
-import { JSX, useState, useEffect, useContext } from 'react';
+import { JSX, useState, useEffect, useContext, useRef } from 'react';
 
 import { GetLinks, GetLoggedOutLinks, Link } from "../../constants/nav-bar-links";
 import styles from "./nav-bar.module.scss";
@@ -20,17 +20,19 @@ function NavBar(props: Props): JSX.Element {
 	const { getService } = useContext(ModuleContext);
 	const authService: AuthService = getService(AuthService);
 
-	useEffect(() => {
-		CheckIsAuthenticated().then(async (auth) => {
-			if (auth.result) {
-				setLinks(await GetLinks());
-			} else {
-				setLinks(await GetLoggedOutLinks());
-			}
+	setInterval(() => {
+		if (authService) {
+			setIsAuthenticated(authService.IsAuthenticated());
+		}
+	});
 
-			setIsAuthenticated(auth.result);
-		});
-	}, [authService.IsAuthenticated()]);
+	useEffect(() => {
+		if (isAuthenticated) {
+			GetLinks().then((links) => setLinks(links));
+		} else {
+			GetLoggedOutLinks().then((links) => setLinks(links));
+		}
+	}, [isAuthenticated]);
 
 	return (
 		<nav id="nav" className={props.open === "true" ? styles.sidenav : styles.sidenavClosed}>
