@@ -7,8 +7,12 @@ import { ThemeContext } from "./contexts/Theme/theme-context";
 
 import './styles/App.scss';
 import ErrorFallback from './components/Error/error-fallback.component';
+import { useNavigation } from './functions/Utils/navigation-utils';
+import ModuleContext from './contexts/Module/module-context';
+import { AuthService } from './services/AuthService.service';
 
 function App(): JSX.Element {
+  useNavigation();
   const { theme, toggleTheme } = useContext(ThemeContext);
 
   const [open, setOpen] = useState(
@@ -38,10 +42,12 @@ function App(): JSX.Element {
   return (
     <div className={`body`} data-theme={theme}>
       <ErrorBoundary FallbackComponent={ErrorFallback}>
-        <TitleBar theme={theme} onToggleTheme={toggleTheme} open={open} onToggleOpen={toggleOpen} title='Crit' />
-        <main className={open === 'true' ? 'main-content' : 'main-content-closed'}>
-          <Outlet />
-        </main>
+        <ModuleContext services={[AuthService]}>
+          <TitleBar theme={theme} onToggleTheme={toggleTheme} open={open} onToggleOpen={toggleOpen} title='Crit' />
+          <main className={open === 'true' ? 'main-content' : 'main-content-closed'}>
+            <Outlet />
+          </main>
+        </ModuleContext>
       </ErrorBoundary>
     </div>
   );

@@ -1,3 +1,4 @@
+using System.Net;
 using System.Text;
 using CritBusinessLogic;
 using CritBusinessLogic.Repositories;
@@ -6,8 +7,12 @@ using CritDataAccess.Contexts;
 using CritDataAccess.Services;
 using CritDTO.Identity;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.CookiePolicy;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
+using MongoDB.Bson.Serialization.Serializers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -58,33 +63,76 @@ if (database == null)
     throw new Exception("A database was not configured.");
 }
 
+BsonSerializer.RegisterSerializer(new GuidSerializer(GuidRepresentation.Standard));
+
 builder.Services.AddDbContext<CritDbContext>(options =>
 {
     options.UseMongoDB(connectionString.ToString(), database);
 });
 
+builder.Services.AddIdentityCore<ApplicationUser>(setupAction =>
+{
+    setupAction.Password.RequireDigit = true;
+    setupAction.Password.RequireLowercase = true;
+    setupAction.Password.RequireUppercase = true;
+    setupAction.Password.RequireNonAlphanumeric = true;
+    setupAction.Password.RequiredLength = 8;
+})
+.AddRoles<ApplicationRole>()
+.AddMongoDbStores<ApplicationUser, ApplicationRole, Guid>(connectionString.ToString(), database).AddSignInManager();
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.Cookie.SameSite = SameSiteMode.None;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+    options.LoginPath = "/Login";
+    options.LogoutPath = "/Logout";
+});
+
+builder.Services.Configure<CookiePolicyOptions>(options =>
+{
+    options.OnAppendCookie = context =>
+    {
+        context.CookieOptions.Extensions.Add("Partitioned");
+    };
+});
+
+builder.Services.AddAuthentication(IdentityConstants.ApplicationScheme).AddIdentityCookies();
+
+builder.Services.AddAuthorization();
+
 builder.Services.AddSwaggerGen();
 builder.Services.AddCors(options =>
 {
-    options.AddDefaultPolicy(policy =>
+    options.AddPolicy(name: "CorsPolicy", policy =>
         {
-            policy.AllowAnyOrigin();
+            string? origins = builder.Configuration.GetValue<string>("Security:AllowedOrigins");
+
+            if (origins == null)
+            {
+                throw new Exception("Allowed origins were not configured.");
+            }
+
+            if (!origins.Any())
+            {
+                throw new Exception("Allowed origins is empty.");
+            }
+
+            policy.WithOrigins(origins.Split(";"))
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
         });
 });
 
-builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(setup =>
+builder.Services.AddScoped<ITenantDbContextService, TenantDbContextService>(x =>
 {
-    setup.Password.RequireDigit = true;
-    setup.Password.RequiredLength = 8;
-    setup.Password.RequireLowercase = true;
-    setup.Password.RequireUppercase = true;
-    setup.Password.RequireNonAlphanumeric = true;
-})
-.AddMongoDbStores<ApplicationUser, ApplicationRole, Guid>(connectionString.ToString(), database);
-
-builder.Services.AddSingleton<ITenantDbContextService, TenantDbContextService>(x => new TenantDbContextService(connectionString.ToString(),
-x.GetService<UserManager<ApplicationUser>>(),
-x.GetService<CritDbContext>()));
+    var userManager = x.GetService<UserManager<ApplicationUser>>() ?? throw new ArgumentNullException(nameof(UserManager<ApplicationUser>));
+    var critDbContext = x.GetService<CritDbContext>() ?? throw new ArgumentNullException(nameof(CritDbContext));
+    return new TenantDbContextService(connectionString.ToString(), userManager, critDbContext);
+});
 string? logPath = builder.Configuration.GetValue<string>("Logging:File:Path");
 
 if (logPath == null)
@@ -94,16 +142,19 @@ if (logPath == null)
 
 builder.Services.AddSingleton<CritApi.Logging.ILogger, CritApi.Logging.Logger>(x => new CritApi.Logging.Logger(logPath));
 
-builder.Services.AddSingleton<IUserRepository, UserRepository>();
-builder.Services.AddSingleton<IProjectsRepository, ProjectsRepository>();
-builder.Services.AddSingleton<ITasksRepository, TasksRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IProjectsRepository, ProjectsRepository>();
+builder.Services.AddScoped<ITasksRepository, TasksRepository>();
+builder.Services.AddScoped<IOrganizationRepository, OrganizationRepository>();
+builder.Services.AddScoped<IEmailRepository, EmailRepository>();
+builder.Services.AddScoped<IPhoneNumberRepository, PhoneNumberRepository>();
 
-builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddCookie(IdentityConstants.ApplicationScheme);
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
-builder.Services.AddAuthorization();
-
-var app = builder.Build();
+WebApplication? app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
@@ -111,8 +162,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseCors();
+app.UseCors("CorsPolicy");
 app.UseHttpsRedirection();
+app.UseRouting();
+app.UseCookiePolicy();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

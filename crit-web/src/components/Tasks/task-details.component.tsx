@@ -9,6 +9,8 @@ async function getTask(taskId: string | undefined): Promise<Task | null> {
     return new Promise(async (resolve, reject): Promise<void> => {
         const response = await fetch(new URL(`${GetEnvValues()?.critApiUrl}/Project/${taskId}`), {
             method: 'GET',
+            mode: 'cors',
+            credentials: 'include',
         });
 
         if (response.status !== 200) {

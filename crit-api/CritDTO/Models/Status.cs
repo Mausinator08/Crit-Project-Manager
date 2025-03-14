@@ -9,13 +9,13 @@ public class Status
         BackgroundColor = backgroundColor;
         Color = color;
         ProjectId = projectId;
-        Tasks = new List<Task>();
+        Tasks = new List<ProjectTask>();
     }
 
     private Status()
     {
         Name = "";
-        Tasks = new List<Task>();
+        Tasks = new List<ProjectTask>();
     }
 
     public Guid Id { get; set; }
@@ -27,5 +27,5 @@ public class Status
     public Guid TaskId { get; set; }
 
     public Project? Project { get; set; }
-    public List<Task> Tasks { get; set; }
+    public List<ProjectTask> Tasks { get; set; }
 }

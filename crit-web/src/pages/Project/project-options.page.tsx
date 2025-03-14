@@ -8,6 +8,8 @@ async function getProject(projectId: string | undefined): Promise<Project | null
     return new Promise(async (resolve, reject): Promise<void> => {
         const response = await fetch(new URL(`${GetEnvValues()?.critApiUrl}/Project/${projectId}`), {
             method: 'GET',
+            credentials: 'include',
+            mode: 'cors',
         });
 
         if (response.status !== 200) {
@@ -30,11 +32,11 @@ function ProjectOptions(): JSX.Element {
     }, [projectId]);
 
     return (
-        <div>
+        <>
             <h2>{project?.name ?? '<no project name>'}</h2>
             <hr />
             {project && (<Tasks selectedProjectId={project.id} tasks={project?.tasks ?? []} customFieldTypes={project?.customFieldTypes ?? []} statuses={project?.statuses ?? []} hiddenCustomFieldTypeIds={project?.hiddenCustomFieldTypeIds} />)}
-        </div>
+        </>
     );
 }
 

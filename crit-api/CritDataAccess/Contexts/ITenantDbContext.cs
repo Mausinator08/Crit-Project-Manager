@@ -11,7 +11,7 @@ public interface ITenantDbContext
     DbSet<Priority> Priorities { get; set; }
     DbSet<CustomFieldType> CustomFieldTypes { get; set; }
     DbSet<CustomField> CustomFields { get; set; }
-    DbSet<CritDTO.Models.Task> Tasks { get; set; }
+    DbSet<ProjectTask> Tasks { get; set; }
 
     void Configure(Action<DatabaseFacade> databaseAction);
 }

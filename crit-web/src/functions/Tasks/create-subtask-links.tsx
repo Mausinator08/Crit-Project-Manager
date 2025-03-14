@@ -1,4 +1,4 @@
-import { icon } from "@fortawesome/fontawesome-svg-core/import.macro";
+import { faListCheck } from "@fortawesome/free-solid-svg-icons";
 
 import { Link } from "../../constants/nav-bar-links";
 import { Task } from "../../models/task.model";
@@ -8,7 +8,7 @@ export function createSubtaskLinks(task: Task): Link[] | undefined {
         return {
             title: subTask?.title ? subTask?.title as string : '<no task title>',
             path: `/Project/${subTask.projectId}/${subTask.id}`,
-            icon: icon({ name: 'list-check' }),
+            icon: faListCheck,
             children: createSubtaskLinks(subTask),
             showInNavBar: false,
         };

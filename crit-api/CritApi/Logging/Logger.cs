@@ -9,8 +9,8 @@ public class Logger : ILogger
     {
         if (path != null)
         {
-            Directory.CreateDirectory(path);
-            filePath = path;
+            Directory.CreateDirectory(Path.Combine(Environment.CurrentDirectory, path));
+            filePath = Path.Combine(path, "crit-api.log");
         }
         else
         {

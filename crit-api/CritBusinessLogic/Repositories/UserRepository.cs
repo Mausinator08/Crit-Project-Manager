@@ -12,9 +12,9 @@ namespace CritBusinessLogic.Repositories;
 public class UserRepository : IUserRepository
 {
     private readonly UserManager<ApplicationUser> _userManager;
-    private readonly ICritDbContext _critDbContext;
+    private readonly CritDbContext _critDbContext;
     private readonly IHttpContextAccessor _httpContextAccessor;
-    public UserRepository(UserManager<ApplicationUser> userManager, ICritDbContext critDbContext, IHttpContextAccessor httpContextAccessor)
+    public UserRepository(UserManager<ApplicationUser> userManager, CritDbContext critDbContext, IHttpContextAccessor httpContextAccessor)
     {
         _userManager = userManager;
         _critDbContext = critDbContext;
@@ -27,7 +27,7 @@ public class UserRepository : IUserRepository
         {
             ClaimsPrincipal? user = null;
 
-            if (_httpContextAccessor.HttpContext != null)
+            if (_httpContextAccessor.HttpContext?.User?.Identity?.IsAuthenticated == true)
             {
                 user = _httpContextAccessor.HttpContext.User;
             }
@@ -58,7 +58,7 @@ public class UserRepository : IUserRepository
         {
             ClaimsPrincipal? user = null;
 
-            if (_httpContextAccessor.HttpContext != null)
+            if (_httpContextAccessor.HttpContext?.User?.Identity?.IsAuthenticated == true)
             {
                 user = _httpContextAccessor.HttpContext.User;
             }

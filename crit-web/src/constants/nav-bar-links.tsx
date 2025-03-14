@@ -1,47 +1,80 @@
-import { icon } from "@fortawesome/fontawesome-svg-core/import.macro";
+import { faHouse, faBarsProgress, faCheck, faListCheck, faSignInAlt, faSignOutAlt, faRegistered } from "@fortawesome/free-solid-svg-icons";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 
 import { GetEnvValues } from "./environment";
 import { Project } from "../models/project.model";
 import { createSubtaskLinks } from "../functions/Tasks/create-subtask-links";
 
-export type Link = { title: string, path: string, icon: IconDefinition, children?: Link[], index?: boolean, showInNavBar?: boolean, data?: any };
+export type Link = { title: string, path: string, icon: IconDefinition, children?: Link[], index?: boolean, showInNavBar?: boolean, roles?: string[], data?: any };
 
-export const links: Link[] = [
-    {
-        title: 'Home',
-        path: "/",
-        icon: icon({ name: 'house' }),
-    },
-    {
-        title: "Projects",
-        path: "/Projects",
-        icon: icon({ name: 'bars-progress' }),
-        index: true,
-        children: await (async (): Promise<Link[]> => {
-            return new Promise<Link[]>(async (resolve, reject): Promise<void> => {
-                const response = await fetch(new URL(`${GetEnvValues()?.critApiUrl}/Project/GetAllProjects`), {
-                    method: 'GET',
-                });
-                const data: Project[] = await response.json() as Project[];
-                resolve(data.map<Link>(project => {
-                    return {
-                        title: project.name,
-                        path: `/Projects/${project.id}`,
-                        icon: icon({ name: 'check' }),
-                        children: project.tasks.map<Link>(task => {
+export const GetLinks = async () => {
+    return new Promise<Link[]>(async (resolve, reject): Promise<void> => {
+        const links: Link[] = [
+            {
+                title: 'Home',
+                path: "/",
+                icon: faHouse,
+                roles: ['OrganizationOwner', 'OrganizationAdmin', 'ProjectOwner', 'ProjectAdmin', 'User'],
+            },
+            {
+                title: "Projects",
+                path: "/Projects",
+                icon: faBarsProgress,
+                roles: ['OrganizationOwner', 'OrganizationAdmin', 'ProjectOwner', 'ProjectAdmin', 'User'],
+                index: true,
+                children: await (async (): Promise<Link[]> => {
+                    return new Promise<Link[]>(async (resolve, reject): Promise<void> => {
+                        const response = await fetch(new URL(`${GetEnvValues()?.critApiUrl}/Project`), {
+                            method: 'GET',
+                            mode: 'cors',
+                            credentials: 'include',
+                        });
+                        const data: Project[] = (await response.json()) as Project[];
+                        resolve(data.map<Link>(project => {
                             return {
-                                title: task.title ? task.title : '<no task title>',
-                                path: `/Projects/${project.id}/${task.id}`,
-                                icon: icon({ name: 'list-check' }),
-                                children: createSubtaskLinks(task),
-                                showInNavBar: false,
-                                data: task,
+                                title: project.name,
+                                path: `/Projects/${project.id}`,
+                                icon: faCheck,
+                                children: project.tasks.map<Link>(task => {
+                                    return {
+                                        title: task.title ? task.title : '<no task title>',
+                                        path: `/Projects/${project.id}/${task.id}`,
+                                        icon: faListCheck,
+                                        children: createSubtaskLinks(task),
+                                        showInNavBar: false,
+                                        data: task,
+                                    };
+                                })
                             };
-                        })
-                    };
-                }))
-            })
-        })(),
-    }
-];
+                        }))
+                    })
+                })(),
+            },
+            {
+                title: 'Logout',
+                path: "/Logout",
+                icon: faSignOutAlt,
+            }
+        ];
+        resolve(links);
+    });
+};
+
+
+export const GetLoggedOutLinks = async () => {
+    return new Promise<Link[]>(async (resolve, reject): Promise<void> => {
+        const links: Link[] = [
+            {
+                title: 'Login',
+                path: "/Login",
+                icon: faSignInAlt,
+            },
+            {
+                title: 'Register',
+                path: '/Register',
+                icon: faRegistered,
+            }
+        ];
+        resolve(links);
+    });
+};

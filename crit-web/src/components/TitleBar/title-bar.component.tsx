@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { icon } from '@fortawesome/fontawesome-svg-core/import.macro';
+import { faToggleOff, faToggleOn } from '@fortawesome/free-solid-svg-icons';
 import { JSX } from 'react';
 
 import NavBar from '../NavBar/nav-bar.component';
@@ -18,7 +18,7 @@ function TitleBar(props: Props): JSX.Element {
         <div id='title-bar' className='grid-container title-bar'>
             <div className='nav-bar'><NavBar open={props.open} onToggleOpen={props.onToggleOpen} /></div>
             <h1 id="title" className='grid-item'>{props.title}</h1>
-            <div className='grid-item'>Dark Mode: {props.theme === 'light' ? (<span>Off <FontAwesomeIcon icon={icon({ name: 'toggle-off' })} onClick={props.onToggleTheme} /></span>) : (<span>On <FontAwesomeIcon icon={icon({ name: 'toggle-on' })} onClick={props.onToggleTheme} /></span>)}</div>
+            <div className='grid-item'>Dark Mode: {props.theme === 'light' ? (<span>Off <FontAwesomeIcon icon={faToggleOff} onClick={props.onToggleTheme} /></span>) : (<span>On <FontAwesomeIcon icon={faToggleOn} onClick={props.onToggleTheme} /></span>)}</div>
         </div>
     );
 }

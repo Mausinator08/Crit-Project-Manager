@@ -2,23 +2,24 @@ using System.Text.Json.Serialization;
 
 namespace CritDTO.Models;
 
-public class Task : AuditInformation
+public class ProjectTask : AuditInformation
 {
-    public Task()
+    public ProjectTask()
     {
         ColaboratorUserIds = new List<Guid>();
-        SubTasks = new List<Task>();
+        SubTasks = new List<ProjectTask>();
         CustomFields = new List<CustomField>();
         DateTime now = DateTime.Now;
         DateCreated = now;
         DateUpdated = now;
     }
 
-    public Task(Guid projectId, Guid createdByUserId)
+    [JsonConstructor]
+    public ProjectTask(Guid projectId, Guid createdByUserId)
     {
         ProjectId = projectId;
         ColaboratorUserIds = new List<Guid>([createdByUserId]);
-        SubTasks = new List<Task>();
+        SubTasks = new List<ProjectTask>();
         CustomFields = new List<CustomField>();
         DateTime now = DateTime.Now;
         DateCreated = now;
@@ -43,6 +44,6 @@ public class Task : AuditInformation
     public Project? Project { get; set; }
     public Status? Status { get; set; }
     public Priority? Priority { get; set; }
-    public List<Task> SubTasks { get; set; }
-    public Task? ParentTask { get; set; }
+    public List<ProjectTask> SubTasks { get; set; }
+    public ProjectTask? ParentTask { get; set; }
 }

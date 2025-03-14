@@ -1,4 +1,4 @@
-import { icon } from "@fortawesome/fontawesome-svg-core/import.macro";
+import { faChevronDown, faChevronUp } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { JSX, useContext } from "react";
 
@@ -16,7 +16,7 @@ function CollapsibleToggle(props: CollapsibleToggleProps): JSX.Element {
         <>
             {props.children}
             <button className="toggle-folding-button" onClick={toggleAccordion}>
-                <FontAwesomeIcon icon={collapsed === true ? icon({ name: 'chevron-down' }) : icon({ name: 'chevron-up' })} />
+                <FontAwesomeIcon icon={collapsed === true ? faChevronDown : faChevronUp} />
             </button>
         </>
 

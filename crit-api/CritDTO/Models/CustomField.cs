@@ -2,7 +2,7 @@ namespace CritDTO.Models;
 
 public class CustomField
 {
-    public CustomField(string name, object value, Guid type, Guid taskId)
+    public CustomField(string name, string value, Guid type, Guid taskId)
     {
         CustomFieldTypeId = type;
         Name = name;
@@ -13,15 +13,15 @@ public class CustomField
     private CustomField()
     {
         Name = "";
-        Value = 0;
+        Value = string.Empty;
     }
 
     public Guid Id { get; set; }
     public Guid CustomFieldTypeId { get; set; }
     public string Name { get; set; }
-    public object Value { get; set; }
+    public string Value { get; set; }
     public Guid TaskId { get; set; }
 
-    public Task? Task { get; set; }
+    public ProjectTask? Task { get; set; }
     public CustomFieldType? CustomFieldType { get; set; }
 }

@@ -5,7 +5,7 @@ export type DevelopmentLocalEnv = {
 };
 
 const developmentLocalEnv: DevelopmentLocalEnv = {
-    critApiUrl: "https://localhost:7295/api",
+    critApiUrl: process.env.REACT_APP_CRIT_API_URL ?? "",
 };
 
 export function GetEnvValues(): DevelopmentLocalEnv | null {

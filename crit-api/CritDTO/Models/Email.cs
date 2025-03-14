@@ -9,5 +9,7 @@ public class Email
     public Guid UserId { get; set; }
     [ProtectedPersonalData]
     public string? EmailAddress { get; set; }
-    public string? EmailDescription { get; set; }
+    public Guid OrganizationId { get; set; }
+
+    public Organization? Organization { get; set; }
 }

@@ -5,10 +5,10 @@
 		}
 	],
 	"settings": {
-		"dotnet.defaultSolution": "./crit-api/CritApi.sln",
+		"dotnet.defaultSolution": "./CritApi.sln",
 		"vssolution.openSolutions.selectedInOmnisharp": true,
 		"vssolution.altSolutionFolders": [
-			"./crit-api"
+			"./"
 		],
 		"editor.formatOnSave": true,
 		"editor.formatOnPaste": true,

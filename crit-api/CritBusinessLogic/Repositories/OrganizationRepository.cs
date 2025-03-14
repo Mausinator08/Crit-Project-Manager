@@ -12,17 +12,17 @@ public class OrganizationRepository : IOrganizationRepository
 {
     private readonly CritDbContext _critDbContext;
     private TenantDbContext? _tenantDbContext = null;
-    private readonly TenantDbContextService _tenantDbContextService;
+    private readonly ITenantDbContextService _tenantDbContextService;
     private readonly IUserRepository _userRepository;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IProjectsRepository _projectsRepository;
 
-    public OrganizationRepository(CritDbContext critDbContext, TenantDbContextService tenantDbContextService, IUserRepository userRepository, IHttpContextAccessor httpContextAccessor, IProjectsRepository projectsRepository)
+    public OrganizationRepository(CritDbContext critDbContext, ITenantDbContextService tenantDbContextService, IUserRepository userRepository, IHttpContextAccessor httpContextAccessor, IProjectsRepository projectsRepository)
     {
         _critDbContext = critDbContext;
         _tenantDbContextService = tenantDbContextService;
         _httpContextAccessor = httpContextAccessor;
-        if (_httpContextAccessor.HttpContext != null)
+        if (httpContextAccessor.HttpContext?.User?.Identity?.IsAuthenticated == true)
         {
             if (_critDbContext.Organizations.Any())
             {
@@ -94,7 +94,7 @@ public class OrganizationRepository : IOrganizationRepository
             {
                 IQueryable<Organization> organizationsQuery = _critDbContext.Organizations.Where(o =>
                 o.Id == organization.Id &&
-                o.affiliatedUserIds.Contains(applicationUser.Id));
+                o.AffiliatedUserIds.Contains(applicationUser.Id));
 
                 if (organizationsQuery.Any())
                 {
@@ -134,7 +134,7 @@ public class OrganizationRepository : IOrganizationRepository
             {
                 IQueryable<Organization> organizationsQuery = _critDbContext.Organizations.Where(o =>
                 o.Id == organizationId &&
-                o.affiliatedUserIds.Contains(applicationUser.Id));
+                o.AffiliatedUserIds.Contains(applicationUser.Id));
 
                 if (organizationsQuery.Any())
                 {

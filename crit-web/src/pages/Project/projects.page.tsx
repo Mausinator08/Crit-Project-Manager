@@ -6,8 +6,10 @@ import { Project } from "../../models/project.model";
 
 async function getProjects(): Promise<Project[] | null> {
     return new Promise(async (resolve, reject): Promise<void> => {
-        const response = await fetch(new URL(`${GetEnvValues()?.critApiUrl}/Project/GetAllProjects`), {
+        const response = await fetch(new URL(`${GetEnvValues()?.critApiUrl}/Project`), {
             method: 'GET',
+            mode: 'cors',
+            credentials: 'include',
         });
 
         if (response.status !== 200) {
@@ -26,10 +28,10 @@ function Projects(): JSX.Element {
         getProjects().then(value => {
             setProjects(value);
         });
-    });
+    }, []);
 
     return (
-        <div>
+        <>
             <h2>Projects</h2>
             <hr />
             {projects && projects?.length > 0 ? projects?.map<JSX.Element>(project => {
@@ -39,7 +41,7 @@ function Projects(): JSX.Element {
                     </NavLink>
                 );
             }) : (<Outlet />)}
-        </div>
+        </>
     );
 }
 

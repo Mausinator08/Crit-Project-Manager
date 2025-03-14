@@ -1,9 +1,12 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
+using CritDTO.Models;
 
-namespace CritDTO.Models;
+namespace CritApi.Models;
 
 public class User
 {
+    [JsonConstructor]
     public User(string userName, string email, string? password = null, string? twoFactorCode = null, string? twoFactorRecoveryCode = null)
     {
         UserName = userName;
@@ -19,17 +22,19 @@ public class User
         Email = email;
     }
 
-    [Required]
-    public string UserName { get; set; }
+    public string? UserName { get; set; }
 
-    [Required]
     [EmailAddress(ErrorMessage = "Invalid Email")]
-    public string Email { get; set; }
+    public string? Email { get; set; }
 
-    [Required]
     public string? Password { get; set; }
 
     public string? TwoFactorCode { get; set; }
 
     public string? TwoFactorRecoveryCode { get; set; }
+    public string? Organization { get; set; }
+    public string? PhoneNumber { get; set; }
+    public string? CountryCode { get; set; }
+    public string? Extension { get; set; }
+    public PhoneNumberType? PhoneType { get; set; }
 }

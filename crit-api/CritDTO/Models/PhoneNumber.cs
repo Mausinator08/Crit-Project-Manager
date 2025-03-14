@@ -25,17 +25,20 @@ public class PhoneNumber
 {
     public PhoneNumber()
     {
-        Type = new List<PhoneNumberType>();
+        Type = PhoneNumberType.Mobile;
         CountryCode = "+1";
         Number = "000-000-0000";
     }
 
     public Guid Id { get; set; }
-    public List<PhoneNumberType> Type { get; set; }
+    public PhoneNumberType Type { get; set; }
     [PersonalData]
     public string CountryCode { get; set; }
     [PersonalData]
     public string Number { get; set; }
     [PersonalData]
     public string? Extension { get; set; }
+    public Guid OrganizationId { get; set; }
+
+    public Organization? Organization { get; set; }
 }

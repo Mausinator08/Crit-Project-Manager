@@ -1,0 +1,30 @@
+@import '../../styles/Custom.scss';
+
+.login-form-body {
+    padding: 20px;
+    border-radius: 5px;
+    border-width: 5px;
+    border-color: $secondary;
+    border-style: solid;
+    color: $secondary;
+    background-color: $primary;
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+    margin-left: 20px;
+    margin-right: 20px;
+    margin-bottom: 20px;
+    max-width: fit-content;
+    max-height: fit-content;
+    .login-form-grid {
+        display: flex;
+    }
+    .login-form-item {
+        color: $secondary;
+        margin: 20px;
+    }
+    .login-form-button {
+        color: $primary;
+        background-color: $secondary;
+        margin: 20px;
+    }
+}

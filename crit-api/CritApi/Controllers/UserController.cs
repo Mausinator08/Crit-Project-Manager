@@ -26,11 +26,16 @@ public class UserController : ControllerBase
 
     [HttpPost]
     [Route("CreateUser")]
-    [Authorize(Roles = "ProjectAdmin,ProjectOwner,OrganizationAdmin,OrganizationOwner")]
+    [Authorize(Roles = "ProjectAdmin,ProjectOwner,OrganizationAdmin,OrganizationOwner,SuperAdmin")]
     public async Task<IActionResult> CreateUser(User user, string role = "User")
     {
         try
         {
+            if (role == "SuperAdmin")
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, new ApiResult("Could not create user.", new List<string>([$"The {role} role cannot be created."]), user));
+            }
+
             ApplicationUser appUser = new ApplicationUser()
             {
                 UserName = user.UserName,
@@ -74,7 +79,7 @@ public class UserController : ControllerBase
 
     [HttpPost]
     [Route("UpdateUser")]
-    [Authorize(Roles = "ProjectAdmin,ProjectOwner,OrganizationAdmin,OrganizationOwner")]
+    [Authorize(Roles = "ProjectAdmin,ProjectOwner,OrganizationAdmin,OrganizationOwner,SuperAdmin")]
     public async Task<IActionResult> UpdateUser(User user)
     {
         try
@@ -83,6 +88,11 @@ public class UserController : ControllerBase
 
             if (appUser != null)
             {
+                if ((await _userManager.GetUsersInRoleAsync("SuperAdmin")).Where(u => u.UserName == appUser.UserName).Any())
+                {
+                    return StatusCode(StatusCodes.Status403Forbidden, new ApiResult("Could not update user.", new List<string>([$"The {appUser.UserName} SuperAdmin user cannot be updated."]), user));
+                }
+
                 appUser.Email = user.Email;
 
                 IdentityResult result = await _userManager.UpdateAsync(appUser);
@@ -116,7 +126,7 @@ public class UserController : ControllerBase
 
     [HttpPost]
     [Route("DeleteUser")]
-    [Authorize(Roles = "ProjectAdmin,ProjectOwner,OrganizationAdmin,OrganizationOwner")]
+    [Authorize(Roles = "ProjectAdmin,ProjectOwner,OrganizationAdmin,OrganizationOwner,SuperAdmin")]
     public async Task<IActionResult> DeleteUser(string userName)
     {
         try
@@ -126,6 +136,16 @@ public class UserController : ControllerBase
             if (appUser == null)
             {
                 return StatusCode(StatusCodes.Status400BadRequest, new ApiResult("Could not delete user.", new List<string>([$"The user {userName} could not be found."])));
+            }
+
+            if (appUser.UserName == null && appUser.Email == null)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new ApiResult("Could not delete user.", new List<string>([$"The user {userName} has no stored user name or email."])));
+            }
+
+            if ((await _userManager.GetUsersInRoleAsync("SuperAdmin")).Where(u => u.UserName == appUser.UserName).Any())
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, new ApiResult("Could not delete user.", new List<string>([$"The {appUser.UserName} SuperAdmin user cannot be deleted."]), new User(appUser.UserName, appUser.Email)));
             }
 
             IdentityResult result = await _userManager.DeleteAsync(appUser);
@@ -161,7 +181,7 @@ public class UserController : ControllerBase
 
     [HttpGet]
     [Route("GetUserByUserName")]
-    [Authorize(Roles = "User;ProjectAdmin,ProjectOwner,OrganizationAdmin,OrganizationOwner")]
+    [Authorize(Roles = "User;ProjectAdmin,ProjectOwner,OrganizationAdmin,OrganizationOwner,SuperAdmin")]
     public async Task<IActionResult> GetUserByUserName(string userName)
     {
         try
@@ -170,6 +190,11 @@ public class UserController : ControllerBase
 
             if (appUser != null && appUser?.Email != null && appUser?.UserName != null)
             {
+                if ((await _userManager.GetUsersInRoleAsync("SuperAdmin")).Where(u => u.UserName == appUser.UserName).Any())
+                {
+                    return StatusCode(StatusCodes.Status403Forbidden, new ApiResult("Could not get user.", new List<string>([$"The {appUser.UserName} SuperAdmin user cannot be retrieved."]), new User(appUser.UserName, appUser.Email)));
+                }
+
                 return Ok(new ApiResult("User retrieved successfully.", null, new User(appUser.UserName, appUser.Email)));
             }
             else
@@ -198,7 +223,7 @@ public class UserController : ControllerBase
 
     [HttpGet]
     [Route("GetUserByEmail")]
-    [Authorize(Roles = "User;ProjectAdmin,ProjectOwner,OrganizationAdmin,OrganizationOwner")]
+    [Authorize(Roles = "User;ProjectAdmin,ProjectOwner,OrganizationAdmin,OrganizationOwner,SuperAdmin")]
     public async Task<IActionResult> GetUserByEmail(string email)
     {
         try
@@ -207,6 +232,11 @@ public class UserController : ControllerBase
 
             if (appUser != null && appUser?.Email != null && appUser?.UserName != null)
             {
+                if ((await _userManager.GetUsersInRoleAsync("SuperAdmin")).Where(u => u.UserName == appUser.UserName).Any())
+                {
+                    return StatusCode(StatusCodes.Status403Forbidden, new ApiResult("Could not get user.", new List<string>([$"The {appUser.UserName} SuperAdmin user cannot be retrieved."]), new User(appUser.UserName, appUser.Email)));
+                }
+
                 return Ok(new ApiResult("User retrieved successfully.", null, new User(appUser.UserName, appUser.Email)));
             }
             else
@@ -235,12 +265,13 @@ public class UserController : ControllerBase
 
     [HttpGet]
     [Route("GetAllUsers")]
-    [Authorize(Roles = "User;ProjectAdmin,ProjectOwner,OrganizationAdmin,OrganizationOwner")]
+    [Authorize(Roles = "User;ProjectAdmin,ProjectOwner,OrganizationAdmin,OrganizationOwner,SuperAdmin")]
     public async Task<IActionResult> GetAllUsers()
     {
         try
         {
-            List<ApplicationUser> appUsers = await _userManager.Users.ToListAsync();
+            List<ApplicationUser> superAdminUsers = (await _userManager.GetUsersInRoleAsync("SuperAdmin")).ToList();
+            List<ApplicationUser> appUsers = await _userManager.Users.Where(u => !superAdminUsers.Contains(u)).ToListAsync();
 
             if (appUsers.Any())
             {
@@ -282,11 +313,16 @@ public class UserController : ControllerBase
 
     [HttpGet]
     [Route("GetAllUsersInRole")]
-    [Authorize(Roles = "User;ProjectAdmin,ProjectOwner,OrganizationAdmin,OrganizationOwner")]
+    [Authorize(Roles = "User;ProjectAdmin,ProjectOwner,OrganizationAdmin,OrganizationOwner,SuperAdmin")]
     public async Task<IActionResult> GetAllUsersInRole(string role)
     {
         try
         {
+            if (role == "SuperAdmin")
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, new ApiResult("Could not get all users for role.", new List<string>([$"The {role} role cannot be retrieved."])));
+            }
+
             IList<ApplicationUser> appUsers = await _userManager.GetUsersInRoleAsync(role);
 
             if (appUsers.Any())

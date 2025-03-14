@@ -12,21 +12,17 @@ namespace CritBusinessLogic.Repositories;
 public class ProjectsRepository : IProjectsRepository
 {
     private readonly CritDbContext _critDbContext;
-    private readonly TenantDbContext _tenantDbContext;
+    private TenantDbContext? _tenantDbContext;
     private readonly IUserRepository _userRepository;
     public ProjectsRepository(ITenantDbContextService tenantDbContextService, IHttpContextAccessor httpContextAccessor, CritDbContext critDbContext, IUserRepository userRepository)
     {
         _critDbContext = critDbContext;
         _userRepository = userRepository;
-        if (httpContextAccessor.HttpContext != null)
+        if (httpContextAccessor.HttpContext?.User?.Identity?.IsAuthenticated == true)
         {
             Task<TenantDbContext> tenantDbContextTask = tenantDbContextService.GetAuthenticatedTenantDb(httpContextAccessor.HttpContext.User);
             tenantDbContextTask.Wait();
             _tenantDbContext = tenantDbContextTask.Result;
-        }
-        else
-        {
-            throw new Exception("HttpContext is null.");
         }
     }
 

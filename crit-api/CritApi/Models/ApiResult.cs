@@ -1,7 +1,10 @@
+using System.Text.Json.Serialization;
+
 namespace CritApi.Models;
 
 public class ApiResult
 {
+    [JsonConstructor]
     public ApiResult(string? message, List<string>? errors, object? data = default)
     {
         Message = message;

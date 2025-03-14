@@ -12,7 +12,7 @@ public class TenantDbContext : DbContext, ITenantDbContext
     public DbSet<Priority> Priorities { get; set; }
     public DbSet<CustomFieldType> CustomFieldTypes { get; set; }
     public DbSet<CustomField> CustomFields { get; set; }
-    public DbSet<CritDTO.Models.Task> Tasks { get; set; }
+    public DbSet<ProjectTask> Tasks { get; set; }
 
     public TenantDbContext(DbContextOptions options) : base(options)
     {
@@ -37,12 +37,11 @@ public class TenantDbContext : DbContext, ITenantDbContext
         {
             entity.ToCollection("Projects");
             entity.HasKey(collection => collection.Id);
-            entity.Property(collection => collection.Id).HasColumnName("_id").IsRequired(false).ValueGeneratedOnAdd();
+            entity.Property(collection => collection.Id).HasColumnName("_id").IsRequired(true).ValueGeneratedOnAdd();
             entity.Property(collection => collection.Name).HasColumnName("name").IsRequired(true);
             entity.Property(collection => collection.Description).HasColumnName("description").IsRequired(false);
             entity.Property(collection => collection.OwningOrganizationId).HasColumnName("owningOrganizationId").IsRequired(true);
             entity.Property(collection => collection.ProjectOwnerUserId).HasColumnName("projectOwnerUserId").IsRequired(true);
-            entity.Property(collection => collection.AllowedStatusIds).HasColumnName("allowedStatusIds").IsRequired(false);
             entity.Property(collection => collection.CreatedByUserId).HasColumnName("createdByUserId").IsRequired(true);
             entity.Property(collection => collection.DateCreated).HasColumnName("dateCreated").IsRequired(true);
             entity.Property(collection => collection.DateUpdated).HasColumnName("dateUpdated").IsRequired(true);
@@ -50,16 +49,11 @@ public class TenantDbContext : DbContext, ITenantDbContext
             entity.Property(collection => collection.ProjectAdminUserIds).HasColumnName("projectAdminUserIds").IsRequired(false);
             entity.Property(collection => collection.ProjectUserIds).HasColumnName("projectUserIds").IsRequired(false);
             entity.Property(collection => collection.UpdatedByUserId).HasColumnName("updatedByUserId").IsRequired(true);
+            entity.Property(collection => collection.HiddenCustomFieldTypeIds).HasColumnName("hiddenCustomFieldTypeIds").IsRequired(false);
         });
 
         modelBuilder.Entity<Project>()
         .HasMany(e => e.CustomFieldTypes)
-        .WithOne(e => e.Project)
-        .HasForeignKey(e => e.ProjectId)
-        .IsRequired(true);
-
-        modelBuilder.Entity<Project>()
-        .HasMany(e => e.HiddenCustomFieldTypes)
         .WithOne(e => e.Project)
         .HasForeignKey(e => e.ProjectId)
         .IsRequired(true);
@@ -77,12 +71,6 @@ public class TenantDbContext : DbContext, ITenantDbContext
         .IsRequired(true);
 
         modelBuilder.Entity<Project>()
-        .HasMany(e => e.AllowedStatuses)
-        .WithOne(e => e.Project)
-        .HasForeignKey(e => e.ProjectId)
-        .IsRequired(true);
-
-        modelBuilder.Entity<Project>()
         .HasMany(e => e.Tasks)
         .WithOne(e => e.Project)
         .HasForeignKey(e => e.ProjectId)
@@ -92,7 +80,7 @@ public class TenantDbContext : DbContext, ITenantDbContext
         {
             entity.ToCollection("Statuses");
             entity.HasKey(collection => collection.Id);
-            entity.Property(collection => collection.Id).HasColumnName("_id").ValueGeneratedOnAdd();
+            entity.Property(collection => collection.Id).HasColumnName("_id").IsRequired(true).ValueGeneratedOnAdd();
             entity.Property(collection => collection.BackgroundColor).HasColumnName("backgroundColor").IsRequired(false);
             entity.Property(collection => collection.Color).HasColumnName("color").IsRequired(false);
             entity.Property(collection => collection.Description).HasColumnName("description").IsRequired(false);
@@ -107,12 +95,6 @@ public class TenantDbContext : DbContext, ITenantDbContext
         .IsRequired(true);
 
         modelBuilder.Entity<Status>()
-        .HasOne(e => e.Project)
-        .WithMany(e => e.AllowedStatuses)
-        .HasForeignKey(e => e.ProjectId)
-        .IsRequired(true);
-
-        modelBuilder.Entity<Status>()
         .HasMany(e => e.Tasks)
         .WithOne(e => e.Status)
         .HasForeignKey(e => e.StatusId)
@@ -122,7 +104,7 @@ public class TenantDbContext : DbContext, ITenantDbContext
         {
             entity.ToCollection("Priorities");
             entity.HasKey(collection => collection.Id);
-            entity.Property(collection => collection.Id).HasColumnName("_id").IsRequired(false).ValueGeneratedOnAdd();
+            entity.Property(collection => collection.Id).HasColumnName("_id").IsRequired(true).ValueGeneratedOnAdd();
             entity.Property(collection => collection.Name).HasColumnName("name").IsRequired(true);
             entity.Property(collection => collection.BackgroundColor).HasColumnName("backgroundColor").IsRequired(false);
             entity.Property(collection => collection.Color).HasColumnName("color").IsRequired(false);
@@ -145,7 +127,7 @@ public class TenantDbContext : DbContext, ITenantDbContext
         {
             entity.ToCollection("CustomFieldTypes");
             entity.HasKey(collection => collection.Id);
-            entity.Property(collection => collection.Id).HasColumnName("_id").IsRequired(false).ValueGeneratedOnAdd();
+            entity.Property(collection => collection.Id).HasColumnName("_id").IsRequired(true).ValueGeneratedOnAdd();
             entity.Property(collection => collection.Name).HasColumnName("name").IsRequired(true);
             entity.Property(collection => collection.ProjectId).HasColumnName("projectId").IsRequired(true);
         });
@@ -156,17 +138,11 @@ public class TenantDbContext : DbContext, ITenantDbContext
         .HasForeignKey(e => e.ProjectId)
         .IsRequired(true);
 
-        modelBuilder.Entity<CustomFieldType>()
-        .HasOne(e => e.Project)
-        .WithMany(e => e.HiddenCustomFieldTypes)
-        .HasForeignKey(e => e.ProjectId)
-        .IsRequired(true);
-
-        modelBuilder.Entity<CritDTO.Models.Task>(entity =>
+        modelBuilder.Entity<ProjectTask>(entity =>
         {
             entity.ToCollection("Tasks");
             entity.HasKey(collection => collection.Id);
-            entity.Property(collection => collection.Id).HasColumnName("_id").IsRequired(false).ValueGeneratedOnAdd();
+            entity.Property(collection => collection.Id).HasColumnName("_id").IsRequired(true).ValueGeneratedOnAdd();
             entity.Property(collection => collection.Title).HasColumnName("title").IsRequired(false);
             entity.Property(collection => collection.Details).HasColumnName("details").IsRequired(false);
             entity.Property(collection => collection.ProjectId).HasColumnName("projectId").IsRequired(true);
@@ -179,31 +155,31 @@ public class TenantDbContext : DbContext, ITenantDbContext
             entity.Property(collection => collection.ParentTaskId).HasColumnName("parentTaskId").IsRequired(false);
         });
 
-        modelBuilder.Entity<CritDTO.Models.Task>()
+        modelBuilder.Entity<ProjectTask>()
         .HasOne(e => e.Status)
         .WithMany(e => e.Tasks)
         .HasForeignKey(e => e.StatusId)
         .IsRequired(false);
 
-        modelBuilder.Entity<CritDTO.Models.Task>()
+        modelBuilder.Entity<ProjectTask>()
         .HasOne(e => e.Priority)
         .WithMany(e => e.Tasks)
         .HasForeignKey(e => e.PriorityId)
         .IsRequired(false);
 
-        modelBuilder.Entity<CritDTO.Models.Task>()
+        modelBuilder.Entity<ProjectTask>()
         .HasMany(e => e.CustomFields)
         .WithOne(e => e.Task)
         .HasForeignKey(e => e.TaskId)
         .IsRequired(true);
 
-        modelBuilder.Entity<CritDTO.Models.Task>()
+        modelBuilder.Entity<ProjectTask>()
         .HasOne(e => e.Project)
         .WithMany(e => e.Tasks)
         .HasForeignKey(e => e.ProjectId)
         .IsRequired(true);
 
-        modelBuilder.Entity<CritDTO.Models.Task>()
+        modelBuilder.Entity<ProjectTask>()
         .HasMany(e => e.SubTasks)
         .WithOne(e => e.ParentTask)
         .HasForeignKey(e => e.ParentTaskId)
@@ -213,11 +189,11 @@ public class TenantDbContext : DbContext, ITenantDbContext
         {
             entity.ToCollection("CustomFields");
             entity.HasKey(collection => collection.Id);
-            entity.Property(collection => collection.Id).HasColumnName("_id").IsRequired(false).ValueGeneratedOnAdd();
+            entity.Property(collection => collection.Id).HasColumnName("_id").IsRequired(true).ValueGeneratedOnAdd();
             entity.Property(collection => collection.Name).HasColumnName("name").IsRequired(true);
             entity.Property(collection => collection.Value).HasColumnName("value").IsRequired(true);
             entity.Property(collection => collection.CustomFieldTypeId).HasColumnName("customFieldTypeId").IsRequired(true);
-            entity.Property(collection => collection.TaskId).HasColumnName("taskId").IsRequired(false);
+            entity.Property(collection => collection.TaskId).HasColumnName("taskId").IsRequired(true);
         });
 
         modelBuilder.Entity<CustomField>()

@@ -11,35 +11,31 @@ namespace CritBusinessLogic.Repositories;
 
 public class TasksRepository : ITasksRepository
 {
-    private readonly TenantDbContext _tenantDbContext;
+    private TenantDbContext? _tenantDbContext = null;
     private readonly IUserRepository _userRepository;
-    public TasksRepository(TenantDbContextService tenantDbContextService, IUserRepository userRepository, IHttpContextAccessor httpContextAccessor)
+    public TasksRepository(ITenantDbContextService tenantDbContextService, IUserRepository userRepository, IHttpContextAccessor httpContextAccessor)
     {
-        if (httpContextAccessor.HttpContext != null)
+        if (httpContextAccessor.HttpContext?.User?.Identity?.IsAuthenticated == true)
         {
             Task<TenantDbContext> tenantDbContextTask = tenantDbContextService.GetAuthenticatedTenantDb(httpContextAccessor.HttpContext.User);
             tenantDbContextTask.Wait();
             _tenantDbContext = tenantDbContextTask.Result;
             _userRepository = userRepository;
         }
-        else
-        {
-            throw new Exception("HttpContext is null.");
-        }
     }
 
-    public async Task<List<CritDTO.Models.Task>> GetAllTasks(Guid projectId)
+    public async Task<List<ProjectTask>> GetAllTasks(Guid projectId)
     {
         try
         {
-            IQueryable<CritDTO.Models.Task> tasksQuery = _tenantDbContext.Tasks.Where(t => t.ProjectId == projectId);
+            IQueryable<ProjectTask> tasksQuery = _tenantDbContext.Tasks.Where(t => t.ProjectId == projectId);
 
             if (tasksQuery.Any())
             {
                 return await tasksQuery.ToListAsync();
             }
 
-            return new List<CritDTO.Models.Task>();
+            return new List<ProjectTask>();
         }
         catch (Exception ex)
         {
@@ -47,11 +43,11 @@ public class TasksRepository : ITasksRepository
         }
     }
 
-    public async Task<CritDTO.Models.Task?> GetTask(Guid projectId, Guid taskId)
+    public async Task<ProjectTask?> GetTask(Guid projectId, Guid taskId)
     {
         try
         {
-            IQueryable<CritDTO.Models.Task> taskQuery = _tenantDbContext.Tasks.Where(t => t.Id == taskId && t.ProjectId == projectId);
+            IQueryable<ProjectTask> taskQuery = _tenantDbContext.Tasks.Where(t => t.Id == taskId && t.ProjectId == projectId);
 
             if (taskQuery.Any())
             {
@@ -66,7 +62,7 @@ public class TasksRepository : ITasksRepository
         }
     }
 
-    public async Task<CritDTO.Models.Task?> CreateTask(CritDTO.Models.Task task)
+    public async Task<ProjectTask?> CreateTask(ProjectTask task)
     {
         try
         {
@@ -107,7 +103,7 @@ public class TasksRepository : ITasksRepository
         }
     }
 
-    public async System.Threading.Tasks.Task UpdateTask(CritDTO.Models.Task task)
+    public async System.Threading.Tasks.Task UpdateTask(ProjectTask task)
     {
         try
         {
@@ -171,7 +167,7 @@ public class TasksRepository : ITasksRepository
                 throw new Exception($"User {applicationUser.Id} is not an admin of project {projectId}.");
             }
 
-            IQueryable<CritDTO.Models.Task> taskQuery = _tenantDbContext.Tasks.Where(t => t.Id == taskId && t.ProjectId == projectId);
+            IQueryable<ProjectTask> taskQuery = _tenantDbContext.Tasks.Where(t => t.Id == taskId && t.ProjectId == projectId);
 
             if (!taskQuery.Any())
             {

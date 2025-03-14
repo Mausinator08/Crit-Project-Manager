@@ -1,12 +1,12 @@
 import { Table } from "react-bootstrap";
-import { JSX, useContext } from "react";
+import { JSX, useContext, useState } from "react";
 import { Outlet, useParams } from "react-router-dom";
 
 import { Task } from "../../models/task.model";
 import { ThemeContext } from "../../contexts/Theme/theme-context";
 import styles from "./tasks.module.scss";
 import { CustomFieldType } from '../../models/custom-field-type.model';
-import { Link, links } from "../../constants/nav-bar-links";
+import { GetLinks, Link } from "../../constants/nav-bar-links";
 import { Status } from "../../models/status.model";
 import { CreateTasks } from "../../functions/Tasks/create-tasks";
 
@@ -34,7 +34,7 @@ function createTaskListCustomColumn(fieldType: CustomFieldType, hiddenCustomFiel
     );
 }
 
-function createTaskRow(task: Task, statuses: Status[]): JSX.Element | undefined {
+function createTaskRow(task: Task, statuses: Status[], links: Link[]): JSX.Element | undefined {
     const link: Link | undefined = links.find(link => (link.data as Task | undefined)?.id === task.id);
 
     if (link) {
@@ -51,6 +51,9 @@ function createTaskRow(task: Task, statuses: Status[]): JSX.Element | undefined 
 function Tasks(props: TasksProps): JSX.Element {
     const { selectedTaskId } = useParams();
     const { theme } = useContext(ThemeContext);
+    const [links, setLinks] = useState<Link[]>([]);
+
+    GetLinks().then((links: Link[]) => setLinks(links));
 
     return (
         <div>
@@ -82,7 +85,7 @@ function Tasks(props: TasksProps): JSX.Element {
                         </tr>
                     </thead>
                     <tbody>
-                        {props.tasks.map<JSX.Element | undefined>(task => createTaskRow(task, props.statuses))}
+                        {props.tasks.map<JSX.Element | undefined>(task => createTaskRow(task, props.statuses, links))}
                     </tbody>
                 </Table>
                 {selectedTaskId && (<Outlet />)}

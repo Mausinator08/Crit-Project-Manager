@@ -1,4 +1,5 @@
 using CritBusinessLogic;
+using CritDTO.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -25,7 +26,7 @@ public class TaskController : ControllerBase
     {
         try
         {
-            List<CritDTO.Models.Task> tasks = await _tasksRepository.GetAllTasks(projectId);
+            List<ProjectTask> tasks = await _tasksRepository.GetAllTasks(projectId);
             return Ok(tasks);
         }
         catch (Exception ex)
@@ -43,7 +44,7 @@ public class TaskController : ControllerBase
     {
         try
         {
-            CritDTO.Models.Task? task = await _tasksRepository.GetTask(projectId, taskId);
+            ProjectTask? task = await _tasksRepository.GetTask(projectId, taskId);
             if (task == null)
             {
                 return NotFound("Task not found.");
@@ -61,7 +62,7 @@ public class TaskController : ControllerBase
     [HttpPost]
     [ProducesResponseType<Task>(StatusCodes.Status201Created)]
     [ProducesErrorResponseType(typeof(string))]
-    public async Task<IActionResult> CreateTask([FromBody] CritDTO.Models.Task task)
+    public async Task<IActionResult> CreateTask([FromBody] ProjectTask task)
     {
         try
         {
@@ -70,7 +71,7 @@ public class TaskController : ControllerBase
                 return BadRequest("Task data is null.");
             }
 
-            CritDTO.Models.Task? createdTask = await _tasksRepository.CreateTask(task);
+            ProjectTask? createdTask = await _tasksRepository.CreateTask(task);
             if (createdTask == null)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error creating task.");
@@ -88,7 +89,7 @@ public class TaskController : ControllerBase
     [HttpPut]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesErrorResponseType(typeof(string))]
-    public async Task<IActionResult> UpdateTask([FromBody] CritDTO.Models.Task task)
+    public async Task<IActionResult> UpdateTask([FromBody] ProjectTask task)
     {
         try
         {
