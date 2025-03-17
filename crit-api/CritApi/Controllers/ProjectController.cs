@@ -39,7 +39,7 @@ public class ProjectController : ControllerBase
     [Route("{projectId}")]
     [ProducesResponseType<Project>(StatusCodes.Status200OK)]
     [ProducesErrorResponseType(typeof(string))]
-    public async Task<IActionResult> GetProject([FromRoute] Guid projectId)
+    public async Task<IActionResult> GetProject([FromRoute] string projectId)
     {
         try
         {
@@ -90,7 +90,7 @@ public class ProjectController : ControllerBase
     [Route("{projectId}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesErrorResponseType(typeof(string))]
-    public async Task<IActionResult> DeleteProject([FromRoute] Guid projectId)
+    public async Task<IActionResult> DeleteProject([FromRoute] string projectId)
     {
         try
         {

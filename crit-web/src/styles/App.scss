@@ -1,2 +1,2 @@
-@import './Theme.scss';
-@import './Custom.scss';
+@use './Theme.scss' as *;
+@use './Custom.scss' as *;

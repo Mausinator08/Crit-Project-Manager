@@ -4,6 +4,6 @@ using MongoDbGenericRepository.Attributes;
 namespace CritDTO.Identity;
 
 [CollectionName("Users")]
-public class ApplicationUser : MongoIdentityUser<Guid>
+public class ApplicationUser : MongoIdentityUser<string>
 {
 }

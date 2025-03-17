@@ -1,10 +1,11 @@
-
 using System.Text;
 
 namespace CritApi.Logging;
 
 public class Logger : ILogger
 {
+    private readonly int maxExceptionDepth = 5;
+
     public Logger(string? path)
     {
         if (path != null)
@@ -57,8 +58,9 @@ public class Logger : ILogger
         stringBuilder.AppendLine($"STACK TRACE: {exception.StackTrace}");
 
         int indent = 0;
-        while (exception.InnerException != null)
+        while (exception.InnerException != null && indent < maxExceptionDepth)
         {
+            exception = exception.InnerException;
             indent++;
             stringBuilder.AppendLine($"--- INNER EXCEPTION: {dateTime} ---".PadLeft(indent, '\t'));
             stringBuilder.AppendLine($"MESSAGE: {exception.Message}".PadLeft(indent, '\t'));

@@ -6,7 +6,8 @@ public class ProjectTask : AuditInformation
 {
     public ProjectTask()
     {
-        ColaboratorUserIds = new List<Guid>();
+        ProjectId = string.Empty;
+        ColaboratorUserIds = new List<string>();
         SubTasks = new List<ProjectTask>();
         CustomFields = new List<CustomField>();
         DateTime now = DateTime.Now;
@@ -15,10 +16,10 @@ public class ProjectTask : AuditInformation
     }
 
     [JsonConstructor]
-    public ProjectTask(Guid projectId, Guid createdByUserId)
+    public ProjectTask(string projectId, string createdByUserId)
     {
         ProjectId = projectId;
-        ColaboratorUserIds = new List<Guid>([createdByUserId]);
+        ColaboratorUserIds = new List<string>([createdByUserId]);
         SubTasks = new List<ProjectTask>();
         CustomFields = new List<CustomField>();
         DateTime now = DateTime.Now;
@@ -28,17 +29,17 @@ public class ProjectTask : AuditInformation
         UpdatedByUserId = createdByUserId;
     }
 
-    public Guid Id { get; set; }
+    public string? Id { get; set; }
     public string? Title { get; set; }
     public string? Details { get; set; }
-    public Guid ProjectId { get; set; }
-    public List<Guid> ColaboratorUserIds { get; set; }
-    public Guid? AssignedUserId { get; set; }
-    public Guid? StatusId { get; set; }
-    public Guid? PriorityId { get; set; }
+    public string ProjectId { get; set; }
+    public List<string> ColaboratorUserIds { get; set; }
+    public string? AssignedUserId { get; set; }
+    public string? StatusId { get; set; }
+    public string? PriorityId { get; set; }
     public int? Complexity { get; set; }
     public DateTime? DueDate { get; set; }
-    public Guid? ParentTaskId { get; set; }
+    public string? ParentTaskId { get; set; }
 
     public List<CustomField> CustomFields { get; set; }
     public Project? Project { get; set; }

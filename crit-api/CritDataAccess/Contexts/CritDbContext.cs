@@ -1,3 +1,4 @@
+using CritDataAccess.ValueGenerators;
 using CritDTO.Identity;
 using CritDTO.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -37,7 +38,10 @@ public class CritDbContext : IdentityDbContext, ICritDbContext
         {
             entity.ToCollection("Organizations");
             entity.HasKey(collection => collection.Id);
-            entity.Property(collection => collection.Id).HasColumnName("_id").IsRequired(true).ValueGeneratedOnAdd();
+            entity.Property(collection => collection.Id).HasColumnName("_id").IsRequired(true)
+            .HasConversion(id => ObjectId.Parse(id), oid => oid.ToString())
+            .HasValueGenerator<ObjectIdValueGenerator>()
+            .ValueGeneratedOnAdd();
             entity.Property(collection => collection.Name).HasColumnName("name").IsRequired(true);
             entity.Property(collection => collection.OwnerUserId).HasColumnName("ownerUserId").IsRequired(true);
             entity.Property(collection => collection.PhoneNumberIds).HasColumnName("phoneNumberIds").IsRequired(false);
@@ -64,7 +68,10 @@ public class CritDbContext : IdentityDbContext, ICritDbContext
         {
             entity.ToCollection("Emails");
             entity.HasKey(collection => collection.Id);
-            entity.Property(collection => collection.Id).HasColumnName("_id").IsRequired(true).ValueGeneratedOnAdd();
+            entity.Property(collection => collection.Id).HasColumnName("_id").IsRequired(true)
+            .HasConversion(id => ObjectId.Parse(id), oid => oid.ToString())
+            .HasValueGenerator<ObjectIdValueGenerator>()
+            .ValueGeneratedOnAdd();
             entity.Property(collection => collection.EmailAddress).HasColumnName("emailAddress").IsRequired(true);
             entity.Property(collection => collection.UserId).HasColumnName("userId").IsRequired(true);
         });
@@ -79,7 +86,10 @@ public class CritDbContext : IdentityDbContext, ICritDbContext
         {
             entity.ToCollection("PhoneNumbers");
             entity.HasKey(collection => collection.Id);
-            entity.Property(collection => collection.Id).HasColumnName("_id").IsRequired(true).ValueGeneratedOnAdd();
+            entity.Property(collection => collection.Id).HasColumnName("_id").IsRequired(true)
+            .HasConversion(id => ObjectId.Parse(id), oid => oid.ToString())
+            .HasValueGenerator<ObjectIdValueGenerator>()
+            .ValueGeneratedOnAdd();
             entity.Property(collection => collection.CountryCode).HasColumnName("countryCode").IsRequired(true);
             entity.Property(collection => collection.Number).HasColumnName("number").IsRequired(true);
             entity.Property(collection => collection.Extension).HasColumnName("extension").IsRequired(false);

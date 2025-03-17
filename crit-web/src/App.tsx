@@ -6,7 +6,7 @@ import { ThemeContext } from "./contexts/Theme/theme-context";
 
 import './styles/App.scss';
 import { setUseNavigation } from './functions/Utils/navigation-utils';
-import ModuleContext from './contexts/Module/module-context';
+import ModuleProvider from './contexts/Module/module-context';
 import { AuthService } from './services/AuthService.service';
 
 function App(): JSX.Element {
@@ -44,12 +44,12 @@ function App(): JSX.Element {
 
   return (
     <div className={`body`} data-theme={theme}>
-      <ModuleContext services={[AuthService]}>
+      <ModuleProvider services={[AuthService]} id='app' key='module_provider_app'>
         <TitleBar theme={theme} onToggleTheme={toggleTheme} open={open} onToggleOpen={toggleOpen} title='Crit' />
         <main className={open === 'true' ? 'main-content' : 'main-content-closed'}>
           <Outlet />
         </main>
-      </ModuleContext>
+      </ModuleProvider>
     </div>
   );
 }

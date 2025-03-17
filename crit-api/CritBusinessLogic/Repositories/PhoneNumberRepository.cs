@@ -38,7 +38,7 @@ public class PhoneNumberRepository : IPhoneNumberRepository
         }
     }
 
-    public async System.Threading.Tasks.Task DeletePhoneNumber(Guid phoneNumberId)
+    public async System.Threading.Tasks.Task DeletePhoneNumber(string phoneNumberId)
     {
         try
         {
@@ -57,7 +57,7 @@ public class PhoneNumberRepository : IPhoneNumberRepository
         }
     }
 
-    public async Task<PhoneNumber> GetPhoneNumberById(Guid phoneNumberId)
+    public async Task<PhoneNumber> GetPhoneNumberById(string phoneNumberId)
     {
         try
         {

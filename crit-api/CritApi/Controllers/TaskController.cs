@@ -22,7 +22,7 @@ public class TaskController : ControllerBase
     [Route("{projectId}")]
     [ProducesResponseType<List<Task>>(StatusCodes.Status200OK)]
     [ProducesErrorResponseType(typeof(string))]
-    public async Task<IActionResult> GetTasks([FromRoute] Guid projectId)
+    public async Task<IActionResult> GetTasks([FromRoute] string projectId)
     {
         try
         {
@@ -40,7 +40,7 @@ public class TaskController : ControllerBase
     [Route("{projectId}/{taskId}")]
     [ProducesResponseType<Task>(StatusCodes.Status200OK)]
     [ProducesErrorResponseType(typeof(string))]
-    public async Task<IActionResult> GetTask([FromRoute] Guid projectId, [FromRoute] Guid taskId)
+    public async Task<IActionResult> GetTask([FromRoute] string projectId, [FromRoute] string taskId)
     {
         try
         {
@@ -111,7 +111,7 @@ public class TaskController : ControllerBase
     [HttpDelete]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesErrorResponseType(typeof(string))]
-    public async Task<IActionResult> DeleteTask([FromQuery] Guid projectId, [FromQuery] Guid taskId)
+    public async Task<IActionResult> DeleteTask([FromQuery] string projectId, [FromQuery] string taskId)
     {
         try
         {

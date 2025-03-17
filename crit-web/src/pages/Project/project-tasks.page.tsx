@@ -1,7 +1,8 @@
-import { JSX, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { GetEnvValues } from "../../constants/environment";
-import { Project } from "../../models/project.model";
+import { JSX, useEffect, useState } from "react";
+import { Project } from '../../models/project.model';
+import Tasks from "../../components/Tasks/tasks.component";
 
 async function getProject(projectId: string | undefined): Promise<Project | null> {
     return new Promise(async (resolve, reject): Promise<void> => {
@@ -21,7 +22,7 @@ async function getProject(projectId: string | undefined): Promise<Project | null
     });
 }
 
-function ProjectOptions(): JSX.Element {
+function ProjectTasks(): JSX.Element {
     const { projectId } = useParams();
     const [project, setProject] = useState<Project | null>(null);
     useEffect(() => {
@@ -33,11 +34,10 @@ function ProjectOptions(): JSX.Element {
     return (
         <>
             <h2>{project?.name ?? '<no project name>'}</h2>
-            <h3>Options</h3>
             <hr />
-            {project && (null)}
+            {project && (<Tasks selectedProjectId={project.id} tasks={project?.tasks ?? []} customFieldTypes={project?.customFieldTypes ?? []} statuses={project?.statuses ?? []} hiddenCustomFieldTypeIds={project?.hiddenCustomFieldTypeIds} />)}
         </>
     );
 }
 
-export default ProjectOptions;
+export default ProjectTasks;

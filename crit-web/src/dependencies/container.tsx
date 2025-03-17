@@ -1,6 +1,11 @@
 import 'reflect-metadata';
 
 export class Container {
+    constructor(id: string) {
+        this.id = id;
+    }
+
+    id: string;
     dependencies: any = [];
     isInitialized: boolean = false;
 

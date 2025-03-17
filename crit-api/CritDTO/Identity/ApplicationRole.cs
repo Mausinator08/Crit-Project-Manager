@@ -5,6 +5,6 @@ using MongoDbGenericRepository.Attributes;
 namespace CritDTO.Identity;
 
 [CollectionName("Roles")]
-public class ApplicationRole : MongoIdentityRole<Guid>
+public class ApplicationRole : MongoIdentityRole<string>
 {
 }

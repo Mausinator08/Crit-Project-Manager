@@ -5,11 +5,11 @@ namespace CritDTO.Models;
 
 public class Email
 {
-    public Guid Id { get; set; }
-    public Guid UserId { get; set; }
+    public string? Id { get; set; }
+    public string? UserId { get; set; }
     [ProtectedPersonalData]
     public string? EmailAddress { get; set; }
-    public Guid OrganizationId { get; set; }
+    public string OrganizationId { get; set; } = string.Empty;
 
     public Organization? Organization { get; set; }
 }

@@ -5,8 +5,7 @@ import { JSX, useState, useEffect, useContext, useRef } from 'react';
 import { GetLinks, GetLoggedOutLinks, Link } from "../../constants/nav-bar-links";
 import styles from "./nav-bar.module.scss";
 import { CreateLinks } from "../../functions/Links/create-links";
-import { CheckIsAuthenticated } from '../../functions/Auth/authentication';
-import { ModuleContext } from "../../contexts/Module/module-context";
+import { GetModuleContext } from "../../contexts/Module/module-context";
 import { AuthService } from "../../services/AuthService.service";
 
 type Props = {
@@ -15,9 +14,10 @@ type Props = {
 };
 
 function NavBar(props: Props): JSX.Element {
+	const moduleContext = useRef(GetModuleContext('app'));
 	const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 	const [links, setLinks] = useState<Link[]>([]);
-	const { getService } = useContext(ModuleContext);
+	const { getService } = useContext(moduleContext.current.context);
 	const authService: AuthService = getService(AuthService);
 
 	setInterval(() => {

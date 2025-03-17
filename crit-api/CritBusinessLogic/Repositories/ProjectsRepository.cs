@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CritBusinessLogic.Repositories;
 
-public class ProjectsRepository : IProjectsRepository
+public class ProjectsRepository : IDisposable, IAsyncDisposable, IProjectsRepository
 {
     private readonly CritDbContext _critDbContext;
     private TenantDbContext? _tenantDbContext;
@@ -42,7 +42,12 @@ public class ProjectsRepository : IProjectsRepository
                 throw new Exception("User is not logged in.");
             }
 
-            IQueryable<Project> projectsQuery = _tenantDbContext.Projects.Where(p =>
+            if (_tenantDbContext == null)
+            {
+                throw new Exception("Tenant database context is not initialized.");
+            }
+
+            IQueryable<Project> projectsQuery = _tenantDbContext.Projects.AsNoTracking().Where(p =>
             p.ProjectUserIds.Contains(applicationUser.Id) ||
             p.ProjectAdminUserIds.Contains(applicationUser.Id) ||
             p.ProjectOwnerUserId == applicationUser.Id);
@@ -60,7 +65,7 @@ public class ProjectsRepository : IProjectsRepository
         }
     }
 
-    public async Task<Project?> GetProject(Guid projectId)
+    public async Task<Project?> GetProject(string projectId)
     {
         try
         {
@@ -76,7 +81,12 @@ public class ProjectsRepository : IProjectsRepository
                 throw new Exception("User is not logged in.");
             }
 
-            IQueryable<Project> projectQuery = _tenantDbContext.Projects.Where(p =>
+            if (_tenantDbContext == null)
+            {
+                throw new Exception("Tenant database context is not initialized.");
+            }
+
+            IQueryable<Project> projectQuery = _tenantDbContext.Projects.AsNoTracking().Where(p =>
             p.Id == projectId &&
             (p.ProjectUserIds.Contains(applicationUser.Id) ||
             p.ProjectAdminUserIds.Contains(applicationUser.Id) ||
@@ -111,15 +121,30 @@ public class ProjectsRepository : IProjectsRepository
                 throw new Exception("User is not logged in.");
             }
 
-            Project newProject = new Project()
+            if (string.IsNullOrWhiteSpace(organization.Id))
             {
-                Name = project.Name,
-                Description = project.Description,
-                OrganizationIds = project.OrganizationIds,
-                ProjectUserIds = project.ProjectUserIds,
-                ProjectAdminUserIds = project.ProjectAdminUserIds,
-                ProjectOwnerUserId = project.ProjectOwnerUserId ?? applicationUser.Id
-            };
+                throw new Exception("Organization ID is not valid.");
+            }
+
+            Project newProject = new Project(project.Name, project.Description, organization.Id, applicationUser.Id);
+
+            foreach (string userId in project.ProjectUserIds)
+            {
+                newProject.ProjectUserIds.Add(userId);
+            }
+            foreach (string adminId in project.ProjectAdminUserIds)
+            {
+                newProject.ProjectAdminUserIds.Add(adminId);
+            }
+            foreach (string organizationId in project.OrganizationIds)
+            {
+                newProject.OrganizationIds.Add(organizationId);
+            }
+
+            if (_tenantDbContext == null)
+            {
+                throw new Exception("Tenant database context is not initialized.");
+            }
 
             _tenantDbContext.Projects.Add(newProject);
             int savedChanges = await _tenantDbContext.SaveChangesAsync();
@@ -141,6 +166,11 @@ public class ProjectsRepository : IProjectsRepository
     {
         try
         {
+            if (string.IsNullOrWhiteSpace(project.Id))
+            {
+                throw new Exception("Project ID is not valid.");
+            }
+
             Project? existingProject = await GetProject(project.Id);
             if (existingProject == null)
             {
@@ -149,13 +179,13 @@ public class ProjectsRepository : IProjectsRepository
 
             existingProject = project;
 
-            _tenantDbContext.Projects.Update(existingProject);
-            int savedChanges = await _tenantDbContext.SaveChangesAsync();
-
-            if (savedChanges <= 0)
+            if (_tenantDbContext == null)
             {
-                throw new Exception("Project failed to update.");
+                throw new Exception("Tenant database context is not initialized.");
             }
+
+            _tenantDbContext.Projects.Update(existingProject);
+            await _tenantDbContext.SaveChangesAsync();
         }
         catch (Exception ex)
         {
@@ -163,7 +193,7 @@ public class ProjectsRepository : IProjectsRepository
         }
     }
 
-    public async System.Threading.Tasks.Task DeleteProject(Guid projectId)
+    public async System.Threading.Tasks.Task DeleteProject(string projectId)
     {
         try
         {
@@ -171,6 +201,11 @@ public class ProjectsRepository : IProjectsRepository
             if (existingProject == null)
             {
                 throw new Exception($"Project {projectId} does not exist.");
+            }
+
+            if (_tenantDbContext == null)
+            {
+                throw new Exception("Tenant database context is not initialized.");
             }
 
             _tenantDbContext.Projects.Remove(existingProject);
@@ -184,6 +219,22 @@ public class ProjectsRepository : IProjectsRepository
         catch (Exception ex)
         {
             throw new Exception("Could not delete project.", ex);
+        }
+    }
+
+    public void Dispose()
+    {
+        if (_tenantDbContext != null)
+        {
+            _tenantDbContext?.Dispose();
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_tenantDbContext != null)
+        {
+            await _tenantDbContext.DisposeAsync();
         }
     }
 }

@@ -1,23 +1,23 @@
-import { JSX, useState, useEffect } from 'react';
+import { JSX, useState, useContext, useRef } from 'react';
 
-import { CheckIsAuthenticated } from "../../functions/Auth/authentication";
-import { navigate } from "../../functions/Utils/navigation-utils";
+import { GetModuleContext } from '../../contexts/Module/module-context';
+import { AuthService } from '../../services/AuthService.service';
 
 type ProtectedRouteProps = {
     children: React.ReactNode;
 };
 
 function ProtectedRoute(props: ProtectedRouteProps): JSX.Element {
+    const moduleContext = useRef(GetModuleContext('app'));
     const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const { getService } = useContext(moduleContext.current.context);
+    const authService: AuthService = getService(AuthService);
 
-    useEffect(() => {
-        CheckIsAuthenticated().then((auth) => {
-            setIsAuthenticated(auth.result);
-            if (!auth) {
-                navigate("/Login");
-            }
-        });
-    }, []);
+    setInterval(() => {
+        if (authService) {
+            setIsAuthenticated(authService.IsAuthenticated());
+        }
+    });
 
     return (
         <>

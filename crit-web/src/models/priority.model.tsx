@@ -6,6 +6,7 @@ export class Priority {
         this.backgroundColor = priority?.backgroundColor ?? null;
         this.color = priority?.color ?? null;
         this.projectId = priority?.projectId ?? projectId;
+        this.taskId = priority?.taskId ?? null;
     }
 
     public id: string;
@@ -14,4 +15,5 @@ export class Priority {
     public backgroundColor?: string;
     public color?: string;
     public projectId: string;
+    public taskId?: string;
 }

@@ -6,6 +6,7 @@ export class Status {
         this.backgroundColor = status?.backgroundColor ?? null;
         this.color = status?.color ?? null;
         this.projectId = status?.projectId ?? projectId;
+        this.taskId = status?.taskId ?? null;
     }
 
     public id: string;
@@ -14,4 +15,5 @@ export class Status {
     public backgroundColor?: string;
     public color?: string;
     public projectId: string;
+    public taskId?: string;
 }

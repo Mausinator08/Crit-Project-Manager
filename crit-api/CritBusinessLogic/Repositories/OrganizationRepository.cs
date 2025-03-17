@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CritBusinessLogic.Repositories;
 
-public class OrganizationRepository : IOrganizationRepository
+public class OrganizationRepository : IDisposable, IAsyncDisposable, IOrganizationRepository
 {
     private readonly CritDbContext _critDbContext;
     private TenantDbContext? _tenantDbContext = null;
@@ -22,7 +22,7 @@ public class OrganizationRepository : IOrganizationRepository
         _critDbContext = critDbContext;
         _tenantDbContextService = tenantDbContextService;
         _httpContextAccessor = httpContextAccessor;
-        if (httpContextAccessor.HttpContext?.User?.Identity?.IsAuthenticated == true)
+        if (_httpContextAccessor.HttpContext?.User?.Identity?.IsAuthenticated == true)
         {
             if (_critDbContext.Organizations.Any())
             {
@@ -119,7 +119,7 @@ public class OrganizationRepository : IOrganizationRepository
         }
     }
 
-    public async Task<Organization?> GetOrganization(Guid organizationId)
+    public async Task<Organization?> GetOrganization(string organizationId)
     {
         try
         {
@@ -241,7 +241,7 @@ public class OrganizationRepository : IOrganizationRepository
         }
     }
 
-    public async System.Threading.Tasks.Task DeleteOrganization(Guid organizationId)
+    public async System.Threading.Tasks.Task DeleteOrganization(string organizationId)
     {
         try
         {
@@ -294,6 +294,22 @@ public class OrganizationRepository : IOrganizationRepository
             }
 
             throw new Exception($"Error deleting organization with ID {organizationId}.", ex);
+        }
+    }
+
+    public void Dispose()
+    {
+        if (_tenantDbContext != null)
+        {
+            _tenantDbContext?.Dispose();
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_tenantDbContext != null)
+        {
+            await _tenantDbContext.DisposeAsync();
         }
     }
 }

@@ -1,9 +1,9 @@
-@import '../../styles/Custom.scss';
+@use '../../styles/Custom.scss' as *;
+@use '../../styles/Colors.scss' as *;
 
 .taskWrapper {
     display: flex;
     flex-direction: row;
-
 }
 
 .taskList {

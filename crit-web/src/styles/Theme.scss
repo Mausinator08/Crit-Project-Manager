@@ -1,8 +1,8 @@
-@import './Colors.scss';
+@use './Colors.scss' as *;
 
 html[data-theme="dark"] {
-  --background-color: #{$primary};
-  --color: #{$secondary};
+  --background-color: #{$dark};
+  --color: #{$light};
 
   --primary-color: #{$primary};
   --secondary-color: #{$secondary};

@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CritBusinessLogic.Repositories;
 
-public class TasksRepository : ITasksRepository
+public class TasksRepository : IDisposable, IAsyncDisposable, ITasksRepository
 {
     private TenantDbContext? _tenantDbContext = null;
     private readonly IUserRepository _userRepository;
@@ -20,14 +20,20 @@ public class TasksRepository : ITasksRepository
             Task<TenantDbContext> tenantDbContextTask = tenantDbContextService.GetAuthenticatedTenantDb(httpContextAccessor.HttpContext.User);
             tenantDbContextTask.Wait();
             _tenantDbContext = tenantDbContextTask.Result;
-            _userRepository = userRepository;
         }
+
+        _userRepository = userRepository;
     }
 
-    public async Task<List<ProjectTask>> GetAllTasks(Guid projectId)
+    public async Task<List<ProjectTask>> GetAllTasks(string projectId)
     {
         try
         {
+            if (_tenantDbContext == null)
+            {
+                throw new Exception("Tenant database context is not initialized.");
+            }
+
             IQueryable<ProjectTask> tasksQuery = _tenantDbContext.Tasks.Where(t => t.ProjectId == projectId);
 
             if (tasksQuery.Any())
@@ -43,10 +49,15 @@ public class TasksRepository : ITasksRepository
         }
     }
 
-    public async Task<ProjectTask?> GetTask(Guid projectId, Guid taskId)
+    public async Task<ProjectTask?> GetTask(string projectId, string taskId)
     {
         try
         {
+            if (_tenantDbContext == null)
+            {
+                throw new Exception("Tenant database context is not initialized.");
+            }
+
             IQueryable<ProjectTask> taskQuery = _tenantDbContext.Tasks.Where(t => t.Id == taskId && t.ProjectId == projectId);
 
             if (taskQuery.Any())
@@ -76,6 +87,11 @@ public class TasksRepository : ITasksRepository
             if (applicationUser == null)
             {
                 throw new Exception("User is not logged in.");
+            }
+
+            if (_tenantDbContext == null)
+            {
+                throw new Exception("Tenant database context is not initialized.");
             }
 
             IQueryable<Project> projectQuery = _tenantDbContext.Projects.Where(p =>
@@ -119,6 +135,11 @@ public class TasksRepository : ITasksRepository
                 throw new Exception("User is not logged in.");
             }
 
+            if (_tenantDbContext == null)
+            {
+                throw new Exception("Tenant database context is not initialized.");
+            }
+
             IQueryable<Project> projectQuery = _tenantDbContext.Projects.Where(p =>
             p.Id == task.ProjectId &&
             p.ProjectAdminUserIds.Contains(applicationUser.Id));
@@ -142,7 +163,7 @@ public class TasksRepository : ITasksRepository
         }
     }
 
-    public async System.Threading.Tasks.Task DeleteTask(Guid projectId, Guid taskId)
+    public async System.Threading.Tasks.Task DeleteTask(string projectId, string taskId)
     {
         try
         {
@@ -156,6 +177,11 @@ public class TasksRepository : ITasksRepository
             if (applicationUser == null)
             {
                 throw new Exception("User is not logged in.");
+            }
+
+            if (_tenantDbContext == null)
+            {
+                throw new Exception("Tenant database context is not initialized.");
             }
 
             IQueryable<Project> projectQuery = _tenantDbContext.Projects.Where(p =>
@@ -185,6 +211,22 @@ public class TasksRepository : ITasksRepository
         catch (Exception ex)
         {
             throw new Exception($"Could not delete task {taskId} from project {projectId}.", ex);
+        }
+    }
+
+    public void Dispose()
+    {
+        if (_tenantDbContext != null)
+        {
+            _tenantDbContext?.Dispose();
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_tenantDbContext != null)
+        {
+            await _tenantDbContext.DisposeAsync();
         }
     }
 }

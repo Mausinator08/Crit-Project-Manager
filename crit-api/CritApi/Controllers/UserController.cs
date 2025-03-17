@@ -84,6 +84,11 @@ public class UserController : ControllerBase
     {
         try
         {
+            if (user.UserName == null || user.Email == null)
+            {
+                return StatusCode(StatusCodes.Status400BadRequest, new ApiResult("Could not update user.", new List<string>(["User name and email are required."]), user));
+            }
+
             ApplicationUser? appUser = await _userManager.FindByNameAsync(user.UserName);
 
             if (appUser != null)

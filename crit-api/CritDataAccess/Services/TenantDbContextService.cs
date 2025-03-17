@@ -42,7 +42,10 @@ public class TenantDbContextService : ITenantDbContextService
 
     public async Task<TenantDbContext> GetTenantDb(string databaseName)
     {
-        TenantDbContext tenantDbContext = new TenantDbContext(new DbContextOptionsBuilder().UseMongoDB(_connectionString, databaseName).Options);
+        DbContextOptionsBuilder<TenantDbContext> dbContextOptions = new DbContextOptionsBuilder<TenantDbContext>()
+            .UseMongoDB(_connectionString, databaseName)
+            .EnableSensitiveDataLogging();
+        TenantDbContext tenantDbContext = new TenantDbContext(dbContextOptions.Options);
 
         return tenantDbContext;
     }

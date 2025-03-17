@@ -5,15 +5,16 @@ import {
 import App from './App';
 import Home from './pages/Home/home.page';
 import Projects from './pages/Project/projects.page';
-import ProjectOptions from './pages/Project/project-options.page';
+import ProjectTasks from './pages/Project/project-tasks.page';
 import TaskDetails from './components/Tasks/task-details.component';
 import Error from './pages/Error/error.page';
 import Login from './pages/Login/login.page';
 import ProtectedRoute from './components/ProtectedRoute/protected-route.component';
-import { GetEnvValues } from './constants/environment';
-import { navigate } from './functions/Utils/navigation-utils';
 import Logout from './pages/Logout/logout.page';
 import Register from './pages/Register/register.page';
+import ModuleProvider from './contexts/Module/module-context';
+import { ProjectService } from './services/ProjectService.service';
+import ProjectOptions from './pages/Project/project-options.page';
 
 const appRouter = createBrowserRouter([
     {
@@ -34,18 +35,22 @@ const appRouter = createBrowserRouter([
             },
             {
                 path: "/Projects",
-                element: (<ProtectedRoute><Projects /></ProtectedRoute>),
+                element: (<ModuleProvider services={[ProjectService]} id='projects' key='module_provider_projects'><ProtectedRoute><Projects /></ProtectedRoute></ModuleProvider>),
                 children: [
                     {
                         path: '/Projects/:projectId',
-                        element: (<ProtectedRoute><ProjectOptions /></ProtectedRoute>),
+                        element: (<ProtectedRoute><ProjectTasks /></ProtectedRoute>),
                         children: [
+                            {
+                                element: (<ProtectedRoute><ProjectOptions /></ProtectedRoute>),
+                                index: true,
+                            },
                             {
                                 path: '/Projects/:projectId/:taskId',
                                 element: (<ProtectedRoute><TaskDetails /></ProtectedRoute>),
                             }
-                        ],
-                    }
+                        ]
+                    },
                 ],
             },
             {

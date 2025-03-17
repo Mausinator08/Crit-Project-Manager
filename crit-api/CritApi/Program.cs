@@ -68,6 +68,7 @@ BsonSerializer.RegisterSerializer(new GuidSerializer(GuidRepresentation.Standard
 builder.Services.AddDbContext<CritDbContext>(options =>
 {
     options.UseMongoDB(connectionString.ToString(), database);
+    options.EnableSensitiveDataLogging();
 });
 
 builder.Services.AddIdentityCore<ApplicationUser>(setupAction =>
@@ -79,7 +80,7 @@ builder.Services.AddIdentityCore<ApplicationUser>(setupAction =>
     setupAction.Password.RequiredLength = 8;
 })
 .AddRoles<ApplicationRole>()
-.AddMongoDbStores<ApplicationUser, ApplicationRole, Guid>(connectionString.ToString(), database).AddSignInManager();
+.AddMongoDbStores<ApplicationUser, ApplicationRole, string>(connectionString.ToString(), database).AddSignInManager();
 
 builder.Services.ConfigureApplicationCookie(options =>
 {

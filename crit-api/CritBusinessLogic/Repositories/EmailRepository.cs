@@ -37,7 +37,7 @@ public class EmailRepository : IEmailRepository
         }
     }
 
-    public async System.Threading.Tasks.Task DeleteEmail(Guid emailId)
+    public async System.Threading.Tasks.Task DeleteEmail(string emailId)
     {
         try
         {
@@ -56,7 +56,7 @@ public class EmailRepository : IEmailRepository
         }
     }
 
-    public async Task<Email> GetEmailById(Guid emailId)
+    public async Task<Email> GetEmailById(string emailId)
     {
         try
         {

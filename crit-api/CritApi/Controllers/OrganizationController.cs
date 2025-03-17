@@ -64,7 +64,7 @@ public class OrganizationController : ControllerBase
     [Route("{organizationId}")]
     [ProducesResponseType<Organization>(StatusCodes.Status200OK)]
     [ProducesErrorResponseType(typeof(string))]
-    public async Task<IActionResult> GetOrganization(Guid organizationId)
+    public async Task<IActionResult> GetOrganization(string organizationId)
     {
         try
         {
@@ -132,7 +132,7 @@ public class OrganizationController : ControllerBase
     [Route("{organizationId}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesErrorResponseType(typeof(string))]
-    public async Task<IActionResult> DeleteOrganization(Guid organizationId)
+    public async Task<IActionResult> DeleteOrganization(string organizationId)
     {
         try
         {

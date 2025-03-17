@@ -1,6 +1,8 @@
+using CritDataAccess.ValueGenerators;
 using CritDTO.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using MongoDB.Bson;
 using MongoDB.EntityFrameworkCore.Extensions;
 
 namespace CritDataAccess.Contexts;
@@ -37,7 +39,10 @@ public class TenantDbContext : DbContext, ITenantDbContext
         {
             entity.ToCollection("Projects");
             entity.HasKey(collection => collection.Id);
-            entity.Property(collection => collection.Id).HasColumnName("_id").IsRequired(true).ValueGeneratedOnAdd();
+            entity.Property(collection => collection.Id).HasColumnName("_id").IsRequired(true)
+            .HasConversion(id => ObjectId.Parse(id), oid => oid.ToString())
+            .HasValueGenerator<ObjectIdValueGenerator>()
+            .ValueGeneratedOnAdd();
             entity.Property(collection => collection.Name).HasColumnName("name").IsRequired(true);
             entity.Property(collection => collection.Description).HasColumnName("description").IsRequired(false);
             entity.Property(collection => collection.OwningOrganizationId).HasColumnName("owningOrganizationId").IsRequired(true);
@@ -80,7 +85,10 @@ public class TenantDbContext : DbContext, ITenantDbContext
         {
             entity.ToCollection("Statuses");
             entity.HasKey(collection => collection.Id);
-            entity.Property(collection => collection.Id).HasColumnName("_id").IsRequired(true).ValueGeneratedOnAdd();
+            entity.Property(collection => collection.Id).HasColumnName("_id").IsRequired(true)
+            .HasConversion(id => ObjectId.Parse(id), oid => oid.ToString())
+            .HasValueGenerator<ObjectIdValueGenerator>()
+            .ValueGeneratedOnAdd();
             entity.Property(collection => collection.BackgroundColor).HasColumnName("backgroundColor").IsRequired(false);
             entity.Property(collection => collection.Color).HasColumnName("color").IsRequired(false);
             entity.Property(collection => collection.Description).HasColumnName("description").IsRequired(false);
@@ -104,7 +112,10 @@ public class TenantDbContext : DbContext, ITenantDbContext
         {
             entity.ToCollection("Priorities");
             entity.HasKey(collection => collection.Id);
-            entity.Property(collection => collection.Id).HasColumnName("_id").IsRequired(true).ValueGeneratedOnAdd();
+            entity.Property(collection => collection.Id).HasColumnName("_id").IsRequired(true)
+            .HasConversion(id => ObjectId.Parse(id), oid => oid.ToString())
+            .HasValueGenerator<ObjectIdValueGenerator>()
+            .ValueGeneratedOnAdd();
             entity.Property(collection => collection.Name).HasColumnName("name").IsRequired(true);
             entity.Property(collection => collection.BackgroundColor).HasColumnName("backgroundColor").IsRequired(false);
             entity.Property(collection => collection.Color).HasColumnName("color").IsRequired(false);
@@ -127,7 +138,10 @@ public class TenantDbContext : DbContext, ITenantDbContext
         {
             entity.ToCollection("CustomFieldTypes");
             entity.HasKey(collection => collection.Id);
-            entity.Property(collection => collection.Id).HasColumnName("_id").IsRequired(true).ValueGeneratedOnAdd();
+            entity.Property(collection => collection.Id).HasColumnName("_id").IsRequired(true)
+            .HasConversion(id => ObjectId.Parse(id), oid => oid.ToString())
+            .HasValueGenerator<ObjectIdValueGenerator>()
+            .ValueGeneratedOnAdd();
             entity.Property(collection => collection.Name).HasColumnName("name").IsRequired(true);
             entity.Property(collection => collection.ProjectId).HasColumnName("projectId").IsRequired(true);
         });
@@ -142,7 +156,10 @@ public class TenantDbContext : DbContext, ITenantDbContext
         {
             entity.ToCollection("Tasks");
             entity.HasKey(collection => collection.Id);
-            entity.Property(collection => collection.Id).HasColumnName("_id").IsRequired(true).ValueGeneratedOnAdd();
+            entity.Property(collection => collection.Id).HasColumnName("_id").IsRequired(true)
+            .HasConversion(id => ObjectId.Parse(id), oid => oid.ToString())
+            .HasValueGenerator<ObjectIdValueGenerator>()
+            .ValueGeneratedOnAdd();
             entity.Property(collection => collection.Title).HasColumnName("title").IsRequired(false);
             entity.Property(collection => collection.Details).HasColumnName("details").IsRequired(false);
             entity.Property(collection => collection.ProjectId).HasColumnName("projectId").IsRequired(true);
@@ -189,7 +206,10 @@ public class TenantDbContext : DbContext, ITenantDbContext
         {
             entity.ToCollection("CustomFields");
             entity.HasKey(collection => collection.Id);
-            entity.Property(collection => collection.Id).HasColumnName("_id").IsRequired(true).ValueGeneratedOnAdd();
+            entity.Property(collection => collection.Id).HasColumnName("_id").IsRequired(true)
+            .HasConversion(id => ObjectId.Parse(id), oid => oid.ToString())
+            .HasValueGenerator<ObjectIdValueGenerator>()
+            .ValueGeneratedOnAdd();
             entity.Property(collection => collection.Name).HasColumnName("name").IsRequired(true);
             entity.Property(collection => collection.Value).HasColumnName("value").IsRequired(true);
             entity.Property(collection => collection.CustomFieldTypeId).HasColumnName("customFieldTypeId").IsRequired(true);

@@ -1,13 +1,13 @@
 
 import { JSX, useContext, useEffect, useRef } from "react";
-import { Outlet } from "react-router-dom";
 import { navigate } from "../../functions/Utils/navigation-utils";
 import { GetEnvValues } from "../../constants/environment";
-import { ModuleContext } from "../../contexts/Module/module-context";
+import { GetModuleContext } from "../../contexts/Module/module-context";
 import { AuthService } from "../../services/AuthService.service";
 
 function Logout(): JSX.Element {
-    const { getService } = useContext(ModuleContext);
+    const moduleContext = useRef(GetModuleContext('app'));
+    const { getService } = useContext(moduleContext.current.context);
     const authService: AuthService = getService(AuthService);
 
     useEffect(() => {

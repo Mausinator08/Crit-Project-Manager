@@ -12,6 +12,7 @@ export class Task {
         this.priorityId = task?.priorityId ?? null;
         this.complexity = task?.complexity ?? null;
         this.dueDate = task?.dueDate ?? null;
+        this.parentTaskId = task?.parentTaskId ?? null;
         this.taskDependencyIds = task?.taskDependencyIds ?? [];
         this.subTasks = task?.subTasks ?? [];
         this.customFields = task?.customFields ?? [];
@@ -27,6 +28,7 @@ export class Task {
     public priorityId?: string;
     public complexity?: number;
     public dueDate?: Date;
+    public parentTaskId?: string;
     public taskDependencyIds: string[];
     public subTasks: Task[];
     public customFields: CustomField[];

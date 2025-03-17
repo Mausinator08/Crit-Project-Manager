@@ -83,7 +83,17 @@ public class LoginController : ControllerBase
                     throw new Exception("Failed to create user.\n" + stringBuilder.ToString());
                 }
 
+                if (string.IsNullOrWhiteSpace(user.Organization))
+                {
+                    return BadRequest("Organization name is required.");
+                }
+
                 Organization organization = await _organizationRepository.CreateOrganization(new Organization(user.Organization, appUser.Id));
+
+                if (organization == null || string.IsNullOrWhiteSpace(organization.Id))
+                {
+                    throw new Exception("Failed to create organization.");
+                }
 
                 Email email = await _emailRepository.CreateEmail(new Email()
                 {
@@ -227,7 +237,17 @@ public class LoginController : ControllerBase
                     throw new Exception("Failed to create user.\n" + stringBuilder.ToString());
                 }
 
+                if (string.IsNullOrWhiteSpace(user.Organization))
+                {
+                    return BadRequest("Organization name is required.");
+                }
+
                 Organization organization = await _organizationRepository.CreateOrganization(new Organization(user.Organization, appUser.Id));
+
+                if (organization == null || string.IsNullOrWhiteSpace(organization.Id))
+                {
+                    throw new Exception("Failed to create organization.");
+                }
 
                 Email email = await _emailRepository.CreateEmail(new Email()
                 {
@@ -274,7 +294,7 @@ public class LoginController : ControllerBase
     [Route("Login")]
     [ProducesResponseType<object>(StatusCodes.Status200OK)]
     [ProducesErrorResponseType(typeof(string))]
-    public async Task<IActionResult> Login([FromBody] User user, [FromQuery] bool? useCookies, [FromQuery] bool? useSessionCookies)
+    public async Task<IActionResult> Login([FromBody] User user, [FromQuery] bool? useCookies)
     {
         try
         {
@@ -283,12 +303,14 @@ public class LoginController : ControllerBase
                 return BadRequest("Invalid user data.");
             }
 
-            bool useCookieScheme = (useCookies == true) || (useSessionCookies == true);
-            bool isPersistent = (useCookies == true) && (useSessionCookies != true);
-
-            _signInManager.AuthenticationScheme = useCookieScheme ? IdentityConstants.ApplicationScheme : IdentityConstants.BearerScheme;
+            bool isPersistent = useCookies == true;
 
             // Simulate user authentication
+            if (string.IsNullOrEmpty(user.UserName))
+            {
+                return BadRequest("Username is required.");
+            }
+
             ApplicationUser? applicationUser = await _userManager.FindByNameAsync(user.UserName);
             if (applicationUser != null)
             {

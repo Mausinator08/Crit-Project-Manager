@@ -28,9 +28,10 @@ public class PhoneNumber
         Type = PhoneNumberType.Mobile;
         CountryCode = "+1";
         Number = "000-000-0000";
+        OrganizationId = string.Empty;
     }
 
-    public Guid Id { get; set; }
+    public string? Id { get; set; }
     public PhoneNumberType Type { get; set; }
     [PersonalData]
     public string CountryCode { get; set; }
@@ -38,7 +39,7 @@ public class PhoneNumber
     public string Number { get; set; }
     [PersonalData]
     public string? Extension { get; set; }
-    public Guid OrganizationId { get; set; }
+    public string OrganizationId { get; set; }
 
     public Organization? Organization { get; set; }
 }

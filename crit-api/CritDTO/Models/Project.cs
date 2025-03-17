@@ -9,11 +9,13 @@ public class Project : AuditInformation
     {
         Name = "";
         Tasks = new List<ProjectTask>();
-        ProjectAdminUserIds = new List<Guid>();
-        ProjectUserIds = new List<Guid>();
-        OrganizationIds = new List<Guid>();
+        OwningOrganizationId = string.Empty;
+        ProjectOwnerUserId = string.Empty;
+        ProjectAdminUserIds = new List<string>();
+        ProjectUserIds = new List<string>();
+        OrganizationIds = new List<string>();
         CustomFieldTypes = new List<CustomFieldType>();
-        HiddenCustomFieldTypeIds = new List<Guid>();
+        HiddenCustomFieldTypeIds = new List<string>();
         Statuses = new List<Status>();
         Priorities = new List<Priority>();
         DateTime now = DateTime.Now;
@@ -22,18 +24,18 @@ public class Project : AuditInformation
     }
 
     [JsonConstructor]
-    public Project(string name, string? description, Guid owningOrganizationId, Guid projectOwnerUserId)
+    public Project(string name, string? description, string owningOrganizationId, string projectOwnerUserId)
     {
         Name = name;
         Description = description;
         Tasks = new List<ProjectTask>();
         OwningOrganizationId = owningOrganizationId;
         ProjectOwnerUserId = projectOwnerUserId;
-        ProjectAdminUserIds = new List<Guid>([projectOwnerUserId]);
-        ProjectUserIds = new List<Guid>([projectOwnerUserId]);
-        OrganizationIds = new List<Guid>([owningOrganizationId]);
+        ProjectAdminUserIds = new List<string>([projectOwnerUserId]);
+        ProjectUserIds = new List<string>([projectOwnerUserId]);
+        OrganizationIds = new List<string>([owningOrganizationId]);
         CustomFieldTypes = new List<CustomFieldType>();
-        HiddenCustomFieldTypeIds = new List<Guid>();
+        HiddenCustomFieldTypeIds = new List<string>();
         Statuses = new List<Status>();
         Priorities = new List<Priority>();
         DateTime now = DateTime.Now;
@@ -43,15 +45,15 @@ public class Project : AuditInformation
         UpdatedByUserId = projectOwnerUserId;
     }
 
-    public Guid Id { get; set; }
+    public string? Id { get; set; }
     public string Name { get; set; }
     public string? Description { get; set; }
-    public Guid OwningOrganizationId { get; set; }
-    public Guid ProjectOwnerUserId { get; set; }
-    public List<Guid> ProjectAdminUserIds { get; set; }
-    public List<Guid> ProjectUserIds { get; set; }
-    public List<Guid> OrganizationIds { get; set; }
-    public List<Guid> HiddenCustomFieldTypeIds { get; set; }
+    public string OwningOrganizationId { get; set; }
+    public string ProjectOwnerUserId { get; set; }
+    public List<string> ProjectAdminUserIds { get; set; }
+    public List<string> ProjectUserIds { get; set; }
+    public List<string> OrganizationIds { get; set; }
+    public List<string> HiddenCustomFieldTypeIds { get; set; }
 
     public List<Status> Statuses { get; set; }
     public List<Priority> Priorities { get; set; }
