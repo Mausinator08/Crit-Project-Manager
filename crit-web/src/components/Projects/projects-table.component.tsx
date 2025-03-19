@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMinus, faPencil } from "@fortawesome/free-solid-svg-icons";
 import { GetModuleContext } from "../../contexts/Module/module-context";
 import { ProjectService } from "../../services/ProjectService.service";
-import './projects-table.scss';
+import './projects.scss';
 
 export interface ProjectTableProps {
     projects: Project[];
@@ -16,7 +16,12 @@ export interface ProjectTableProps {
     setError: (error: string) => void;
 }
 
-function ProjectsTable({ projects, setProjects, selectedProjects, setSelectedProjects, isLockedProjectsEnabled, setError }: ProjectTableProps): JSX.Element {
+function ProjectsTable({ projects,
+    setProjects,
+    selectedProjects,
+    setSelectedProjects,
+    isLockedProjectsEnabled,
+    setError }: ProjectTableProps): JSX.Element {
     const moduleContext = useRef(GetModuleContext('projects'));
     const { getService } = useContext(moduleContext.current.context);
     const projectService: ProjectService = getService(ProjectService);
