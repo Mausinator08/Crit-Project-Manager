@@ -220,13 +220,3 @@ input[type="checkbox"]:not(:disabled):hover:after {
     opacity: 0.5;
     pointer-events: none;
 }
-
-.clickable {
-    display: inline-block;
-    position: relative;
-    font-size: 16pt;
-    width: 16pt;
-    height: 16pt;
-    color: $secondary;
-    background-color: transparent;
-}

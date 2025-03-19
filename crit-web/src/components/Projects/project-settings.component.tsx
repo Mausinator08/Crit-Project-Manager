@@ -20,7 +20,6 @@ function ProjectSettings({
     setIsLockedProjectsEnabled
 }: ProjectSettingsProps): JSX.Element {
     return (
-
         <div className="settings-panel">
             <label>Settings</label>
             <hr />
@@ -68,7 +67,7 @@ function ProjectSettings({
                             checked={isLockedProjectsEnabled}
                             onChange={(e) => {
                                 setIsLockedProjectsEnabled(e.target.checked);
-                                localStorage.setItem('isLockProjectDeletionsEnabled', e.target.checked.toString());
+                                localStorage.setItem('isLockedProjectsEnabled', e.target.checked.toString());
                             }} /><Tooltip id="lockProjectsTooltip" /><span className="checkbox-span">Lock Projects</span>
                     </label>
                 </div>

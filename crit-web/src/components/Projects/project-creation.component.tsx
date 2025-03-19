@@ -28,8 +28,6 @@ function ProjectCreation({
             <div className="project-row" key={`project_row_new_project`}>
                 <FontAwesomeIcon icon={faPlus} onClick={() => {
                     if (newProjectName === "") {
-                        setError('Please enter a name for the new project.');
-                        alert('Please enter a name for the new project.');
                         return;
                     }
 
@@ -39,6 +37,16 @@ function ProjectCreation({
                     };
                     projectService.CreateNewProject(newProject)
                         .then((createdProject) => {
+                            setNewProjectName('');
+                            setNewProjectDescription('');
+                            let newProjectNameInput = (document.getElementById('newProjectName') as HTMLInputElement | null);
+                            let newProjectDescriptionInput = (document.getElementById('newProjectDescripton') as HTMLInputElement | null);
+                            if (newProjectNameInput) {
+                                newProjectNameInput.value = '';
+                            }
+                            if (newProjectDescriptionInput) {
+                                newProjectDescriptionInput.value = '';
+                            }
                             projectService.GetAllProjects()
                                 .then(value => {
                                     setProjects(value);
@@ -53,7 +61,7 @@ function ProjectCreation({
                             console.error(error);
                             setError(error.message);
                         });
-                }} className="clickable project-action-icon" />
+                }} className={newProjectName ? 'project-action-icon' : 'project-action-icon-disabled'} />
                 <input type="text" id="newProjectName" onBlur={(e) => {
                     setNewProjectName(e.target.value);
                 }} />

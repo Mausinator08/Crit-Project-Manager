@@ -135,9 +135,8 @@ function ProjectsTable({ projects,
                                 </h5>
                             </td>
                             <td>
-                                <FontAwesomeIcon icon={faMinus} className={isLockedProjectsEnabled ? 'disabled project-action-icon' : 'project-action-icon'} onClick={() => {
+                                <FontAwesomeIcon icon={faMinus} className={isLockedProjectsEnabled ? 'project-action-icon-disabled' : 'project-action-icon'} onClick={() => {
                                     if (isLockedProjectsEnabled) {
-                                        alert('Project deletions are locked. Please unlock them to delete projects.');
                                         return;
                                     }
 
