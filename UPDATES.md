@@ -43,3 +43,28 @@
 
 * Restored Authorize attribute for Controllers that needed it.
 * Implemented API endpoints for Login/Logout, Organizations, Projects, and Tasks.
+
+## 2025/03/13 21:00 CST
+
+### Enhancements
+
+* Registration and Login works and API endpoints are authorizing correctly
+
+## 2025/03/14 00:08 CST
+
+### Fixes
+
+* Fixed nav menu not updating after login/logout.
+
+## 2025/03/16 20:48 CST
+
+### Enhancements
+
+* Projects are pulling, creating, and saving in API via UI.
+
+## 2025/03/19 12:13 CST
+
+### Fixes
+
+* Fixed issue where navbar collapsible items would not revert to collapsed state when the navbar is condensed.
+* Fixed some visual issues with icons and fixed the Lock Projects checkbox to save in the local storage.
