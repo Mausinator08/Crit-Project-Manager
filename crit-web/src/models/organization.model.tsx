@@ -1,6 +1,6 @@
 export class Organization {
     constructor(name?: string, ownerUserId?: string, organization?: any) {
-        this.id = organization?.id ?? crypto.randomUUID();
+        this.id = organization?.id ?? null;
         this.name = name ?? organization?.name ?? '';
         this.ownerUserId = ownerUserId ?? organization?.ownerUserId ?? '';
         this.phoneNumberIds = organization?.phoneNumberIds ?? [];
@@ -11,7 +11,7 @@ export class Organization {
         this.affiliatedUserIds = organization?.affiliatedUserIds ?? [];
     }
 
-    public id: string;
+    public id?: string;
     public name: string;
     public ownerUserId: string;
     public phoneNumberIds: string[];

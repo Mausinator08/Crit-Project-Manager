@@ -1,6 +1,6 @@
 export class Priority {
     constructor(name?: string, projectId?: string, priority?: any) {
-        this.id = priority?.id ?? crypto.randomUUID();
+        this.id = priority?.id ?? null;
         this.name = priority?.name ?? name;
         this.description = priority?.description ?? null;
         this.backgroundColor = priority?.backgroundColor ?? null;
@@ -9,7 +9,7 @@ export class Priority {
         this.taskId = priority?.taskId ?? null;
     }
 
-    public id: string;
+    public id?: string;
     public name: string;
     public description?: string;
     public backgroundColor?: string;

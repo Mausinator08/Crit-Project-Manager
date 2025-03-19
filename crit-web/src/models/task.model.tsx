@@ -2,7 +2,7 @@ import { CustomField } from "./custom-field.model";
 
 export class Task {
     constructor(projectId?: string, task?: any) {
-        this.id = task?.id ?? crypto.randomUUID();
+        this.id = task?.id ?? null;
         this.title = task?.title ?? null;
         this.details = task?.details ?? null;
         this.projectId = task?.projectId ?? projectId;
@@ -18,7 +18,7 @@ export class Task {
         this.customFields = task?.customFields ?? [];
     }
 
-    public id: string;
+    public id?: string;
     public title?: string;
     public details?: string;
     public projectId: string;

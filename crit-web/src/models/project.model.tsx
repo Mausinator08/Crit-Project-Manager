@@ -5,7 +5,7 @@ import { Task } from "./task.model";
 
 export class Project {
     constructor(name?: string, project?: any) {
-        this.id = project?.id ?? crypto.randomUUID();
+        this.id = project?.id ?? null;
         this.name = project?.name ?? name;
         this.description = project?.description ?? null;
         this.tasks = project?.tasks ?? [];
@@ -20,7 +20,7 @@ export class Project {
         this.priorities = project?.priorities ?? [];
     }
 
-    public id: string;
+    public id?: string;
     public name: string;
     public description?: string;
     public tasks: Task[];

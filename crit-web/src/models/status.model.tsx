@@ -1,6 +1,6 @@
 export class Status {
     constructor(name?: string, projectId?: string, status?: any) {
-        this.id = status?.id ?? crypto.randomUUID();
+        this.id = status?.id ?? null;
         this.name = status?.name ?? name;
         this.description = status?.description ?? null;
         this.backgroundColor = status?.backgroundColor ?? null;
@@ -9,7 +9,7 @@ export class Status {
         this.taskId = status?.taskId ?? null;
     }
 
-    public id: string;
+    public id?: string;
     public name: string;
     public description?: string;
     public backgroundColor?: string;
