@@ -35,7 +35,7 @@ const appRouter = createBrowserRouter([
             },
             {
                 path: "/Projects",
-                element: (<ModuleProvider services={[ProjectService]} id='projects' key='module_provider_projects'><ProtectedRoute><Projects /></ProtectedRoute></ModuleProvider>),
+                element: (<ProtectedRoute><ModuleProvider services={[ProjectService]} id='projects' key='module_provider_projects'><Projects /></ModuleProvider></ProtectedRoute>),
                 children: [
                     {
                         path: '/Projects/:projectId',

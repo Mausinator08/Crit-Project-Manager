@@ -45,18 +45,3 @@
     width: 200px;
     margin: 5px;
 }
-
-.project-row {
-    display: flex;
-    flex-direction: row;
-    align-items: left;
-    justify-content: space-evenly;
-    padding: 5px;
-    max-width: 100%;
-    max-height: fit-content;
-    vertical-align: middle;
-}
-
-.project-action-icon {
-    top: 12px;
-}

@@ -9,18 +9,7 @@ import { Tooltip } from "react-tooltip";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMinus, faPencil, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { ProjectRequest } from "../../models/requests/project-request.model";
-
-async function getProjects(projectService: ProjectService): Promise<Project[] | null> {
-    return new Promise((resolve, reject): void => {
-        projectService.GetAllProjects()
-            .then((data: Project[]) => {
-                resolve(data);
-            })
-            .catch((error: Error) => {
-                reject(error);
-            });
-    });
-}
+import ProjectsTable from "../../components/Projects/projects-table.component";
 
 function Projects(): JSX.Element {
     const { projectId } = useParams();
@@ -35,13 +24,11 @@ function Projects(): JSX.Element {
     const [autoRefreshIntervalInstance, setAutoRefreshIntervalInstance] = useState<NodeJS.Timeout | null>(null);
     const [selectedProjects, setSelectedProjects] = useState<string[]>([]);
     const [isLockedProjectsEnabled, setIsLockedProjectsEnabled] = useState<boolean>(localStorage.getItem('isLockedProjectsEnabled') === 'true');
-    const [editingProjectName, setEditingProjectName] = useState<string | null>(null);
-    const [editingProjectDescription, setEditingProjectDescription] = useState<string | null>(null);
     const [newProjectName, setNewProjectName] = useState<string>("");
     const [newProjectDescription, setNewProjectDescription] = useState<string>("");
 
     useEffect(() => {
-        getProjects(projectService)
+        projectService.GetAllProjects()
             .then(value => {
                 setProjects(value);
             })
@@ -72,7 +59,7 @@ function Projects(): JSX.Element {
         if (!isAutoRefreshEnabled) return;
 
         setAutoRefreshIntervalInstance(setInterval(() => {
-            getProjects(projectService)
+            projectService.GetAllProjects()
                 .then(value => {
                     setProjects(value);
                 })
@@ -144,7 +131,7 @@ function Projects(): JSX.Element {
             <hr />
             <div className="actions-panel">
                 <button onClick={() => {
-                    getProjects(projectService)
+                    projectService.GetAllProjects()
                         .then(value => {
                             setProjects(value);
                         })
@@ -168,7 +155,7 @@ function Projects(): JSX.Element {
                     for (let projectId in selectedProjects) {
                         projectService.DeleteProject(selectedProjects[projectId])
                             .then(() => {
-                                getProjects(projectService)
+                                projectService.GetAllProjects()
                                     .then(value => {
                                         setProjects(value);
                                     })
@@ -196,156 +183,13 @@ function Projects(): JSX.Element {
             <div className="projects-panel">
                 {error && <p style={{ color: "red" }}>{error}</p>}
                 {projectId ? <Outlet /> :
-                    projects &&
-                    <table width="100%">
-                        <thead>
-                            <tr>
-                                <th>Select</th>
-                                <th>Edit</th>
-                                <th>Project Name</th>
-                                <th>Project Description</th>
-                                <th>Delete</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {projects?.length > 0 ? projects?.map<JSX.Element>(project => {
-                                return (
-                                    <tr key={`project_row_${project.id}`}>
-                                        <td>
-                                            <input type="checkbox" name="project_select" onChange={(e) => {
-                                                if (selectedProjects.includes(project.id)) {
-                                                    if (!e.target.checked) {
-                                                        setSelectedProjects(selectedProjects.filter(id => id !== project.id));
-                                                    }
-                                                } else {
-                                                    if (e.target.checked) {
-                                                        setSelectedProjects([...selectedProjects, project.id]);
-                                                    }
-                                                }
-                                            }} checked={((): boolean => {
-                                                return selectedProjects.includes(project.id);
-                                            })()} />
-                                        </td>
-                                        <td>
-                                            <NavLink to={`/Projects/${project.id}`} key={`/Projects/${project.id}`}>
-                                                <FontAwesomeIcon icon={faPencil} />
-                                            </NavLink>
-                                        </td>
-                                        <td>
-                                            <h5 onClick={() => setEditingProjectName(project.id)}>
-                                                {editingProjectName === project.id ? (<input
-                                                    type="text"
-                                                    id={`project_name_for_${project.id}`}
-                                                    defaultValue={project.name}
-                                                    onBlur={(e) => {
-                                                        const proj: Project | undefined = projects.find(p => p.id === e.target.id.replace(/project_name_for_/g, ''));
-
-                                                        if (!proj) {
-                                                            console.error(`Project with id ${e.target.id.replace(/project_name_for_/g, '')} not found.`);
-                                                            return;
-                                                        }
-
-                                                        proj.name = e.target.value;
-                                                        projectService.UpdateProject(proj)
-                                                            .then(() => {
-                                                                getProjects(projectService)
-                                                                    .then(value => {
-                                                                        setProjects(value);
-                                                                    })
-                                                                    .catch((error: Error) => {
-                                                                        console.error(error);
-                                                                        setError(error.message);
-                                                                        setProjects([]);
-                                                                    });
-                                                            })
-                                                            .catch((error: Error) => {
-                                                                console.error(error);
-                                                                setError(error.message);
-                                                            });
-                                                        setEditingProjectName(null);
-                                                    }}
-                                                />) : project.name}
-                                            </h5>
-                                        </td>
-                                        <td>
-                                            <h5 onClick={() => setEditingProjectDescription(project.description ?? null)}>{editingProjectDescription === project.description ? (<input
-                                                type="text"
-                                                id={`project_description_for_${project.id}`}
-                                                defaultValue={project.description}
-                                                onBlur={(e) => {
-                                                    const proj: Project | undefined = projects.find(p => p.id === e.target.id.replace(/project_description_for_/g, ''));
-
-                                                    if (!proj) {
-                                                        console.error(`Project with id ${e.target.id.replace(/project_description_for_/g, '')} not found.`);
-                                                        return;
-                                                    }
-
-                                                    project.description = e.target.value;
-                                                    projectService.UpdateProject(project)
-                                                        .then(() => {
-                                                            getProjects(projectService)
-                                                                .then(value => {
-                                                                    setProjects(value);
-                                                                })
-                                                                .catch((error: Error) => {
-                                                                    console.error(error);
-                                                                    setError(error.message);
-                                                                    setProjects([]);
-                                                                });
-                                                        })
-                                                        .catch((error: Error) => {
-                                                            console.error(error);
-                                                            setError(error.message);
-                                                        });
-                                                    setEditingProjectDescription(null);
-                                                }}
-                                            />) : project.description}
-                                            </h5>
-                                        </td>
-                                        <td>
-                                            <FontAwesomeIcon icon={faMinus} className={isLockedProjectsEnabled ? 'disabled project-action-icon' : 'project-action-icon'} onClick={() => {
-                                                if (isLockedProjectsEnabled) {
-                                                    alert('Project deletions are locked. Please unlock them to delete projects.');
-                                                    return;
-                                                }
-
-                                                projectService.DeleteProject(project.id)
-                                                    .then(() => {
-                                                        getProjects(projectService)
-                                                            .then(value => {
-                                                                setProjects(value);
-                                                            })
-                                                            .catch((error: Error) => {
-                                                                console.error(error);
-                                                                setError(error.message);
-                                                                setProjects([]);
-                                                            });
-                                                    })
-                                                    .catch((error: Error) => {
-                                                        console.error(error);
-                                                        setError(error.message);
-                                                    });
-                                            }} />
-                                        </td>
-                                    </tr>
-                                );
-                            }) : (
-                                <tr>
-                                    <td>
-                                    </td>
-                                    <td>
-                                    </td>
-                                    <td>
-                                    </td>
-                                    <td>
-                                        <p>No projects found. Please create a new project.</p>
-                                    </td>
-                                    <td>
-                                    </td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
+                    projects && <ProjectsTable
+                        projects={projects}
+                        setProjects={setProjects}
+                        selectedProjects={selectedProjects}
+                        setSelectedProjects={setSelectedProjects}
+                        isLockedProjectsEnabled={isLockedProjectsEnabled}
+                        setError={setError} />
                 }
                 <hr />
                 <h3>Create New Project</h3>
@@ -363,7 +207,7 @@ function Projects(): JSX.Element {
                         };
                         projectService.CreateNewProject(newProject)
                             .then((createdProject) => {
-                                getProjects(projectService)
+                                projectService.GetAllProjects()
                                     .then(value => {
                                         setProjects(value);
                                     })
