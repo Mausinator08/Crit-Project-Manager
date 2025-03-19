@@ -45,26 +45,26 @@ function ProjectsTable({ projects,
                         <tr key={`project_row_${project.id}`}>
                             <td>
                                 <input type="checkbox" name="project_select" onChange={(e) => {
-                                    if (selectedProjects.includes(project.id)) {
+                                    if (selectedProjects.includes(project.id!)) {
                                         if (!e.target.checked) {
                                             setSelectedProjects(selectedProjects.filter(id => id !== project.id));
                                         }
                                     } else {
                                         if (e.target.checked) {
-                                            setSelectedProjects([...selectedProjects, project.id]);
+                                            setSelectedProjects([...selectedProjects, project.id!]);
                                         }
                                     }
                                 }} checked={((): boolean => {
-                                    return selectedProjects.includes(project.id);
+                                    return selectedProjects.includes(project.id!);
                                 })()} />
                             </td>
                             <td>
-                                <NavLink to={`/Projects/${project.id}`} key={`/Projects/${project.id}`}>
+                                <NavLink to={`/Projects/${project.id}`} key={`/Projects/${project.id!}`}>
                                     <FontAwesomeIcon icon={faPencil} />
                                 </NavLink>
                             </td>
                             <td>
-                                <h5 onClick={() => setEditingProjectName(project.id)}>
+                                <h5 onClick={() => setEditingProjectName(project.id!)}>
                                     {editingProjectName === project.id ? (<input
                                         type="text"
                                         id={`project_name_for_${project.id}`}
@@ -140,7 +140,7 @@ function ProjectsTable({ projects,
                                         return;
                                     }
 
-                                    projectService.DeleteProject(project.id)
+                                    projectService.DeleteProject(project.id!)
                                         .then(() => {
                                             projectService.GetAllProjects()
                                                 .then(value => {

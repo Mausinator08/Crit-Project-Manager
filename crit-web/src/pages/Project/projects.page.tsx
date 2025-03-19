@@ -16,7 +16,7 @@ function Projects(): JSX.Element {
     const { getService } = useContext(moduleContext.current.context);
     const projectService: ProjectService = getService(ProjectService);
 
-    const [projects, setProjects] = useState<Project[] | null>([]);
+    const [projects, setProjects] = useState<Project[]>([]);
     const [error, setError] = useState<string | null>(null);
     const [isAutoRefreshEnabled, setIsAutoRefreshEnabled] = useState<boolean>(localStorage.getItem('isAutoRefreshEnabled') === 'true');
     const [autoRefreshInterval, setAutoRefreshInterval] = useState<number>(parseInt(localStorage.getItem('autoRefreshInterval') || '1', 10));

@@ -5,8 +5,8 @@ import { Project } from "../../models/project.model";
 import './projects.scss';
 
 export interface ProjectActionsProps {
-    projects: Project[] | null;
-    setProjects: (projects: Project[] | null) => void;
+    projects: Project[];
+    setProjects: (projects: Project[]) => void;
     selectedProjects: string[];
     setSelectedProjects: (selectedProjects: string[]) => void;
     isLockedProjectsEnabled: boolean;
@@ -70,7 +70,7 @@ function ProjectActions({
                 }
             }}>{'Delete Project(s)'}</button>
             <button disabled={selectedProjects.length > 0} onClick={() => {
-                setSelectedProjects(projects?.map(project => project.id) ?? []);
+                setSelectedProjects(projects?.map(project => project.id!) ?? []);
             }}>Select All Projects</button>
             <button disabled={selectedProjects.length === 0} onClick={() => {
                 setSelectedProjects([]);

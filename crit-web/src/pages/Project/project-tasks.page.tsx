@@ -35,7 +35,7 @@ function ProjectTasks(): JSX.Element {
         <>
             <h2>{project?.name ?? '<no project name>'}</h2>
             <hr />
-            {project && (<Tasks selectedProjectId={project.id} tasks={project?.tasks ?? []} customFieldTypes={project?.customFieldTypes ?? []} statuses={project?.statuses ?? []} hiddenCustomFieldTypeIds={project?.hiddenCustomFieldTypeIds} />)}
+            {project && (<Tasks selectedProjectId={project.id!} tasks={project?.tasks ?? []} customFieldTypes={project?.customFieldTypes ?? []} statuses={project?.statuses ?? []} hiddenCustomFieldTypeIds={project?.hiddenCustomFieldTypeIds} />)}
         </>
     );
 }
