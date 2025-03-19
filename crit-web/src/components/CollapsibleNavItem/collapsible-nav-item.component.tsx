@@ -21,13 +21,13 @@ function CollapsibleNavItem(props: Props): JSX.Element {
             <Collapsible>
                 <Collapsible.Label>
                     <h2 className={styles.sideitem}>
-                        <Collapsible.Toggle>
+                        <Collapsible.Toggle isOpen={props.open}>
                             <NavLink className={styles.navBarLink} to={link.path} key={link.path + '-icon'}>
                                 <FontAwesomeIcon icon={link.icon} />
                             </NavLink>
-                            <NavLink to={link.path} className={props.open === "true" ? styles.linkText : styles.linkTextClosed} key={link.path + '-text'}>
+                            {props.open === 'true' && (<NavLink to={link.path} className={styles.linkText} key={link.path + '-text'}>
                                 <h5>{link.title}</h5>
-                            </NavLink>
+                            </NavLink>)}
                         </Collapsible.Toggle>
                     </h2>
                 </Collapsible.Label>

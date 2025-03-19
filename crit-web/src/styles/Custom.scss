@@ -22,7 +22,7 @@
     transition: margin-left 0.3s ease-in-out;
     margin-top: 88px;
     margin-bottom: 0px;
-    margin-left: 85px;
+    margin-left: 170px;
     margin-right: 0px;
 }
 
@@ -105,7 +105,7 @@ button:disabled:active {
     margin: 3pt;
 }
 
-input {
+input[type="checkbox"] {
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
@@ -122,7 +122,7 @@ input {
     will-change: auto;
 }
 
-input:after {
+input[type="checkbox"]:after {
     display: inline-block;
     position: relative;
     width: 16pt;
@@ -140,7 +140,7 @@ input:after {
     will-change: auto;
 }
 
-input:checked:after {
+input[type="checkbox"]:checked:after {
     display: inline-block;
     position: relative;
     width: 16pt;
@@ -156,7 +156,7 @@ input:checked:after {
     will-change: auto;
 }
 
-input:disabled:after {
+input[type="checkbox"]:disabled:after {
     display: inline-block;
     position: relative;
     width: 16pt;
@@ -175,7 +175,7 @@ input:disabled:after {
     will-change: auto;
 }
 
-input:not(:disabled):checked:hover:after {
+input[type="checkbox"]:not(:disabled):checked:hover:after {
     display: inline-block;
     position: relative;
     width: 16pt;
@@ -191,7 +191,7 @@ input:not(:disabled):checked:hover:after {
     will-change: auto;
 }
 
-input:not(:disabled):hover:after {
+input[type="checkbox"]:not(:disabled):hover:after {
     display: inline-block;
     position: relative;
     width: 16pt;

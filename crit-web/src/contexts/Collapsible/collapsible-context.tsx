@@ -2,12 +2,14 @@ import React, { createContext, useState } from "react";
 
 interface ICollapsibleContext {
     collapsed: boolean;
-    toggleAccordion: (event: React.MouseEvent<HTMLElement>) => void;
+    toggleAccordion: (event: React.MouseEvent<SVGSVGElement | HTMLElement>) => void;
+    setCollapsed: (collapsed: boolean) => void;
 }
 
 export const CollapsibleContext = createContext<ICollapsibleContext>({
     collapsed: true,
-    toggleAccordion: (event: React.MouseEvent<HTMLElement>) => void {},
+    toggleAccordion: (event: React.MouseEvent<SVGSVGElement | HTMLElement>) => void {},
+    setCollapsed: (collapsed: boolean) => void {}
 });
 
 interface CollapsibleProviderProps {
@@ -17,7 +19,7 @@ interface CollapsibleProviderProps {
 const CollapsibleProvider: React.FC<CollapsibleProviderProps> = ({ children }) => {
     const [collapsed, setCollapsed] = useState<boolean>(true);
 
-    function toggleAccordionHandler(event: React.MouseEvent<HTMLElement>): void {
+    function toggleAccordionHandler(event: React.MouseEvent<SVGSVGElement | HTMLElement>): void {
         if (collapsed === true) {
             setCollapsed(false);
         } else {
@@ -30,6 +32,7 @@ const CollapsibleProvider: React.FC<CollapsibleProviderProps> = ({ children }) =
             value={{
                 collapsed: collapsed,
                 toggleAccordion: toggleAccordionHandler,
+                setCollapsed: setCollapsed,
             }}
         >
             {children}

@@ -20,9 +20,9 @@ export function CreateLinks(
                     <NavLink className={styles.navBarLink} to={link.path} key={link.path + '-icon'}>
                         <FontAwesomeIcon icon={link.icon} />
                     </NavLink>
-                    <NavLink to={link.path} className={open === "true" ? styles.linkText : styles.linkTextClosed} key={link.path + '-text'}>
+                    {open === 'true' && (<NavLink to={link.path} className={styles.linkText} key={link.path + '-text'}>
                         <h5>{link.title}</h5>
-                    </NavLink>
+                    </NavLink>)}
                 </h2>
             </div>
         );

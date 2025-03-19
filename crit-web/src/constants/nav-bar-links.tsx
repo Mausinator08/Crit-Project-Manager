@@ -35,16 +35,6 @@ export const GetLinks = async () => {
                                 title: project.name,
                                 path: `/Projects/${project.id}`,
                                 icon: faCheck,
-                                children: project.tasks.map<Link>(task => {
-                                    return {
-                                        title: task.title ? task.title : '<no task title>',
-                                        path: `/Projects/${project.id}/${task.id}`,
-                                        icon: faListCheck,
-                                        children: createSubtaskLinks(task),
-                                        showInNavBar: false,
-                                        data: task,
-                                    };
-                                })
                             };
                         }))
                     })

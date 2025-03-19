@@ -17,11 +17,6 @@
     background-color: transparent;
 }
 
-.linkTextClosed {
-    @extend .linkText;
-    visibility: hidden;
-}
-
 .navBarLink {
     color: var(--primary-color);
 }

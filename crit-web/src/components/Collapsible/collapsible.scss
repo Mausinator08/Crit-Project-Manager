@@ -6,6 +6,7 @@
 }
 
 .toggle-folding-button {
+    margin: 10px;
     border: none !important;
     background-color: transparent !important;
     color: $primary !important;
@@ -21,4 +22,14 @@
 
 .folded {
     display: none;
+}
+
+.collapsible-toggle-item {
+    display: flex;
+    align-items: center;
+    padding-left: 20px;
+    padding-top: 10px;
+    cursor: pointer;
+    color: $primary;
+    text-decoration: none;
 }

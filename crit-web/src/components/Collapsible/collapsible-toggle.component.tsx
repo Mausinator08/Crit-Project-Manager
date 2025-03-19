@@ -7,19 +7,21 @@ import { CollapsibleContext } from "../../contexts/Collapsible/collapsible-conte
 
 type CollapsibleToggleProps = {
     children?: React.ReactNode;
+    isOpen?: string;
 };
 
 function CollapsibleToggle(props: CollapsibleToggleProps): JSX.Element {
-    const { collapsed, toggleAccordion } = useContext(CollapsibleContext);
+    const { collapsed, toggleAccordion, setCollapsed } = useContext(CollapsibleContext);
+
+    if (props.isOpen === 'false') {
+        setCollapsed(true);
+    }
 
     return (
         <>
             {props.children}
-            <button className="toggle-folding-button" onClick={toggleAccordion}>
-                <FontAwesomeIcon icon={collapsed === true ? faChevronDown : faChevronUp} />
-            </button>
+            {props.isOpen === 'true' && (<FontAwesomeIcon className="toggle-folding-button" icon={collapsed === true ? faChevronDown : faChevronUp} onClick={toggleAccordion} />)}
         </>
-
     );
 }
 

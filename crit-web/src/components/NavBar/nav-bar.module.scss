@@ -32,11 +32,6 @@
     background-color: transparent;
 }
 
-.linkTextClosed {
-    @extend .linkText;
-    visibility: hidden;
-}
-
 .sideitem:hover {
     background-color: lighten($primary, 50%);
 }
