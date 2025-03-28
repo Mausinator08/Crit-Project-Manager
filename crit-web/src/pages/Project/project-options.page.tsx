@@ -24,7 +24,15 @@ async function getProject(projectId: string | undefined): Promise<Project | null
 function ProjectOptions(): JSX.Element {
     const { projectId } = useParams();
     const [project, setProject] = useState<Project | null>(null);
+    const [hasFetched, setHasFetched] = useState<boolean>(false);
+
     useEffect(() => {
+        if (hasFetched) {
+            return;
+        }
+
+        setHasFetched(true);
+
         getProject(projectId).then(value => {
             setProject(value);
         });

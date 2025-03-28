@@ -3,9 +3,8 @@ import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 
 import { GetEnvValues } from "./environment";
 import { Project } from "../models/project.model";
-import { createSubtaskLinks } from "../functions/Tasks/create-subtask-links";
 
-export type Link = { title: string, path: string, icon: IconDefinition, children?: Link[], index?: boolean, showInNavBar?: boolean, roles?: string[], data?: any };
+export type Link = { title: string, path: string, icon: IconDefinition, children?: Link[], index?: boolean, roles?: string[], data?: any };
 
 export const GetLinks = async () => {
     return new Promise<Link[]>(async (resolve, reject): Promise<void> => {

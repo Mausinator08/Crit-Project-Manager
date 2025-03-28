@@ -1,14 +1,16 @@
 import { Table } from "react-bootstrap";
-import { JSX, useContext, useState } from "react";
+import { JSX, useContext, useEffect, useRef, useState } from "react";
 import { Outlet, useParams } from "react-router-dom";
 
 import { Task } from "../../models/task.model";
 import { ThemeContext } from "../../contexts/Theme/theme-context";
 import styles from "./tasks.module.scss";
 import { CustomFieldType } from '../../models/custom-field-type.model';
-import { GetLinks, Link } from "../../constants/nav-bar-links";
+import { GetLinks, GetLoggedOutLinks, Link } from "../../constants/nav-bar-links";
 import { Status } from "../../models/status.model";
 import { CreateTasks } from "../../functions/Tasks/create-tasks";
+import { GetModuleContext } from "../../contexts/Module/module-context";
+import { AuthService } from "../../services/AuthService.service";
 
 export interface TasksProps {
     tasks: Task[];
@@ -34,11 +36,9 @@ function createTaskListCustomColumn(fieldType: CustomFieldType, hiddenCustomFiel
     );
 }
 
-function createTaskRow(task: Task, statuses: Status[], links: Link[]): JSX.Element | undefined {
-    const link: Link | undefined = links.find(link => (link.data as Task | undefined)?.id === task.id);
-
-    if (link) {
-        return CreateTasks(link, task, statuses);
+function createTaskRow(task: Task, statuses: Status[]): JSX.Element | undefined {
+    if (task) {
+        return CreateTasks(task, statuses);
     }
 
     return (
@@ -51,9 +51,10 @@ function createTaskRow(task: Task, statuses: Status[], links: Link[]): JSX.Eleme
 function Tasks(props: TasksProps): JSX.Element {
     const { selectedTaskId } = useParams();
     const { theme } = useContext(ThemeContext);
-    const [links, setLinks] = useState<Link[]>([]);
-
-    GetLinks().then((links: Link[]) => setLinks(links));
+    const moduleContext = useRef(GetModuleContext('app'));
+    const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+    const { getService } = useContext(moduleContext.current.context);
+    const authService: AuthService = getService(AuthService);
 
     return (
         <div>
@@ -85,7 +86,7 @@ function Tasks(props: TasksProps): JSX.Element {
                         </tr>
                     </thead>
                     <tbody>
-                        {props.tasks.map<JSX.Element | undefined>(task => createTaskRow(task, props.statuses, links))}
+                        {props.tasks.map<JSX.Element | undefined>(task => createTaskRow(task, props.statuses))}
                     </tbody>
                 </Table>
                 {selectedTaskId && (<Outlet />)}

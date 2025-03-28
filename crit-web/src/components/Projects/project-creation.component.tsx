@@ -61,7 +61,7 @@ function ProjectCreation({
                             console.error(error);
                             setError(error.message);
                         });
-                }} className={newProjectName ? 'project-action-icon' : 'project-action-icon-disabled'} />
+                }} className={newProjectName ? 'project-action-icon-new' : 'project-action-icon-new-disabled'} />
                 <input type="text" id="newProjectName" onBlur={(e) => {
                     setNewProjectName(e.target.value);
                 }} />

@@ -11,9 +11,9 @@ import Collapsible from "../Collapsible/collapsible.component";
 import Error from "../../pages/Error/error.page";
 import { Table } from "react-bootstrap";
 import { ThemeContext } from "../../contexts/Theme/theme-context";
+import { faClipboardCheck } from "@fortawesome/free-solid-svg-icons";
 
 type CollapsibleTaskItemProps = {
-    link: Link,
     task: Task,
     children?: React.ReactNode,
     statuses: Status[],
@@ -21,30 +21,28 @@ type CollapsibleTaskItemProps = {
 };
 
 type CollapsibleTaskBodyProps = {
-    link: Link,
     task: Task,
     children?: React.ReactNode,
     statuses: Status[],
 }
 
 function CollapsibleTask(props: CollapsibleTaskItemProps): JSX.Element {
-    const link: Link = props.link;
     const { theme } = useContext(ThemeContext);
 
     function CollapsibleTaskBody(props: CollapsibleTaskBodyProps): JSX.Element {
         return (
-            <Collapsible key={link.path}>
+            <Collapsible key={props.task.id}>
                 <Collapsible.Label>
                     <tr>
                         <td>
-                            {link.title}
+                            {props.task.title}
                         </td>
                         {props.children}
                         <td>
                             <Collapsible.Toggle>
                                 <h4>
-                                    <NavLink to={link.path} key={link.path + '-icon'}>
-                                        <FontAwesomeIcon icon={link.icon} />
+                                    <NavLink to={`Projects/${props.task.projectId}/${props.task.id}`} key={props.task.id + '-icon'}>
+                                        <FontAwesomeIcon icon={faClipboardCheck} />
                                     </NavLink>
                                 </h4>
                             </Collapsible.Toggle>
@@ -55,25 +53,15 @@ function CollapsibleTask(props: CollapsibleTaskItemProps): JSX.Element {
                     <td colSpan={6 + Children.count(props.children) + 1}>
                         <Collapsible.Body>
                             {(() => {
-                                if (link.children && link.children.length > 0) {
-                                    return link.children.map((child) => {
-                                        const task: Task | undefined = props.task.subTasks.find(subTask => subTask.id === (child?.data as Task | undefined)?.id);
-                                        if (task) {
-                                            return CreateTasks(child, task, props.statuses, true);
-                                        } else {
-                                            return (
-                                                <Error>
-                                                    <h6 className='error-text'>Error Loading Task Child!</h6>
-                                                    <p className='error-text'>The task child item {link.title} could not be found.</p>
-                                                </Error>
-                                            );
-                                        }
+                                if (props.task.subTasks && props.task.subTasks.length > 0) {
+                                    return props.task.subTasks.map((child) => {
+                                        return CreateTasks(child, props.statuses, true);
                                     });
                                 } else {
                                     return (
                                         <Error>
                                             <h6 className='error-text'>Error Loading Task Children!</h6>
-                                            <p className='error-text'>The task item {link.title} could not load its children.</p>
+                                            <p className='error-text'>The task item {props.task.title} could not load its children.</p>
                                         </Error>
                                     );
                                 }
@@ -88,7 +76,7 @@ function CollapsibleTask(props: CollapsibleTaskItemProps): JSX.Element {
     if (!props.isSubtask || (props.isSubtask && props.isSubtask.valueOf() === false)) {
         return (
             <>
-                <CollapsibleTaskBody link={props.link} task={props.task} statuses={props.statuses}>
+                <CollapsibleTaskBody task={props.task} statuses={props.statuses}>
                     {props.children}
                 </CollapsibleTaskBody>
             </>
@@ -97,7 +85,7 @@ function CollapsibleTask(props: CollapsibleTaskItemProps): JSX.Element {
         return (
             <Table responsive striped bordered hover variant={theme}>
                 <tbody>
-                    <CollapsibleTaskBody link={props.link} task={props.task} statuses={props.statuses}>
+                    <CollapsibleTaskBody task={props.task} statuses={props.statuses}>
                         {props.children}
                     </CollapsibleTaskBody>
                 </tbody>

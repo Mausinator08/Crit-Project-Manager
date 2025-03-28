@@ -2,10 +2,12 @@ import { JSX, useContext, useRef, useState } from "react";
 import { Project } from "../../models/project.model";
 import { NavLink } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faMinus, faPencil } from "@fortawesome/free-solid-svg-icons";
+import { faPencil, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { GetModuleContext } from "../../contexts/Module/module-context";
 import { ProjectService } from "../../services/ProjectService.service";
 import './projects.scss';
+import { ThemeContext } from "../../contexts/Theme/theme-context";
+import { Table } from "react-bootstrap";
 
 export interface ProjectTableProps {
     projects: Project[];
@@ -23,13 +25,14 @@ function ProjectsTable({ projects,
     isLockedProjectsEnabled,
     setError }: ProjectTableProps): JSX.Element {
     const moduleContext = useRef(GetModuleContext('projects'));
+    const { theme } = useContext(ThemeContext);
     const { getService } = useContext(moduleContext.current.context);
     const projectService: ProjectService = getService(ProjectService);
     const [editingProjectName, setEditingProjectName] = useState<string | null>(null);
     const [editingProjectDescription, setEditingProjectDescription] = useState<string | null>(null);
 
     return (
-        <table width="100%">
+        <Table responsive striped bordered hover variant={theme} width="100%">
             <thead>
                 <tr>
                     <th>Select</th>
@@ -135,7 +138,7 @@ function ProjectsTable({ projects,
                                 </h5>
                             </td>
                             <td>
-                                <FontAwesomeIcon icon={faMinus} className={isLockedProjectsEnabled ? 'project-action-icon-disabled' : 'project-action-icon'} onClick={() => {
+                                <FontAwesomeIcon icon={faTrash} className={isLockedProjectsEnabled ? 'project-action-icon-disabled' : 'project-action-icon'} onClick={() => {
                                     if (isLockedProjectsEnabled) {
                                         return;
                                     }
@@ -176,7 +179,7 @@ function ProjectsTable({ projects,
                     </tr>
                 )}
             </tbody>
-        </table>
+        </Table>
     );
 }
 

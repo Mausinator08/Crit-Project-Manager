@@ -26,7 +26,15 @@ async function getTask(taskId: string | undefined): Promise<Task | null> {
 function TaskDetails(): JSX.Element {
     const { taskId } = useParams();
     const [task, setTask] = useState<Task | null>(null);
+    const [hasFetched, setHasFetched] = useState<boolean>(false);
+
     useEffect(() => {
+        if (hasFetched) {
+            return;
+        }
+
+        setHasFetched(true);
+
         getTask(taskId).then(value => {
             setTask(value);
         });

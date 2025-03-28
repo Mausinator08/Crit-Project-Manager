@@ -15,17 +15,29 @@
 .project-action-icon {
     display: inline-block;
     position: relative;
-    font-size: 32pt;
-    width: 32pt;
-    height: 32pt;
     color: $secondary;
     background-color: transparent;
-    top: 12px;
+    cursor: pointer;
 }
 
 .project-action-icon-disabled {
     @extend .project-action-icon;
-    opacity: 0.4;
+    cursor: default;
+    opacity: 0.2;
+}
+
+.project-action-icon-new {
+    @extend .project-action-icon;
+    font-size: 32pt;
+    width: 32pt;
+    height: 32pt;
+    top: 12px;
+}
+
+.project-action-icon-new-disabled {
+    @extend .project-action-icon-new;
+    cursor: default;
+    opacity: 0.2;
 }
 
 .settings-panel {

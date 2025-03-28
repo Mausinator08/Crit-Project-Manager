@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 import { GetEnvValues } from "../../constants/environment";
-import { JSX, useEffect, useState } from "react";
+import { JSX, useEffect, useRef, useState } from "react";
 import { Project } from '../../models/project.model';
 import Tasks from "../../components/Tasks/tasks.component";
 
@@ -25,7 +25,15 @@ async function getProject(projectId: string | undefined): Promise<Project | null
 function ProjectTasks(): JSX.Element {
     const { projectId } = useParams();
     const [project, setProject] = useState<Project | null>(null);
+    const [hasFetched, setHasFetched] = useState<boolean>(false);
+
     useEffect(() => {
+        if (hasFetched) {
+            return;
+        }
+
+        setHasFetched(true);
+
         getProject(projectId).then(value => {
             setProject(value);
         });

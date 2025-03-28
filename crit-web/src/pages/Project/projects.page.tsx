@@ -23,8 +23,15 @@ function Projects(): JSX.Element {
     const [autoRefreshIntervalInstance, setAutoRefreshIntervalInstance] = useState<NodeJS.Timeout | null>(null);
     const [selectedProjects, setSelectedProjects] = useState<string[]>([]);
     const [isLockedProjectsEnabled, setIsLockedProjectsEnabled] = useState<boolean>(localStorage.getItem('isLockedProjectsEnabled') === 'true');
+    const [hasFetched, setHasFetched] = useState<boolean>(false);
 
     useEffect(() => {
+        if (hasFetched) {
+            return;
+        }
+
+        setHasFetched(true);
+
         projectService.GetAllProjects()
             .then(value => {
                 setProjects(value);
@@ -70,7 +77,7 @@ function Projects(): JSX.Element {
 
     return (
         <div>
-            <h2>Projects</h2>
+            <h2>{projectId ? projects.find(p => p.id === projectId)!.name : 'Projects'}</h2>
             <hr />
             <ProjectSettings isAutoRefreshEnabled={isAutoRefreshEnabled}
                 setIsAutoRefreshEnabled={setIsAutoRefreshEnabled}
@@ -99,11 +106,11 @@ function Projects(): JSX.Element {
                         setError={setError} />
                 }
                 <hr />
-                <ProjectCreation
+                {projectId ? 'Create a new task placeholder' : <ProjectCreation
                     setProjects={setProjects}
-                    setError={setError} />
+                    setError={setError} />}
             </div>
-        </div >
+        </div>
     );
 }
 

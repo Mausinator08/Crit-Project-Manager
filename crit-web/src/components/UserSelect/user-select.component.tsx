@@ -4,12 +4,12 @@ import { Dropdown } from "react-bootstrap";
 type UserSelectProps = {
     assignedUser: string;
     onAssignedUserSelect: (value: string | null) => void;
-    path: string;
+    taskId: string;
 };
 
 function UserSelect(props: UserSelectProps): JSX.Element {
     return (
-        <Dropdown key={props.path + '-assignedUser'} onSelect={props.onAssignedUserSelect}>
+        <Dropdown key={props.taskId + '-assignedUser'} onSelect={props.onAssignedUserSelect}>
             <Dropdown.Toggle id="assignedUser" >
                 {props.assignedUser}
             </Dropdown.Toggle>
