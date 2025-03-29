@@ -1,26 +1,51 @@
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faToggleOff, faToggleOn } from '@fortawesome/free-solid-svg-icons';
-import { JSX } from 'react';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faToggleOff, faToggleOn } from "@fortawesome/free-solid-svg-icons";
+import { JSX } from "react";
 
-import NavBar from '../NavBar/nav-bar.component';
-import './title-bar.scss';
+import NavBar from "../NavBar/nav-bar.component";
+import "./title-bar.scss";
+import ModuleProvider from "../../contexts/Module/module-context";
+import { ProjectService } from "../../services/ProjectService.service";
 
 type Props = {
-    onToggleTheme: () => void;
-    theme: string;
-    onToggleOpen: () => void;
-    open: string;
-    title: string;
-}
+	onToggleTheme: () => void;
+	theme: string;
+	onToggleOpen: () => void;
+	open: string;
+	title: string;
+};
 
 function TitleBar(props: Props): JSX.Element {
-    return (
-        <div id='title-bar' className='grid-container title-bar'>
-            <div className='nav-bar'><NavBar open={props.open} onToggleOpen={props.onToggleOpen} /></div>
-            <h1 id="title" className='grid-item'>{props.title}</h1>
-            <div className='grid-item'>Dark Mode: {props.theme === 'light' ? (<span>Off <FontAwesomeIcon icon={faToggleOff} onClick={props.onToggleTheme} /></span>) : (<span>On <FontAwesomeIcon icon={faToggleOn} onClick={props.onToggleTheme} /></span>)}</div>
-        </div>
-    );
+	return (
+		<div id="title-bar" className="grid-container title-bar">
+			<div className="nav-bar">
+				<NavBar open={props.open} onToggleOpen={props.onToggleOpen} />
+			</div>
+			<h1 id="title" className="grid-item">
+				{props.title}
+			</h1>
+			<div className="grid-item">
+				Dark Mode:{" "}
+				{props.theme === "light" ? (
+					<span>
+						Off{" "}
+						<FontAwesomeIcon
+							icon={faToggleOff}
+							onClick={props.onToggleTheme}
+						/>
+					</span>
+				) : (
+					<span>
+						On{" "}
+						<FontAwesomeIcon
+							icon={faToggleOn}
+							onClick={props.onToggleTheme}
+						/>
+					</span>
+				)}
+			</div>
+		</div>
+	);
 }
 
 export default TitleBar;

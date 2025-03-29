@@ -1,57 +1,69 @@
-import { JSX, useContext, useEffect, useState } from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { JSX, useContext, useEffect, useState } from "react";
+import { Outlet, useNavigate } from "react-router-dom";
 
-import TitleBar from './components/TitleBar/title-bar.component';
+import TitleBar from "./components/TitleBar/title-bar.component";
 import { ThemeContext } from "./contexts/Theme/theme-context";
 
-import './styles/App.scss';
-import { setUseNavigation } from './functions/Utils/navigation-utils';
-import ModuleProvider from './contexts/Module/module-context';
-import { AuthService } from './services/AuthService.service';
+import "./styles/App.scss";
+import { setUseNavigation } from "./functions/Utils/navigation-utils";
+import ModuleProvider from "./contexts/Module/module-context";
+import { AuthService } from "./services/AuthService.service";
+import { ProjectService } from "./services/ProjectService.service";
 
 function App(): JSX.Element {
-  const navFn = useNavigate();
+	const navFn = useNavigate();
 
-  useEffect(() => {
-    setUseNavigation(navFn);
-  }, [navFn]);
+	useEffect(() => {
+		setUseNavigation(navFn);
+	}, [navFn]);
 
-  const { theme, toggleTheme } = useContext(ThemeContext);
+	const { theme, toggleTheme } = useContext(ThemeContext);
 
-  const [open, setOpen] = useState(
-    localStorage.getItem('nav-open') || 'false'
-  );
+	const [open, setOpen] = useState(
+		localStorage.getItem("nav-open") || "false"
+	);
 
-  const toggleOpen: () => void = () => {
-    if (open === 'false') {
-      setOpen('true');
-    } else {
-      setOpen('false');
-    }
-  };
+	const toggleOpen: () => void = () => {
+		if (open === "false") {
+			setOpen("true");
+		} else {
+			setOpen("false");
+		}
+	};
 
-  useEffect(() => {
-    localStorage.setItem('theme', theme);
-    document.documentElement.setAttribute(
-      "data-theme",
-      theme
-    );
-  }, [theme]);
+	useEffect(() => {
+		localStorage.setItem("theme", theme);
+		document.documentElement.setAttribute("data-theme", theme);
+	}, [theme]);
 
-  useEffect(() => {
-    localStorage.setItem('nav-open', open);
-  }, [open]);
+	useEffect(() => {
+		localStorage.setItem("nav-open", open);
+	}, [open]);
 
-  return (
-    <div className={`body`} data-theme={theme}>
-      <ModuleProvider services={[AuthService]} id='app' key='module_provider_app'>
-        <TitleBar theme={theme} onToggleTheme={toggleTheme} open={open} onToggleOpen={toggleOpen} title='Crit' />
-        <main className={open === 'true' ? 'main-content' : 'main-content-closed'}>
-          <Outlet />
-        </main>
-      </ModuleProvider>
-    </div>
-  );
+	return (
+		<div className={`body`} data-theme={theme}>
+			<ModuleProvider
+				services={[AuthService, ProjectService]}
+				id="app"
+				key="module_provider_app"
+			>
+				<TitleBar
+					theme={theme}
+					onToggleTheme={toggleTheme}
+					open={open}
+					onToggleOpen={toggleOpen}
+					title="Crit"
+				/>
+				<main
+					className={
+						open === "true" ? "main-content" : "main-content-closed"
+					}
+				>
+					<Outlet />
+				</main>
+			</ModuleProvider>
+		</div>
+	);
 }
 
 export default App;

@@ -11,107 +11,147 @@ import ProjectActions from "../../components/Projects/project-actions.component"
 import ProjectCreation from "../../components/Projects/project-creation.component";
 
 function Projects(): JSX.Element {
-    const { projectId } = useParams();
-    const moduleContext = useRef(GetModuleContext('projects'));
-    const { getService } = useContext(moduleContext.current.context);
-    const projectService: ProjectService = getService(ProjectService);
+	const { projectId } = useParams();
+	const moduleContext = useRef(GetModuleContext("app"));
+	const { getService } = useContext(moduleContext.current.context);
+	const projectService: ProjectService = getService(ProjectService);
 
-    const [projects, setProjects] = useState<Project[]>([]);
-    const [error, setError] = useState<string | null>(null);
-    const [isAutoRefreshEnabled, setIsAutoRefreshEnabled] = useState<boolean>(localStorage.getItem('isAutoRefreshEnabled') === 'true');
-    const [autoRefreshInterval, setAutoRefreshInterval] = useState<number>(parseInt(localStorage.getItem('autoRefreshInterval') || '1', 10));
-    const [autoRefreshIntervalInstance, setAutoRefreshIntervalInstance] = useState<NodeJS.Timeout | null>(null);
-    const [selectedProjects, setSelectedProjects] = useState<string[]>([]);
-    const [isLockedProjectsEnabled, setIsLockedProjectsEnabled] = useState<boolean>(localStorage.getItem('isLockedProjectsEnabled') === 'true');
-    const [hasFetched, setHasFetched] = useState<boolean>(false);
+	const [projects, setProjects] = useState<Project[]>([]);
+	const [error, setError] = useState<string | null>(null);
+	const [isAutoRefreshEnabled, setIsAutoRefreshEnabled] = useState<boolean>(
+		localStorage.getItem("isAutoRefreshEnabled") === "true"
+	);
+	const [autoRefreshInterval, setAutoRefreshInterval] = useState<number>(
+		parseInt(localStorage.getItem("autoRefreshInterval") || "1", 10)
+	);
+	const [autoRefreshIntervalInstance, setAutoRefreshIntervalInstance] =
+		useState<NodeJS.Timeout | null>(null);
+	const [selectedProjects, setSelectedProjects] = useState<string[]>([]);
+	const [isLockedProjectsEnabled, setIsLockedProjectsEnabled] =
+		useState<boolean>(
+			localStorage.getItem("isLockedProjectsEnabled") === "true"
+		);
+	const [hasFetched, setHasFetched] = useState<boolean>(false);
 
-    useEffect(() => {
-        if (hasFetched) {
-            return;
-        }
+	useEffect(() => {
+		if (hasFetched) {
+			return;
+		}
 
-        setHasFetched(true);
+		setHasFetched(true);
 
-        projectService.GetAllProjects()
-            .then(value => {
-                setProjects(value);
-            })
-            .catch((error: Error) => {
-                console.error(error);
-                setError(error.message);
-                setProjects([]);
-            });
+		projectService
+			.GetAllProjects()
+			.then((value) => {
+				setProjects(value);
+			})
+			.catch((error: Error) => {
+				console.error(error);
+				setError(error.message);
+				setProjects([]);
+			});
 
-        setIsAutoRefreshEnabled(localStorage.getItem('isAutoRefreshEnabled') === 'true');
-        let refreshInterval: number = parseInt(localStorage.getItem('autoRefreshInterval') || '1', 10);
+		setIsAutoRefreshEnabled(
+			localStorage.getItem("isAutoRefreshEnabled") === "true"
+		);
+		let refreshInterval: number = parseInt(
+			localStorage.getItem("autoRefreshInterval") || "1",
+			10
+		);
 
-        if (refreshInterval < 1 || refreshInterval > 60) {
-            refreshInterval = 1;
-        }
+		if (refreshInterval < 1 || refreshInterval > 60) {
+			refreshInterval = 1;
+		}
 
-        setAutoRefreshInterval(refreshInterval);
-    }, []);
+		setAutoRefreshInterval(refreshInterval);
+	}, []);
 
-    useEffect(() => {
-        localStorage.setItem('isAutoRefreshEnabled', isAutoRefreshEnabled.toString());
-        localStorage.setItem('autoRefreshInterval', autoRefreshInterval.toString());
+	useEffect(() => {
+		localStorage.setItem(
+			"isAutoRefreshEnabled",
+			isAutoRefreshEnabled.toString()
+		);
+		localStorage.setItem(
+			"autoRefreshInterval",
+			autoRefreshInterval.toString()
+		);
 
-        if (autoRefreshIntervalInstance) {
-            clearInterval(autoRefreshIntervalInstance);
-        }
+		if (autoRefreshIntervalInstance) {
+			clearInterval(autoRefreshIntervalInstance);
+		}
 
-        if (!isAutoRefreshEnabled) return;
+		if (!isAutoRefreshEnabled) return;
 
-        setAutoRefreshIntervalInstance(setInterval(() => {
-            projectService.GetAllProjects()
-                .then(value => {
-                    setProjects(value);
-                })
-                .catch((error: Error) => {
-                    console.error(error);
-                    setError(error.message);
-                    setProjects([]);
-                });
-        }, autoRefreshInterval * 60000)); // Convert minutes to milliseconds
-    }, [isAutoRefreshEnabled, autoRefreshInterval]);
+		setAutoRefreshIntervalInstance(
+			setInterval(() => {
+				projectService
+					.GetAllProjects()
+					.then((value) => {
+						setProjects(value);
+					})
+					.catch((error: Error) => {
+						console.error(error);
+						setError(error.message);
+						setProjects([]);
+					});
+			}, autoRefreshInterval * 60000)
+		); // Convert minutes to milliseconds
+	}, [isAutoRefreshEnabled, autoRefreshInterval]);
 
-    return (
-        <div>
-            <h2>{projectId ? projects.find(p => p.id === projectId)!.name : 'Projects'}</h2>
-            <hr />
-            <ProjectSettings isAutoRefreshEnabled={isAutoRefreshEnabled}
-                setIsAutoRefreshEnabled={setIsAutoRefreshEnabled}
-                autoRefreshInterval={autoRefreshInterval}
-                setAutoRefreshInterval={setAutoRefreshInterval}
-                isLockedProjectsEnabled={isLockedProjectsEnabled}
-                setIsLockedProjectsEnabled={setIsLockedProjectsEnabled}
-            />
-            <hr />
-            <ProjectActions projects={projects}
-                setProjects={setProjects}
-                selectedProjects={selectedProjects}
-                setSelectedProjects={setSelectedProjects}
-                isLockedProjectsEnabled={isLockedProjectsEnabled}
-                setError={setError} />
-            <hr />
-            <div className="projects-panel">
-                {error && <p style={{ color: "red" }}>{error}</p>}
-                {projectId ? <Outlet /> :
-                    projects && <ProjectsTable
-                        projects={projects}
-                        setProjects={setProjects}
-                        selectedProjects={selectedProjects}
-                        setSelectedProjects={setSelectedProjects}
-                        isLockedProjectsEnabled={isLockedProjectsEnabled}
-                        setError={setError} />
-                }
-                <hr />
-                {projectId ? 'Create a new task placeholder' : <ProjectCreation
-                    setProjects={setProjects}
-                    setError={setError} />}
-            </div>
-        </div>
-    );
+	return (
+		<div>
+			<h2>
+				{projectId
+					? projects.find((p) => p.id === projectId)?.name
+					: "Projects"}
+			</h2>
+			<hr />
+			<ProjectSettings
+				isAutoRefreshEnabled={isAutoRefreshEnabled}
+				setIsAutoRefreshEnabled={setIsAutoRefreshEnabled}
+				autoRefreshInterval={autoRefreshInterval}
+				setAutoRefreshInterval={setAutoRefreshInterval}
+				isLockedProjectsEnabled={isLockedProjectsEnabled}
+				setIsLockedProjectsEnabled={setIsLockedProjectsEnabled}
+			/>
+			<hr />
+			<ProjectActions
+				projects={projects}
+				setProjects={setProjects}
+				selectedProjects={selectedProjects}
+				setSelectedProjects={setSelectedProjects}
+				isLockedProjectsEnabled={isLockedProjectsEnabled}
+				setError={setError}
+			/>
+			<hr />
+			<div className="projects-panel">
+				{error && <p style={{ color: "red" }}>{error}</p>}
+				{projectId ? (
+					<Outlet />
+				) : (
+					projects && (
+						<ProjectsTable
+							projects={projects}
+							setProjects={setProjects}
+							selectedProjects={selectedProjects}
+							setSelectedProjects={setSelectedProjects}
+							isLockedProjectsEnabled={isLockedProjectsEnabled}
+							setError={setError}
+						/>
+					)
+				)}
+				<hr />
+				{projectId ? (
+					"Create a new task placeholder"
+				) : (
+					<ProjectCreation
+						setProjects={setProjects}
+						setError={setError}
+					/>
+				)}
+			</div>
+		</div>
+	);
 }
 
 export default Projects;

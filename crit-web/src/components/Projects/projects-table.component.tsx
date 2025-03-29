@@ -24,7 +24,7 @@ function ProjectsTable({ projects,
     setSelectedProjects,
     isLockedProjectsEnabled,
     setError }: ProjectTableProps): JSX.Element {
-    const moduleContext = useRef(GetModuleContext('projects'));
+    const moduleContext = useRef(GetModuleContext("app"));
     const { theme } = useContext(ThemeContext);
     const { getService } = useContext(moduleContext.current.context);
     const projectService: ProjectService = getService(ProjectService);
