@@ -242,11 +242,21 @@ public class LoginController : ControllerBase
                     return BadRequest("Organization name is required.");
                 }
 
-                Organization organization = await _organizationRepository.CreateOrganization(new Organization(user.Organization, appUser.Id));
+                Organization? organization = null;
+                IEnumerable<Organization> organizationQuery = (await _organizationRepository.GetAllOrganizations()).Where(o => o.Name == user.Organization);
+
+                if (!organizationQuery.Any())
+                {
+                    organization = await _organizationRepository.CreateOrganization(new Organization(user.Organization, appUser.Id));
+                }
+                else
+                {
+                    organization = organizationQuery.First();
+                }
 
                 if (organization == null || string.IsNullOrWhiteSpace(organization.Id))
                 {
-                    throw new Exception("Failed to create organization.");
+                    throw new Exception("Failed to get or create organization.");
                 }
 
                 Email email = await _emailRepository.CreateEmail(new Email()
