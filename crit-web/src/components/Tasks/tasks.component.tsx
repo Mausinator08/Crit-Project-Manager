@@ -8,7 +8,7 @@ import styles from "./tasks.module.scss";
 import { CustomFieldType } from '../../models/custom-field-type.model';
 import { GetLinks, GetLoggedOutLinks, Link } from "../../constants/nav-bar-links";
 import { Status } from "../../models/status.model";
-import { CreateTasks } from "../../functions/Tasks/create-tasks";
+import { ListTasks } from "../../functions/Tasks/list-tasks";
 import { GetModuleContext } from "../../contexts/Module/module-context";
 import { AuthService } from "../../services/AuthService.service";
 
@@ -20,7 +20,7 @@ export interface TasksProps {
     selectedProjectId: string;
 }
 
-function createTaskListCustomColumn(fieldType: CustomFieldType, hiddenCustomFieldTypeIds: string[]): JSX.Element {
+function listTaskListCustomColumn(fieldType: CustomFieldType, hiddenCustomFieldTypeIds: string[]): JSX.Element {
     if (hiddenCustomFieldTypeIds.find(typeId => typeId === fieldType.id)) {
         return (
             <>
@@ -33,18 +33,6 @@ function createTaskListCustomColumn(fieldType: CustomFieldType, hiddenCustomFiel
         <th>
             {fieldType.name}
         </th>
-    );
-}
-
-function createTaskRow(task: Task, statuses: Status[]): JSX.Element | undefined {
-    if (task) {
-        return CreateTasks(task, statuses);
-    }
-
-    return (
-        <>
-            {null}
-        </>
     );
 }
 
@@ -82,11 +70,11 @@ function Tasks(props: TasksProps): JSX.Element {
                             <th>
                                 Due Date
                             </th>
-                            {props.customFieldTypes?.map<JSX.Element>(fieldType => createTaskListCustomColumn(fieldType, props.hiddenCustomFieldTypeIds))}
+                            {props.customFieldTypes?.map<JSX.Element>(fieldType => listTaskListCustomColumn(fieldType, props.hiddenCustomFieldTypeIds))}
                         </tr>
                     </thead>
                     <tbody>
-                        {props.tasks.map<JSX.Element | undefined>(task => createTaskRow(task, props.statuses))}
+                        {props.tasks && props.tasks.map(task => task && ListTasks(task, props.statuses))}
                     </tbody>
                 </Table>
                 {selectedTaskId && (<Outlet />)}

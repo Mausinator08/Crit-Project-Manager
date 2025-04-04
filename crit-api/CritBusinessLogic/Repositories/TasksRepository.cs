@@ -100,7 +100,7 @@ public class TasksRepository : IDisposable, IAsyncDisposable, ITasksRepository
 
             if (!projectQuery.Any())
             {
-                throw new Exception($"User {applicationUser.Id} is not an admin of project {task.ProjectId}.");
+                throw new Exception($"User {applicationUser.Id} is not an admin of project {task.ProjectId} or {task.ProjectId} does not exist.");
             }
 
             _tenantDbContext.Tasks.Add(task);

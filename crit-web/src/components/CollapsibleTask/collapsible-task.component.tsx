@@ -6,7 +6,7 @@ import { Link } from "../../constants/nav-bar-links";
 import './collapsible-task.scss';
 import { Task } from "../../models/task.model";
 import { Status } from "../../models/status.model";
-import { CreateTasks } from "../../functions/Tasks/create-tasks";
+import { ListTasks } from "../../functions/Tasks/list-tasks";
 import Collapsible from "../Collapsible/collapsible.component";
 import Error from "../../pages/Error/error.page";
 import { Table } from "react-bootstrap";
@@ -55,7 +55,7 @@ function CollapsibleTask(props: CollapsibleTaskItemProps): JSX.Element {
                             {(() => {
                                 if (props.task.subTasks && props.task.subTasks.length > 0) {
                                     return props.task.subTasks.map((child) => {
-                                        return CreateTasks(child, props.statuses, true);
+                                        return ListTasks(child, props.statuses, true);
                                     });
                                 } else {
                                     return (

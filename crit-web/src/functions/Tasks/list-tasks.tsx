@@ -10,7 +10,7 @@ import UserSelect from "../../components/UserSelect/user-select.component";
 import StatusSelect from "../../components/StatusSelect/status-select.component";
 import { faClipboardCheck } from "@fortawesome/free-solid-svg-icons";
 
-export function CreateTasks(
+export function ListTasks(
     task: Task,
     statuses: Status[],
     isSubtask?: boolean,
