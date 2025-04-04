@@ -248,10 +248,36 @@ public class LoginController : ControllerBase
                 if (!organizationQuery.Any())
                 {
                     organization = await _organizationRepository.CreateOrganization(new Organization(user.Organization, appUser.Id));
+
+                    IdentityResult roleResult = await _userManager.AddToRoleAsync(appUser, "OrganizationOwner");
+
+                    if (!roleResult.Succeeded)
+                    {
+                        StringBuilder stringBuilder = new StringBuilder();
+                        foreach (IdentityError error in result.Errors)
+                        {
+                            stringBuilder.AppendLine(error.Description);
+                        }
+
+                        throw new Exception("Failed to create user with User role.");
+                    }
                 }
                 else
                 {
                     organization = organizationQuery.First();
+
+                    IdentityResult roleResult = await _userManager.AddToRoleAsync(appUser, "User");
+
+                    if (!roleResult.Succeeded)
+                    {
+                        StringBuilder stringBuilder = new StringBuilder();
+                        foreach (IdentityError error in result.Errors)
+                        {
+                            stringBuilder.AppendLine(error.Description);
+                        }
+
+                        throw new Exception("Failed to create user with User role.");
+                    }
                 }
 
                 if (organization == null || string.IsNullOrWhiteSpace(organization.Id))
@@ -276,19 +302,6 @@ public class LoginController : ControllerBase
                     Extension = user.Extension,
                     Type = user.PhoneType.HasValue ? user.PhoneType.Value : PhoneNumberType.Mobile
                 });
-
-                IdentityResult roleResult = await _userManager.AddToRoleAsync(appUser, "User");
-
-                if (!roleResult.Succeeded)
-                {
-                    StringBuilder stringBuilder = new StringBuilder();
-                    foreach (IdentityError error in result.Errors)
-                    {
-                        stringBuilder.AppendLine(error.Description);
-                    }
-
-                    throw new Exception("Failed to create user with User role.");
-                }
             }
 
             return Ok(new { userName = appUser.UserName, message = $"Welcome to Crit! Enjoy your stay, {appUser.UserName}!" });
