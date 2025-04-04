@@ -6,7 +6,6 @@ import { Task } from "../../models/task.model";
 import { ThemeContext } from "../../contexts/Theme/theme-context";
 import styles from "./tasks.module.scss";
 import { CustomFieldType } from '../../models/custom-field-type.model';
-import { GetLinks, GetLoggedOutLinks, Link } from "../../constants/nav-bar-links";
 import { Status } from "../../models/status.model";
 import { ListTasks } from "../../functions/Tasks/list-tasks";
 import { GetModuleContext } from "../../contexts/Module/module-context";
@@ -20,15 +19,7 @@ export interface TasksProps {
     selectedProjectId: string;
 }
 
-function listTaskListCustomColumn(fieldType: CustomFieldType, hiddenCustomFieldTypeIds: string[]): JSX.Element {
-    if (hiddenCustomFieldTypeIds.find(typeId => typeId === fieldType.id)) {
-        return (
-            <>
-                {null}
-            </>
-        );
-    }
-
+function listTaskListCustomColumn(fieldType: CustomFieldType): JSX.Element {
     return (
         <th>
             {fieldType.name}
@@ -36,7 +27,7 @@ function listTaskListCustomColumn(fieldType: CustomFieldType, hiddenCustomFieldT
     );
 }
 
-function Tasks(props: TasksProps): JSX.Element {
+function TaskTable(props: TasksProps): JSX.Element {
     const { selectedTaskId } = useParams();
     const { theme } = useContext(ThemeContext);
     const moduleContext = useRef(GetModuleContext('app'));
@@ -70,7 +61,7 @@ function Tasks(props: TasksProps): JSX.Element {
                             <th>
                                 Due Date
                             </th>
-                            {props.customFieldTypes?.map<JSX.Element>(fieldType => listTaskListCustomColumn(fieldType, props.hiddenCustomFieldTypeIds))}
+                            {props.customFieldTypes?.filter(fieldType => !props.hiddenCustomFieldTypeIds.find(typeId => typeId === fieldType.id)).map<JSX.Element>(fieldType => listTaskListCustomColumn(fieldType))}
                         </tr>
                     </thead>
                     <tbody>
@@ -83,4 +74,4 @@ function Tasks(props: TasksProps): JSX.Element {
     );
 }
 
-export default Tasks;
+export default TaskTable;

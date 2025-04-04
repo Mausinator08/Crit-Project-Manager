@@ -2,7 +2,7 @@ import { useParams } from "react-router-dom";
 import { GetEnvValues } from "../../constants/environment";
 import { JSX, useEffect, useRef, useState } from "react";
 import { Project } from '../../models/project.model';
-import Tasks from "../../components/Tasks/tasks.component";
+import TaskTable from "../../components/Tasks/tasks-table.component";
 
 async function getProject(projectId: string | undefined): Promise<Project | null> {
     return new Promise(async (resolve, reject): Promise<void> => {
@@ -43,7 +43,7 @@ function ProjectTasks(): JSX.Element {
         <>
             <h2>{project?.name ?? '<no project name>'}</h2>
             <hr />
-            {project && (<Tasks selectedProjectId={project.id!} tasks={project?.tasks ?? []} customFieldTypes={project?.customFieldTypes ?? []} statuses={project?.statuses ?? []} hiddenCustomFieldTypeIds={project?.hiddenCustomFieldTypeIds} />)}
+            {project && (<TaskTable selectedProjectId={project.id!} tasks={project?.tasks ?? []} customFieldTypes={project?.customFieldTypes ?? []} statuses={project?.statuses ?? []} hiddenCustomFieldTypeIds={project?.hiddenCustomFieldTypeIds} />)}
         </>
     );
 }

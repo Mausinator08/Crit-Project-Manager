@@ -1,4 +1,5 @@
 using CritApi.Models;
+using CritBusinessLogic.RepositoryInterfaces;
 using CritDTO.Identity;
 using CritDTO.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -16,16 +17,23 @@ public class UserController : ControllerBase
     private readonly Logging.ILogger _logger;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly RoleManager<ApplicationRole> _roleManager;
+    private readonly IPhoneNumberRepository _phoneNumberRepository;
+    private readonly IOrganizationRepository _organizationRepository;
 
-    public UserController(UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager, Logging.ILogger logger)
+    public UserController(UserManager<ApplicationUser> userManager,
+    RoleManager<ApplicationRole> roleManager,
+    Logging.ILogger logger,
+    IPhoneNumberRepository phoneNumberRepository,
+    IOrganizationRepository organizationRepository)
     {
         _logger = logger;
         _userManager = userManager;
         _roleManager = roleManager;
+        _phoneNumberRepository = phoneNumberRepository;
+        _organizationRepository = organizationRepository;
     }
 
     [HttpPost]
-    [Route("CreateUser")]
     [Authorize(Roles = "ProjectAdmin,ProjectOwner,OrganizationAdmin,OrganizationOwner,SuperAdmin")]
     public async Task<IActionResult> CreateUser(User user, string role = "User")
     {
@@ -77,8 +85,7 @@ public class UserController : ControllerBase
         }
     }
 
-    [HttpPost]
-    [Route("UpdateUser")]
+    [HttpPut]
     [Authorize(Roles = "ProjectAdmin,ProjectOwner,OrganizationAdmin,OrganizationOwner,SuperAdmin")]
     public async Task<IActionResult> UpdateUser(User user)
     {
@@ -129,8 +136,7 @@ public class UserController : ControllerBase
         }
     }
 
-    [HttpPost]
-    [Route("DeleteUser")]
+    [HttpDelete]
     [Authorize(Roles = "ProjectAdmin,ProjectOwner,OrganizationAdmin,OrganizationOwner,SuperAdmin")]
     public async Task<IActionResult> DeleteUser(string userName)
     {
@@ -185,9 +191,63 @@ public class UserController : ControllerBase
     }
 
     [HttpGet]
-    [Route("GetUserByUserName")]
+    [Route("{userId}")]
     [Authorize(Roles = "User;ProjectAdmin,ProjectOwner,OrganizationAdmin,OrganizationOwner,SuperAdmin")]
-    public async Task<IActionResult> GetUserByUserName(string userName)
+    public async Task<IActionResult> GetUserByUserId([FromRoute] string userId)
+    {
+        try
+        {
+            ApplicationUser? appUser = await _userManager.FindByIdAsync(userId);
+
+            if (appUser != null && appUser?.Email != null && appUser?.UserName != null)
+            {
+                if ((await _userManager.GetUsersInRoleAsync("SuperAdmin")).Where(u => u.UserName == appUser.UserName).Any())
+                {
+                    return StatusCode(StatusCodes.Status403Forbidden, new ApiResult("Could not get user.", new List<string>([$"The {appUser.UserName} SuperAdmin user cannot be retrieved."]), new User(appUser.UserName, appUser.Email)));
+                }
+
+                PhoneNumber phoneNumber = await _phoneNumberRepository.GetPhoneNumberByUserId(userId);
+                Organization organization = await _organizationRepository.GetOrganization(userId);
+
+                User user = new User(appUser.UserName, appUser.Email);
+
+                user.CountryCode = phoneNumber.CountryCode;
+                user.PhoneNumber = phoneNumber.Number;
+                user.PhoneType = phoneNumber.Type;
+                user.Extension = phoneNumber.Extension;
+                user.Organization = organization.Name;
+
+                return Ok(new ApiResult("User retrieved successfully.", null, user));
+            }
+            else
+            {
+                List<string> errors = new List<string>();
+
+                if (appUser == null)
+                {
+                    errors.Add($"User with user id {userId} does not exist.");
+                }
+
+                if (appUser?.Email == null)
+                {
+                    errors.Add($"User with user id {userId} was found, but this user has no email.");
+                }
+
+                return StatusCode(StatusCodes.Status500InternalServerError, new ApiResult("Could not get user.", errors));
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogException(ex);
+            return StatusCode(StatusCodes.Status500InternalServerError, "Server Error: Failed to get user.");
+        }
+    }
+
+
+    [HttpGet]
+    [Route("GetUserByUserName/{userName}")]
+    [Authorize(Roles = "User;ProjectAdmin,ProjectOwner,OrganizationAdmin,OrganizationOwner,SuperAdmin")]
+    public async Task<IActionResult> GetUserByUserName([FromRoute] string userName)
     {
         try
         {
@@ -227,9 +287,9 @@ public class UserController : ControllerBase
     }
 
     [HttpGet]
-    [Route("GetUserByEmail")]
+    [Route("GetUserByEmail/{email}")]
     [Authorize(Roles = "User;ProjectAdmin,ProjectOwner,OrganizationAdmin,OrganizationOwner,SuperAdmin")]
-    public async Task<IActionResult> GetUserByEmail(string email)
+    public async Task<IActionResult> GetUserByEmail([FromRoute] string email)
     {
         try
         {
@@ -269,7 +329,6 @@ public class UserController : ControllerBase
     }
 
     [HttpGet]
-    [Route("GetAllUsers")]
     [Authorize(Roles = "User;ProjectAdmin,ProjectOwner,OrganizationAdmin,OrganizationOwner,SuperAdmin")]
     public async Task<IActionResult> GetAllUsers()
     {
@@ -317,9 +376,9 @@ public class UserController : ControllerBase
     }
 
     [HttpGet]
-    [Route("GetAllUsersInRole")]
+    [Route("GetAllUsersInRole/{role}")]
     [Authorize(Roles = "User;ProjectAdmin,ProjectOwner,OrganizationAdmin,OrganizationOwner,SuperAdmin")]
-    public async Task<IActionResult> GetAllUsersInRole(string role)
+    public async Task<IActionResult> GetAllUsersInRole([FromRoute] string role)
     {
         try
         {

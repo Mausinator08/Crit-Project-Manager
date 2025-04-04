@@ -26,7 +26,7 @@ export function ListTasks(
         setStatus(value ?? 'Status Not Set');
     }
 
-    function TaskBody(): JSX.Element {
+    function TaskTableRow(): JSX.Element {
         return (
             <>
                 <td>
@@ -43,7 +43,7 @@ export function ListTasks(
         if (task.subTasks && task.subTasks.length > 0) {
             return (
                 <CollapsibleTask key={task.id} task={task} statuses={statuses} isSubtask={isSubtask}>
-                    <TaskBody />
+                    <TaskTableRow />
                 </CollapsibleTask>
             );
         }
@@ -53,7 +53,7 @@ export function ListTasks(
                 <td>
                     {task.title}
                 </td>
-                <TaskBody />
+                <TaskTableRow />
                 <td>
                     <h4>
                         <NavLink to={`Projects/${task.projectId}/${task.id}`} key={task.id + '-icon'}>

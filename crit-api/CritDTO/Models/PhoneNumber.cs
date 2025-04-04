@@ -40,6 +40,7 @@ public class PhoneNumber
     [PersonalData]
     public string? Extension { get; set; }
     public string OrganizationId { get; set; }
+    public string? UserId { get; set; }
 
     public Organization? Organization { get; set; }
 }

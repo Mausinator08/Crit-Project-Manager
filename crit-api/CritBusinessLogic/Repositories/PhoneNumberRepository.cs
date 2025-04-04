@@ -1,6 +1,7 @@
 using CritBusinessLogic.RepositoryInterfaces;
 using CritDataAccess.Contexts;
 using CritDTO.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace CritBusinessLogic.Repositories;
 
@@ -54,6 +55,24 @@ public class PhoneNumberRepository : IPhoneNumberRepository
         catch (Exception e)
         {
             throw new Exception("Error deleting phone number", e);
+        }
+    }
+
+    public async Task<PhoneNumber> GetPhoneNumberByUserId(string userId)
+    {
+        try
+        {
+            IQueryable<PhoneNumber> phoneNumber = _critDbContext.PhoneNumbers.Where(p => p.UserId == userId);
+            if (!phoneNumber.Any())
+            {
+                throw new Exception($"Phone number not found for user id {userId}");
+            }
+
+            return await phoneNumber.FirstAsync();
+        }
+        catch (Exception e)
+        {
+            throw new Exception("Error getting phone number", e);
         }
     }
 

@@ -119,6 +119,23 @@ public class OrganizationRepository : IDisposable, IAsyncDisposable, IOrganizati
         }
     }
 
+    public async Task<Organization> GetOrganizationByUserId(string userId)
+    {
+        if (_critDbContext == null)
+        {
+            throw new NullReferenceException("TenantDbContext is null.");
+        }
+
+        IQueryable<Organization> organizationsQuery = _critDbContext.Organizations.Where(o => o.AdminUserIds.Contains(userId) || o.MemberUserIds.Contains(userId));
+
+        if (!organizationsQuery.Any())
+        {
+            throw new InvalidOperationException($"User with ID {userId} is not a member of any organization.");
+        }
+
+        return await organizationsQuery.FirstAsync();
+    }
+
     public async Task<Organization?> GetOrganization(string organizationId)
     {
         try
