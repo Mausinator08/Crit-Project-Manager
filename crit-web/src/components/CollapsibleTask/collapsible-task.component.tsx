@@ -12,18 +12,29 @@ import Error from "../../pages/Error/error.page";
 import { Table } from "react-bootstrap";
 import { ThemeContext } from "../../contexts/Theme/theme-context";
 import { faClipboardCheck } from "@fortawesome/free-solid-svg-icons";
+import { User } from "../../models/user.model";
+import { Priority } from "../../models/priority.model";
+import { CustomFieldType } from "../../models/custom-field-type.model";
 
 type CollapsibleTaskItemProps = {
     task: Task,
     children?: React.ReactNode,
+    users: User[],
     statuses: Status[],
+    priorities: Priority[],
+    customFieldTypes: CustomFieldType[],
+    hiddenCustomFieldTypeIds: string[],
     isSubtask?: boolean,
 };
 
 type CollapsibleTaskBodyProps = {
     task: Task,
     children?: React.ReactNode,
+    users: User[],
     statuses: Status[],
+    priorities: Priority[],
+    customFieldTypes: CustomFieldType[],
+    hiddenCustomFieldTypeIds: string[],
 }
 
 function CollapsibleTask(props: CollapsibleTaskItemProps): JSX.Element {
@@ -34,9 +45,6 @@ function CollapsibleTask(props: CollapsibleTaskItemProps): JSX.Element {
             <Collapsible key={props.task.id}>
                 <Collapsible.Label>
                     <tr>
-                        <td>
-                            {props.task.title}
-                        </td>
                         {props.children}
                         <td>
                             <Collapsible.Toggle>
@@ -55,7 +63,7 @@ function CollapsibleTask(props: CollapsibleTaskItemProps): JSX.Element {
                             {(() => {
                                 if (props.task.subTasks && props.task.subTasks.length > 0) {
                                     return props.task.subTasks.map((child) => {
-                                        return ListTasks(child, props.statuses, true);
+                                        return ListTasks(child, props.users, props.statuses, props.priorities, props.customFieldTypes, props.hiddenCustomFieldTypeIds, true);
                                     });
                                 } else {
                                     return (
@@ -76,7 +84,7 @@ function CollapsibleTask(props: CollapsibleTaskItemProps): JSX.Element {
     if (!props.isSubtask || (props.isSubtask && props.isSubtask.valueOf() === false)) {
         return (
             <>
-                <CollapsibleTaskBody task={props.task} statuses={props.statuses}>
+                <CollapsibleTaskBody task={props.task} users={props.users} statuses={props.statuses} priorities={props.priorities} customFieldTypes={props.customFieldTypes} hiddenCustomFieldTypeIds={props.hiddenCustomFieldTypeIds}>
                     {props.children}
                 </CollapsibleTaskBody>
             </>
@@ -85,7 +93,7 @@ function CollapsibleTask(props: CollapsibleTaskItemProps): JSX.Element {
         return (
             <Table responsive striped bordered hover variant={theme}>
                 <tbody>
-                    <CollapsibleTaskBody task={props.task} statuses={props.statuses}>
+                    <CollapsibleTaskBody task={props.task} users={props.users} statuses={props.statuses} priorities={props.priorities} customFieldTypes={props.customFieldTypes} hiddenCustomFieldTypeIds={props.hiddenCustomFieldTypeIds}>
                         {props.children}
                     </CollapsibleTaskBody>
                 </tbody>

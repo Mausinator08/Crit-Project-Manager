@@ -9,6 +9,7 @@ import { setUseNavigation } from "./functions/Utils/navigation-utils";
 import ModuleProvider from "./contexts/Module/module-context";
 import { AuthService } from "./services/AuthService.service";
 import { ProjectService } from "./services/ProjectService.service";
+import { UserService } from "./services/UserService.service";
 
 function App(): JSX.Element {
 	const navFn = useNavigate();
@@ -43,7 +44,7 @@ function App(): JSX.Element {
 	return (
 		<div className={`body`} data-theme={theme}>
 			<ModuleProvider
-				services={[AuthService, ProjectService]}
+				services={[AuthService, ProjectService, UserService]}
 				id="app"
 				key="module_provider_app"
 			>

@@ -2,7 +2,7 @@ import { JSX, useContext, useRef } from "react";
 import { GetEnvValues } from "../../constants/environment";
 import { Button, Form } from "react-bootstrap";
 import { navigate } from "../../functions/Utils/navigation-utils";
-import { User } from "../../models/requests/user.model";
+import { User } from "../../models/user.model";
 import "./login.scss";
 import { NavLink } from "react-router-dom";
 import { GetModuleContext } from "../../contexts/Module/module-context";

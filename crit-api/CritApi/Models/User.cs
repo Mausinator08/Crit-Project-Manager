@@ -22,6 +22,7 @@ public class User
         Email = email;
     }
 
+    public string? Id { get; set; }
     public string? UserName { get; set; }
 
     [EmailAddress(ErrorMessage = "Invalid Email")]

@@ -210,7 +210,6 @@ public class TenantDbContext : DbContext, ITenantDbContext
             .HasConversion(id => ObjectId.Parse(id), oid => oid.ToString())
             .HasValueGenerator<ObjectIdValueGenerator>()
             .ValueGeneratedOnAdd();
-            entity.Property(collection => collection.Name).HasColumnName("name").IsRequired(true);
             entity.Property(collection => collection.Value).HasColumnName("value").IsRequired(true);
             entity.Property(collection => collection.CustomFieldTypeId).HasColumnName("customFieldTypeId").IsRequired(true);
             entity.Property(collection => collection.TaskId).HasColumnName("taskId").IsRequired(true);

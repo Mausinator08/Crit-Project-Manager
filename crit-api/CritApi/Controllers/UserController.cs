@@ -106,8 +106,9 @@ public class UserController : ControllerBase
                 }
 
                 appUser.Email = user.Email;
-
                 IdentityResult result = await _userManager.UpdateAsync(appUser);
+
+                user.Id = appUser.Id;
 
                 if (result.Succeeded)
                 {
@@ -211,6 +212,7 @@ public class UserController : ControllerBase
 
                 User user = new User(appUser.UserName, appUser.Email);
 
+                user.Id = appUser.Id;
                 user.CountryCode = phoneNumber.CountryCode;
                 user.PhoneNumber = phoneNumber.Number;
                 user.PhoneType = phoneNumber.Type;
@@ -260,7 +262,19 @@ public class UserController : ControllerBase
                     return StatusCode(StatusCodes.Status403Forbidden, new ApiResult("Could not get user.", new List<string>([$"The {appUser.UserName} SuperAdmin user cannot be retrieved."]), new User(appUser.UserName, appUser.Email)));
                 }
 
-                return Ok(new ApiResult("User retrieved successfully.", null, new User(appUser.UserName, appUser.Email)));
+                PhoneNumber phoneNumber = await _phoneNumberRepository.GetPhoneNumberByUserId(appUser.Id);
+                Organization organization = await _organizationRepository.GetOrganization(appUser.Id);
+
+                User user = new User(appUser.UserName, appUser.Email);
+
+                user.Id = appUser.Id;
+                user.CountryCode = phoneNumber.CountryCode;
+                user.PhoneNumber = phoneNumber.Number;
+                user.PhoneType = phoneNumber.Type;
+                user.Extension = phoneNumber.Extension;
+                user.Organization = organization.Name;
+
+                return Ok(new ApiResult("User retrieved successfully.", null, user));
             }
             else
             {
@@ -302,7 +316,19 @@ public class UserController : ControllerBase
                     return StatusCode(StatusCodes.Status403Forbidden, new ApiResult("Could not get user.", new List<string>([$"The {appUser.UserName} SuperAdmin user cannot be retrieved."]), new User(appUser.UserName, appUser.Email)));
                 }
 
-                return Ok(new ApiResult("User retrieved successfully.", null, new User(appUser.UserName, appUser.Email)));
+                PhoneNumber phoneNumber = await _phoneNumberRepository.GetPhoneNumberByUserId(appUser.Id);
+                Organization organization = await _organizationRepository.GetOrganization(appUser.Id);
+
+                User user = new User(appUser.UserName, appUser.Email);
+
+                user.Id = appUser.Id;
+                user.CountryCode = phoneNumber.CountryCode;
+                user.PhoneNumber = phoneNumber.Number;
+                user.PhoneType = phoneNumber.Type;
+                user.Extension = phoneNumber.Extension;
+                user.Organization = organization.Name;
+
+                return Ok(new ApiResult("User retrieved successfully.", null, user));
             }
             else
             {
@@ -346,7 +372,19 @@ public class UserController : ControllerBase
                 {
                     if (appUser.UserName != null && appUser.Email != null)
                     {
-                        users.Add(new User(appUser.UserName, appUser.Email));
+                        PhoneNumber phoneNumber = await _phoneNumberRepository.GetPhoneNumberByUserId(appUser.Id);
+                        Organization organization = await _organizationRepository.GetOrganization(appUser.Id);
+
+                        User user = new User(appUser.UserName, appUser.Email);
+
+                        user.Id = appUser.Id;
+                        user.CountryCode = phoneNumber.CountryCode;
+                        user.PhoneNumber = phoneNumber.Number;
+                        user.PhoneType = phoneNumber.Type;
+                        user.Extension = phoneNumber.Extension;
+                        user.Organization = organization.Name;
+
+                        users.Add(user);
                     }
                     else
                     {
@@ -398,7 +436,19 @@ public class UserController : ControllerBase
                 {
                     if (appUser.UserName != null && appUser.Email != null)
                     {
-                        users.Add(new User(appUser.UserName, appUser.Email));
+                        PhoneNumber phoneNumber = await _phoneNumberRepository.GetPhoneNumberByUserId(appUser.Id);
+                        Organization organization = await _organizationRepository.GetOrganization(appUser.Id);
+
+                        User user = new User(appUser.UserName, appUser.Email);
+
+                        user.Id = appUser.Id;
+                        user.CountryCode = phoneNumber.CountryCode;
+                        user.PhoneNumber = phoneNumber.Number;
+                        user.PhoneType = phoneNumber.Type;
+                        user.Extension = phoneNumber.Extension;
+                        user.Organization = organization.Name;
+
+                        users.Add(user);
                     }
                     else
                     {
