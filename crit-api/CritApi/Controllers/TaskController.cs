@@ -77,7 +77,7 @@ public class TaskController : ControllerBase
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error creating task.");
             }
 
-            return CreatedAtAction(nameof(GetTask), new { taskId = createdTask.Id }, createdTask);
+            return CreatedAtAction(nameof(GetTask), new { projectId = task.ProjectId, taskId = createdTask.Id }, createdTask);
         }
         catch (Exception ex)
         {

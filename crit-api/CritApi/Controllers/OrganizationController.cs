@@ -34,7 +34,7 @@ public class OrganizationController : ControllerBase
             }
 
             Organization? createdOrganization = await _organizationRepository.CreateFirstOrganization(organization);
-            return CreatedAtAction(nameof(GetAllOrganizations), new { id = createdOrganization.Id }, createdOrganization);
+            return CreatedAtAction(nameof(GetOrganization), new { organizationId = createdOrganization.Id }, createdOrganization);
         }
         catch (Exception ex)
         {
@@ -97,7 +97,7 @@ public class OrganizationController : ControllerBase
             }
 
             Organization? createdOrganization = await _organizationRepository.CreateOrganization(organization);
-            return CreatedAtAction(nameof(GetOrganization), new { id = createdOrganization.Id }, createdOrganization);
+            return CreatedAtAction(nameof(GetOrganization), new { organizationId = createdOrganization.Id }, createdOrganization);
         }
         catch (Exception ex)
         {

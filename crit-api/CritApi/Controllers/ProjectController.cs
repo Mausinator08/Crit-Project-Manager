@@ -60,7 +60,7 @@ public class ProjectController : ControllerBase
         try
         {
             Project createdProject = await _projectsRepository.CreateProject(project);
-            return CreatedAtAction(nameof(CreateProject), new { id = createdProject.Id }, createdProject);
+            return CreatedAtAction(nameof(GetProject), new { projectId = createdProject.Id }, createdProject);
         }
         catch (Exception ex)
         {
