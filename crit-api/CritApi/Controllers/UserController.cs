@@ -81,7 +81,7 @@ public class UserController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogException(ex);
-            return StatusCode(StatusCodes.Status500InternalServerError, "Server Error: Failed to create user.");
+            return StatusCode(StatusCodes.Status500InternalServerError, new ApiResult("Server Error: Failed to create user.", new List<string>(["If this error persists, please contact support."])));
         }
     }
 
@@ -133,7 +133,7 @@ public class UserController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogException(ex);
-            return StatusCode(StatusCodes.Status500InternalServerError, "Server Error: Failed to update user.");
+            return StatusCode(StatusCodes.Status500InternalServerError, new ApiResult("Server Error: Failed to update user.", new List<string>(["If this error persists, please contact support."])));
         }
     }
 
@@ -187,7 +187,7 @@ public class UserController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogException(ex);
-            return StatusCode(StatusCodes.Status500InternalServerError, "Server Error: Failed to delete user.");
+            return StatusCode(StatusCodes.Status500InternalServerError, new ApiResult("Server Error: Failed to delete user.", errors: new List<string>(["If this error persists, please contact support."])));
         }
     }
 
@@ -241,7 +241,7 @@ public class UserController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogException(ex);
-            return StatusCode(StatusCodes.Status500InternalServerError, "Server Error: Failed to get user.");
+            return StatusCode(StatusCodes.Status500InternalServerError, new ApiResult("Server Error: Failed to get user.", new List<string>(["If this error persists, please contact support."])));
         }
     }
 
@@ -296,7 +296,7 @@ public class UserController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogException(ex);
-            return StatusCode(StatusCodes.Status500InternalServerError, "Server Error: Failed to get user.");
+            return StatusCode(StatusCodes.Status500InternalServerError, new ApiResult("Server Error: Failed to get user.", new List<string>(["If this error persists, please contact support."])));
         }
     }
 
@@ -350,7 +350,7 @@ public class UserController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogException(ex);
-            return StatusCode(StatusCodes.Status500InternalServerError, "Server Error: Failed to get user.");
+            return StatusCode(StatusCodes.Status500InternalServerError, new ApiResult("Server Error: Failed to get user.", errors: new List<string>(["If this error persists, please contact support."])));
         }
     }
 
@@ -409,7 +409,7 @@ public class UserController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogException(ex);
-            return StatusCode(StatusCodes.Status500InternalServerError, "Server Error: Failed to get all users.");
+            return StatusCode(StatusCodes.Status500InternalServerError, new ApiResult("Server Error: Failed to get all users.", errors: new List<string>(["If this error persists, please contact support."])));
         }
     }
 
@@ -473,7 +473,71 @@ public class UserController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogException(ex);
-            return StatusCode(StatusCodes.Status500InternalServerError, $"Server Error: Failed to get all users for {role} role.");
+            return StatusCode(StatusCodes.Status500InternalServerError, new ApiResult($"Server Error: Failed to get all users for {role} role.", errors: new List<string>(["If this error persists, please contact support."])));
+        }
+    }
+
+    [HttpGet]
+    [Route("IsUserIdInRole")]
+    [Authorize(Roles = "User,ProjectAdmin,ProjectOwner,OrganizationAdmin,OrganizationOwner,SuperAdmin")]
+    public async Task<IActionResult> IsUserIdInRole([FromQuery] string userId, [FromQuery] string role)
+    {
+        try
+        {
+            if (role == "SuperAdmin")
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, new ApiResult("Could not get user role.", new List<string>([$"The {role} role cannot be retrieved."])));
+            }
+
+            ApplicationUser? appUser = await _userManager.FindByIdAsync(userId);
+
+            if (appUser != null)
+            {
+                IList<ApplicationUser> appUsers = await _userManager.GetUsersInRoleAsync(role);
+
+                if (appUsers.Contains(appUser))
+                {
+                    return Ok(new ApiResult($"User {userId} is in the {role} role.", null, true));
+                }
+                else
+                {
+                    return Ok(new ApiResult($"User {userId} is not in the {role} role.", null, false));
+                }
+            }
+            else
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new ApiResult("Could not get user role.", new List<string>([$"User with user id {userId} does not exist."])));
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogException(ex);
+            return StatusCode(StatusCodes.Status500InternalServerError, new ApiResult("Server Error: Failed to get user role.", errors: new List<string>(["If this error persists, please contact support."])));
+        }
+    }
+
+    [HttpGet]
+    [Route("GetLoggedInUserId")]
+    [Authorize(Roles = "User,ProjectAdmin,ProjectOwner,OrganizationAdmin,OrganizationOwner,SuperAdmin")]
+    public async Task<IActionResult> GetLoggedInUserId()
+    {
+        try
+        {
+            string? userId = _userManager.GetUserId(User);
+
+            if (userId != null)
+            {
+                return Ok(new ApiResult("Logged in user id retrieved successfully.", null, userId));
+            }
+            else
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new ApiResult("Could not get logged in user id.", new List<string>(["User id could not be found."])));
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogException(ex);
+            return StatusCode(StatusCodes.Status500InternalServerError, new ApiResult("Server Error: Failed to get logged in user id.", errors: new List<string>(["If this error persists, please contact support."])));
         }
     }
 }
