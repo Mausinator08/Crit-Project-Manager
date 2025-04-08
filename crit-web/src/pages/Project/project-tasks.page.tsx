@@ -8,6 +8,7 @@ import { UserService } from "../../services/UserService.service";
 import { User } from "../../models/user.model";
 
 import "./projects.scss";
+import { ApiResult } from "../../models/responses/api-result.model";
 
 function ProjectTasks(): JSX.Element {
     const { projectId } = useParams();
@@ -42,12 +43,15 @@ function ProjectTasks(): JSX.Element {
             });
 
         project?.projectUserIds?.forEach((userId) => {
-            userService.GetUserByUserId(userId).then((user) => {
-                if (user) {
-                    setUsers([...users, user]);
+            userService.GetUserByUserId(userId).then((result) => {
+                if (result && result.data) {
+                    setUsers([...users, result.data]);
                 }
-            }).catch((error: Error) => {
-                console.error(error);
+            }).catch((error: ApiResult<User | null>) => {
+                console.error(error.message);
+                (error.errors && error.errors.length > 0) && error.errors.forEach((err) => {
+                    console.error(err);
+                });
                 setError(error.message);
             });
         });

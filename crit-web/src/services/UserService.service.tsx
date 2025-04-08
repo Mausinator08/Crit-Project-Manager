@@ -8,7 +8,7 @@ export class UserService {
     private readonly userUrl: string =
         GetEnvValues()?.critApiUrl + "/User";
 
-    public async GetUserByUserId(userId: string): Promise<User> {
+    public async GetUserByUserId(userId: string): Promise<ApiResult<User | null>> {
         return new Promise(async (resolve, reject): Promise<void> => {
             const response = await fetch(new URL(`${this.userUrl}/${userId}`), {
                 method: "GET",
@@ -20,16 +20,16 @@ export class UserService {
             });
 
             if (response.status !== 200) {
-                reject(await response.text());
+                reject(await response.json() as ApiResult<User | null>);
                 return;
             }
 
-            const data: User = await response.json();
+            const data: ApiResult<User | null> = await response.json() as ApiResult<User | null>;
             resolve(data);
         });
     }
 
-    public async GetUserByUserName(username: string): Promise<User> {
+    public async GetUserByUserName(username: string): Promise<ApiResult<User | null>> {
         return new Promise(async (resolve, reject): Promise<void> => {
             const response = await fetch(new URL(`${this.userUrl}/GetUserByUserName/${username}`), {
                 method: "GET",
@@ -41,11 +41,11 @@ export class UserService {
             });
 
             if (response.status !== 200) {
-                reject(await response.text());
+                reject(await response.json() as ApiResult<User | null>);
                 return;
             }
 
-            const data: User = await response.json();
+            const data: ApiResult<User | null> = await response.json() as ApiResult<User | null>;
             resolve(data);
         });
     }
