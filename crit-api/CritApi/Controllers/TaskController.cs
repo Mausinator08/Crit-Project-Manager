@@ -22,6 +22,7 @@ public class TaskController : ControllerBase
     [Route("{projectId}")]
     [ProducesResponseType<List<Task>>(StatusCodes.Status200OK)]
     [ProducesErrorResponseType(typeof(string))]
+    [Authorize(Roles = "User,ProjectAdmin,ProjectOwner,OrganizationAdmin,OrganizationOwner,SuperAdmin")]
     public async Task<IActionResult> GetTasks([FromRoute] string projectId)
     {
         try
@@ -40,6 +41,7 @@ public class TaskController : ControllerBase
     [Route("{projectId}/{taskId}")]
     [ProducesResponseType<Task>(StatusCodes.Status200OK)]
     [ProducesErrorResponseType(typeof(string))]
+    [Authorize(Roles = "User,ProjectAdmin,ProjectOwner,OrganizationAdmin,OrganizationOwner,SuperAdmin")]
     public async Task<IActionResult> GetTask([FromRoute] string projectId, [FromRoute] string taskId)
     {
         try
@@ -62,6 +64,7 @@ public class TaskController : ControllerBase
     [HttpPost]
     [ProducesResponseType<Task>(StatusCodes.Status201Created)]
     [ProducesErrorResponseType(typeof(string))]
+    [Authorize(Roles = "ProjectAdmin,ProjectOwner,OrganizationAdmin,OrganizationOwner,SuperAdmin")]
     public async Task<IActionResult> CreateTask([FromBody] ProjectTask task)
     {
         try
@@ -89,6 +92,7 @@ public class TaskController : ControllerBase
     [HttpPut]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesErrorResponseType(typeof(string))]
+    [Authorize(Roles = "ProjectAdmin,ProjectOwner,OrganizationAdmin,OrganizationOwner,SuperAdmin")]
     public async Task<IActionResult> UpdateTask([FromBody] ProjectTask task)
     {
         try
@@ -111,6 +115,7 @@ public class TaskController : ControllerBase
     [HttpDelete]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesErrorResponseType(typeof(string))]
+    [Authorize(Roles = "ProjectAdmin,ProjectOwner,OrganizationAdmin,OrganizationOwner,SuperAdmin")]
     public async Task<IActionResult> DeleteTask([FromQuery] string projectId, [FromQuery] string taskId)
     {
         try

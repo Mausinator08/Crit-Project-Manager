@@ -4,7 +4,6 @@ using CritDataAccess.Services;
 using CritDTO.Identity;
 using CritDTO.Models;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace CritBusinessLogic.Repositories;
@@ -29,12 +28,28 @@ public class TasksRepository : IDisposable, IAsyncDisposable, ITasksRepository
     {
         try
         {
+            Organization? organization = await _userRepository.GetLoggedInUserOrganization();
+            if (organization == null)
+            {
+                throw new Exception("User is not a member of any organization and therefore cannot create projects.");
+            }
+
+            ApplicationUser? applicationUser = await _userRepository.GetLoggedInUser();
+            if (applicationUser == null)
+            {
+                throw new Exception("User is not logged in.");
+            }
+
             if (_tenantDbContext == null)
             {
                 throw new Exception("Tenant database context is not initialized.");
             }
 
-            IQueryable<ProjectTask> tasksQuery = _tenantDbContext.Tasks.Where(t => t.ProjectId == projectId);
+            IQueryable<ProjectTask> tasksQuery = _tenantDbContext.Tasks.Where(t =>
+            t.ProjectId == projectId &&
+            t.Project != null &&
+            t.Project.ProjectUserIds.Contains(applicationUser.Id) &&
+            t.Project.OrganizationIds.Contains(organization.Id!));
 
             if (tasksQuery.Any())
             {
@@ -53,12 +68,29 @@ public class TasksRepository : IDisposable, IAsyncDisposable, ITasksRepository
     {
         try
         {
+            Organization? organization = await _userRepository.GetLoggedInUserOrganization();
+            if (organization == null)
+            {
+                throw new Exception("User is not a member of any organization and therefore cannot create projects.");
+            }
+
+            ApplicationUser? applicationUser = await _userRepository.GetLoggedInUser();
+            if (applicationUser == null)
+            {
+                throw new Exception("User is not logged in.");
+            }
+
             if (_tenantDbContext == null)
             {
                 throw new Exception("Tenant database context is not initialized.");
             }
 
-            IQueryable<ProjectTask> taskQuery = _tenantDbContext.Tasks.Where(t => t.Id == taskId && t.ProjectId == projectId);
+            IQueryable<ProjectTask> taskQuery = _tenantDbContext.Tasks.Where(t =>
+            t.Id == taskId &&
+            t.ProjectId == projectId &&
+            t.Project != null &&
+            t.Project.ProjectUserIds.Contains(applicationUser.Id) &&
+            t.Project.OrganizationIds.Contains(organization.Id!));
 
             if (taskQuery.Any())
             {
@@ -96,7 +128,8 @@ public class TasksRepository : IDisposable, IAsyncDisposable, ITasksRepository
 
             IQueryable<Project> projectQuery = _tenantDbContext.Projects.Where(p =>
             p.Id == task.ProjectId &&
-            p.ProjectAdminUserIds.Contains(applicationUser.Id));
+            p.ProjectAdminUserIds.Contains(applicationUser.Id) &&
+            p.OrganizationIds.Contains(organization.Id!));
 
             if (!projectQuery.Any())
             {
@@ -142,7 +175,8 @@ public class TasksRepository : IDisposable, IAsyncDisposable, ITasksRepository
 
             IQueryable<Project> projectQuery = _tenantDbContext.Projects.Where(p =>
             p.Id == task.ProjectId &&
-            p.ProjectAdminUserIds.Contains(applicationUser.Id));
+            p.ProjectAdminUserIds.Contains(applicationUser.Id) &&
+            p.OrganizationIds.Contains(organization.Id!));
 
             if (!projectQuery.Any())
             {
@@ -186,7 +220,8 @@ public class TasksRepository : IDisposable, IAsyncDisposable, ITasksRepository
 
             IQueryable<Project> projectQuery = _tenantDbContext.Projects.Where(p =>
             p.Id == projectId &&
-            p.ProjectAdminUserIds.Contains(applicationUser.Id));
+            p.ProjectAdminUserIds.Contains(applicationUser.Id) &&
+            p.OrganizationIds.Contains(organization.Id!));
 
             if (!projectQuery.Any())
             {

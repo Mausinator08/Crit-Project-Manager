@@ -193,7 +193,7 @@ public class UserController : ControllerBase
 
     [HttpGet]
     [Route("{userId}")]
-    [Authorize(Roles = "User;ProjectAdmin,ProjectOwner,OrganizationAdmin,OrganizationOwner,SuperAdmin")]
+    [Authorize(Roles = "User,ProjectAdmin,ProjectOwner,OrganizationAdmin,OrganizationOwner,SuperAdmin")]
     public async Task<IActionResult> GetUserByUserId([FromRoute] string userId)
     {
         try
@@ -248,7 +248,7 @@ public class UserController : ControllerBase
 
     [HttpGet]
     [Route("GetUserByUserName/{userName}")]
-    [Authorize(Roles = "User;ProjectAdmin,ProjectOwner,OrganizationAdmin,OrganizationOwner,SuperAdmin")]
+    [Authorize(Roles = "User,ProjectAdmin,ProjectOwner,OrganizationAdmin,OrganizationOwner,SuperAdmin")]
     public async Task<IActionResult> GetUserByUserName([FromRoute] string userName)
     {
         try
@@ -302,7 +302,7 @@ public class UserController : ControllerBase
 
     [HttpGet]
     [Route("GetUserByEmail/{email}")]
-    [Authorize(Roles = "User;ProjectAdmin,ProjectOwner,OrganizationAdmin,OrganizationOwner,SuperAdmin")]
+    [Authorize(Roles = "User,ProjectAdmin,ProjectOwner,OrganizationAdmin,OrganizationOwner,SuperAdmin")]
     public async Task<IActionResult> GetUserByEmail([FromRoute] string email)
     {
         try
@@ -355,7 +355,7 @@ public class UserController : ControllerBase
     }
 
     [HttpGet]
-    [Authorize(Roles = "User;ProjectAdmin,ProjectOwner,OrganizationAdmin,OrganizationOwner,SuperAdmin")]
+    [Authorize(Roles = "User,ProjectAdmin,ProjectOwner,OrganizationAdmin,OrganizationOwner,SuperAdmin")]
     public async Task<IActionResult> GetAllUsers()
     {
         try
@@ -415,7 +415,7 @@ public class UserController : ControllerBase
 
     [HttpGet]
     [Route("GetAllUsersInRole/{role}")]
-    [Authorize(Roles = "User;ProjectAdmin,ProjectOwner,OrganizationAdmin,OrganizationOwner,SuperAdmin")]
+    [Authorize(Roles = "User,ProjectAdmin,ProjectOwner,OrganizationAdmin,OrganizationOwner,SuperAdmin")]
     public async Task<IActionResult> GetAllUsersInRole([FromRoute] string role)
     {
         try
