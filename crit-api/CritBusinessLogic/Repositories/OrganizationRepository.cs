@@ -136,7 +136,7 @@ public class OrganizationRepository : IDisposable, IAsyncDisposable, IOrganizati
         return await organizationsQuery.FirstAsync();
     }
 
-    public async Task<Organization?> GetOrganization(string organizationId)
+    public async Task<Organization> GetOrganization(string organizationId)
     {
         try
         {
@@ -157,13 +157,13 @@ public class OrganizationRepository : IDisposable, IAsyncDisposable, IOrganizati
                 {
                     return await organizationsQuery.FirstAsync();
                 }
+
+                throw new InvalidOperationException($"User with ID {applicationUser.Id} is not a member or affilate of organization with ID {organizationId}.");
             }
             else
             {
                 throw new UnauthorizedAccessException("User is not logged in.");
             }
-
-            return null;
         }
         catch (Exception ex)
         {
