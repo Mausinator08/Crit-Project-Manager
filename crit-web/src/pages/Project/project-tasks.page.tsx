@@ -1,31 +1,24 @@
-import { useParams } from "react-router-dom";
-import { GetEnvValues } from "../../constants/environment";
-import { JSX, useEffect, useRef, useState } from "react";
+import { Outlet, useParams } from "react-router-dom";
+import { JSX, useContext, useEffect, useRef, useState } from "react";
 import { Project } from '../../models/project.model';
 import TaskTable from "../../components/Tasks/tasks-table.component";
-
-async function getProject(projectId: string | undefined): Promise<Project | null> {
-    return new Promise(async (resolve, reject): Promise<void> => {
-        const response = await fetch(new URL(`${GetEnvValues()?.critApiUrl}/Project/${projectId}`), {
-            method: 'GET',
-            credentials: 'include',
-            mode: 'cors',
-        });
-
-        if (response.status !== 200) {
-            reject(await response.text());
-            return;
-        }
-
-        const data: Project = await response.json() as Project;
-        resolve(data);
-    });
-}
+import { GetModuleContext } from "../../contexts/Module/module-context";
+import { ProjectService } from "../../services/ProjectService.service";
+import "./projects.scss";
+import { UserService } from "../../services/UserService.service";
+import { User } from "../../models/user.model";
 
 function ProjectTasks(): JSX.Element {
     const { projectId } = useParams();
     const [project, setProject] = useState<Project | null>(null);
     const [hasFetched, setHasFetched] = useState<boolean>(false);
+    const [error, setError] = useState<string | null>(null);
+    const [showSidePanel, setShowSidePanel] = useState<boolean>(false);
+    const [users, setUsers] = useState<User[]>([]);
+    const moduleContext = useRef(GetModuleContext('app'));
+    const { getService } = useContext(moduleContext.current.context);
+    const projectService: ProjectService = getService('ProjectService');
+    const userService: UserService = getService('UserService');
 
     useEffect(() => {
         if (hasFetched) {
@@ -34,8 +27,28 @@ function ProjectTasks(): JSX.Element {
 
         setHasFetched(true);
 
-        getProject(projectId).then(value => {
-            setProject(value);
+        if (!projectId) {
+            return;
+        }
+
+        projectService.GetProject(projectId)
+            .then(value => {
+                setProject(value);
+            })
+            .catch((error: Error) => {
+                console.error(error);
+                setError(error.message);
+            });
+
+        project?.projectUserIds?.forEach((userId) => {
+            userService.GetUserByUserId(userId).then((user) => {
+                if (user) {
+                    setUsers([...users, user]);
+                }
+            }).catch((error: Error) => {
+                console.error(error);
+                setError(error.message);
+            });
         });
     }, [projectId]);
 
@@ -43,7 +56,18 @@ function ProjectTasks(): JSX.Element {
         <>
             <h2>{project?.name ?? '<no project name>'}</h2>
             <hr />
-            {project && (<TaskTable selectedProjectId={project.id!} tasks={project?.tasks ?? []} customFieldTypes={project?.customFieldTypes ?? []} statuses={project?.statuses ?? []} hiddenCustomFieldTypeIds={project?.hiddenCustomFieldTypeIds} />)}
+            {error && <p style={{ color: "red" }}>{error}</p>}
+            <div className={showSidePanel ? "projects-panel split-panel" : "projects-panel"}>
+                {project && (<TaskTable
+                    selectedProjectId={project.id!}
+                    tasks={project?.tasks ?? []}
+                    customFieldTypes={project?.customFieldTypes ?? []}
+                    statuses={project?.statuses ?? []}
+                    hiddenCustomFieldTypeIds={project?.hiddenCustomFieldTypeIds}
+                    users={users}
+                    priorities={project?.priorities} />)}
+                {showSidePanel && <Outlet />}
+            </div>
         </>
     );
 }
