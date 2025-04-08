@@ -7,7 +7,6 @@ public class ProjectTask : AuditInformation
     public ProjectTask()
     {
         ProjectId = string.Empty;
-        ColaboratorUserIds = new List<string>();
         SubTasks = new List<ProjectTask>();
         CustomFields = new List<CustomField>();
         DateTime now = DateTime.Now;
@@ -19,7 +18,6 @@ public class ProjectTask : AuditInformation
     public ProjectTask(string projectId, string createdByUserId)
     {
         ProjectId = projectId;
-        ColaboratorUserIds = new List<string>([createdByUserId]);
         SubTasks = new List<ProjectTask>();
         CustomFields = new List<CustomField>();
         DateTime now = DateTime.Now;
@@ -33,7 +31,6 @@ public class ProjectTask : AuditInformation
     public string? Title { get; set; }
     public string? Details { get; set; }
     public string ProjectId { get; set; }
-    public List<string> ColaboratorUserIds { get; set; }
     public string? AssignedUserId { get; set; }
     public string? StatusId { get; set; }
     public string? PriorityId { get; set; }

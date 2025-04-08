@@ -163,7 +163,6 @@ public class TenantDbContext : DbContext, ITenantDbContext
             entity.Property(collection => collection.Title).HasColumnName("title").IsRequired(false);
             entity.Property(collection => collection.Details).HasColumnName("details").IsRequired(false);
             entity.Property(collection => collection.ProjectId).HasColumnName("projectId").IsRequired(true);
-            entity.Property(collection => collection.ColaboratorUserIds).HasColumnName("colaboratorUserIds").IsRequired(false);
             entity.Property(collection => collection.AssignedUserId).HasColumnName("assignedUserId").IsRequired(false);
             entity.Property(collection => collection.StatusId).HasColumnName("statusId").IsRequired(false);
             entity.Property(collection => collection.PriorityId).HasColumnName("priorityId").IsRequired(false);
