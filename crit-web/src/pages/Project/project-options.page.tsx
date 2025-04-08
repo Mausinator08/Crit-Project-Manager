@@ -1,32 +1,25 @@
-import { JSX, useEffect, useState } from "react";
+import { JSX, useContext, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { GetEnvValues } from "../../constants/environment";
 import { Project } from "../../models/project.model";
 
 import "./projects.scss";
-
-async function getProject(projectId: string | undefined): Promise<Project | null> {
-    return new Promise(async (resolve, reject): Promise<void> => {
-        const response = await fetch(new URL(`${GetEnvValues()?.critApiUrl}/Project/${projectId}`), {
-            method: 'GET',
-            credentials: 'include',
-            mode: 'cors',
-        });
-
-        if (response.status !== 200) {
-            reject(await response.text());
-            return;
-        }
-
-        const data: Project = await response.json() as Project;
-        resolve(data);
-    });
-}
+import { GetModuleContext } from "../../contexts/Module/module-context";
+import { UserService } from "../../services/UserService.service";
+import { ProjectService } from "../../services/ProjectService.service";
+import { ApiResult } from "../../models/responses/api-result.model";
+import { Dropdown } from "react-bootstrap";
 
 function ProjectOptions(): JSX.Element {
     const { projectId } = useParams();
     const [project, setProject] = useState<Project | null>(null);
     const [hasFetched, setHasFetched] = useState<boolean>(false);
+    const [error, setError] = useState<string | null>(null);
+    const moduleContext = useRef(GetModuleContext("app"));
+    const { getService } = useContext(moduleContext.current.context);
+    const projectService: ProjectService = getService("ProjectService");
+    const userService: UserService = getService("UserService");
+    const [userId, setUserId] = useState<string | null>(null);
 
     useEffect(() => {
         if (hasFetched) {
@@ -35,9 +28,40 @@ function ProjectOptions(): JSX.Element {
 
         setHasFetched(true);
 
-        getProject(projectId).then(value => {
-            setProject(value);
-        });
+        if (!projectId) {
+            return;
+        }
+
+        projectService.GetProject(projectId)
+            .then(value => {
+                setProject(value);
+            })
+            .catch((error: Error) => {
+                console.error(error);
+                setProject(null);
+                setError(error.message);
+            });
+
+        userService.GetLoggedInUserId()
+            .then((result) => {
+                if (result) {
+                    if (!result.data) {
+                        console.error("No user ID found in the result.");
+                        setError("No user ID found in the result.");
+                        setUserId(null);
+                        return;
+                    }
+
+                    setUserId(result.data);
+                }
+            })
+            .catch((error: ApiResult<string | null>) => {
+                console.error(error.message);
+                (error.errors && error.errors.length > 0) && error.errors.forEach((err) => {
+                    console.error(err);
+                });
+                setError(error.message);
+            });
     }, [projectId]);
 
     return (
@@ -45,15 +69,18 @@ function ProjectOptions(): JSX.Element {
             <h2>{project?.name ?? '<no project name>'}</h2>
             <h3>Options</h3>
             <hr />
+            {error && <p style={{ color: "red" }}>{error}</p>}
             {project && (
-                <div className="project-options">
-                    <div className="project-option">
+                <div>
+                    <div>
                         <label htmlFor="project-name">Project Name</label>
-                        <input type="text" id="project-name" value={project.name} readOnly />
+                        <input type="text" id="project-name" value={project.name} />
                     </div>
-                    <div className="project-option">
+                    <div>
                         <label htmlFor="project-description">Project Description</label>
-                        <textarea id="project-description" value={project.description} readOnly />
+                        <textarea id="project-description" value={project.description} />
+                    </div>
+                    <div>
                     </div>
                 </div>
             )}
