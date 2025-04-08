@@ -4,9 +4,10 @@ import { Project } from '../../models/project.model';
 import TaskTable from "../../components/Tasks/tasks-table.component";
 import { GetModuleContext } from "../../contexts/Module/module-context";
 import { ProjectService } from "../../services/ProjectService.service";
-import "./projects.scss";
 import { UserService } from "../../services/UserService.service";
 import { User } from "../../models/user.model";
+
+import "./projects.scss";
 
 function ProjectTasks(): JSX.Element {
     const { projectId } = useParams();
@@ -58,15 +59,21 @@ function ProjectTasks(): JSX.Element {
             <hr />
             {error && <p style={{ color: "red" }}>{error}</p>}
             <div className={showSidePanel ? "projects-panel split-panel" : "projects-panel"}>
-                {project && (<TaskTable
-                    selectedProjectId={project.id!}
-                    tasks={project?.tasks ?? []}
-                    customFieldTypes={project?.customFieldTypes ?? []}
-                    statuses={project?.statuses ?? []}
-                    hiddenCustomFieldTypeIds={project?.hiddenCustomFieldTypeIds}
-                    users={users}
-                    priorities={project?.priorities} />)}
-                {showSidePanel && <Outlet />}
+                <div className="scrollable-panel-left">
+                    {project && (<TaskTable
+                        selectedProjectId={project.id!}
+                        tasks={project?.tasks ?? []}
+                        customFieldTypes={project?.customFieldTypes ?? []}
+                        statuses={project?.statuses ?? []}
+                        hiddenCustomFieldTypeIds={project?.hiddenCustomFieldTypeIds}
+                        users={users}
+                        priorities={project?.priorities} />)}
+                </div>
+                {showSidePanel && (
+                    <div className="scrollable-panel-right">
+                        <Outlet />
+                    </div>
+                )}
             </div>
         </>
     );
