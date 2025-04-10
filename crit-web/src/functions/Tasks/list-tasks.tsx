@@ -1,4 +1,4 @@
-import { JSX, useContext, useEffect, useRef, useState } from "react";
+import { JSX, useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
@@ -8,8 +8,6 @@ import CollapsibleTask from "../../components/CollapsibleTask/collapsible-task.c
 import UserSelect from "../../components/UserSelect/user-select.component";
 import StatusSelect from "../../components/StatusSelect/status-select.component";
 import { faClipboardCheck } from "@fortawesome/free-solid-svg-icons";
-import { GetModuleContext } from "../../contexts/Module/module-context";
-import { UserService } from "../../services/UserService.service";
 import { Priority } from "../../models/priority.model";
 import { User } from "../../models/user.model";
 import PrioritySelect from "../../components/PrioritySelect/priority-select.component";
@@ -27,9 +25,6 @@ export function ListTasks(
     hiddenCustomFieldTypeIds: string[],
     isSubtask?: boolean,
 ): JSX.Element {
-    const moduleContext = useRef(GetModuleContext('app'));
-    const { getService } = useContext(moduleContext.current.context);
-    const userService: UserService = getService(UserService);
     const [assignedUser, setAssignedUser] = useState<string | undefined>(undefined);
     const [status, setStatus] = useState<string | undefined>(undefined)
     const [priority, setPriority] = useState<string | undefined>(undefined);
@@ -179,7 +174,12 @@ export function ListTasks(
                     {customFieldTypes.length > 0 &&
                         customFieldTypes.filter(fieldType => !hiddenCustomFieldTypeIds.find(typeId => typeId === fieldType.id)).map<JSX.Element>(fieldType =>
                             <>
-                                <CustomFieldSelect taskId={task.id!} customFields={task.customFields} customFieldType={fieldType} onCustomFieldSelect={onCustomFieldSelect} customField={task.customFields.find(cf => cf.customFieldTypeId === fieldType.id)?.id} />
+                                <CustomFieldSelect
+                                    taskId={task.id!}
+                                    customFields={task.customFields}
+                                    customFieldType={fieldType}
+                                    onCustomFieldSelect={onCustomFieldSelect}
+                                    customField={customFields.find(cf => cf === fieldType.id)} />
                             </>
                         )
                     }
@@ -191,7 +191,15 @@ export function ListTasks(
     return (() => {
         if (task.subTasks && task.subTasks.length > 0) {
             return (
-                <CollapsibleTask key={task.id} task={task} users={users} statuses={statuses} priorities={priorities} isSubtask={isSubtask}>
+                <CollapsibleTask
+                    key={task.id}
+                    task={task}
+                    users={users}
+                    statuses={statuses}
+                    priorities={priorities}
+                    isSubtask={isSubtask}
+                    customFieldTypes={customFieldTypes}
+                    hiddenCustomFieldTypeIds={hiddenCustomFieldTypeIds}>
                     <TaskTableRow />
                 </CollapsibleTask>
             );
