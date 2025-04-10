@@ -10,6 +10,7 @@ import ModuleProvider from "./contexts/Module/module-context";
 import { AuthService } from "./services/AuthService.service";
 import { ProjectService } from "./services/ProjectService.service";
 import { UserService } from "./services/UserService.service";
+import { OrganizationService } from "./services/OrganizationService";
 
 function App(): JSX.Element {
 	const navFn = useNavigate();
@@ -44,7 +45,7 @@ function App(): JSX.Element {
 	return (
 		<div className={`body`} data-theme={theme}>
 			<ModuleProvider
-				services={[AuthService, ProjectService, UserService]}
+				services={[AuthService, ProjectService, UserService, OrganizationService]}
 				id="app"
 				key="module_provider_app"
 			>
