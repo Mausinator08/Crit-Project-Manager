@@ -2,7 +2,6 @@ import { NavLink } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Children, JSX, useContext } from "react";
 
-import { Link } from "../../constants/nav-bar-links";
 import './collapsible-task.scss';
 import { Task } from "../../models/task.model";
 import { Status } from "../../models/status.model";
