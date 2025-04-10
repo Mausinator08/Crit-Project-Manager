@@ -84,7 +84,7 @@ public class OrganizationRepository : IDisposable, IAsyncDisposable, IOrganizati
         {
             if (_critDbContext == null)
             {
-                throw new NullReferenceException("TenantDbContext is null.");
+                throw new NullReferenceException("CritDbContext is null.");
             }
 
             ApplicationUser? applicationUser = await _userRepository.GetLoggedInUser();
@@ -119,11 +119,62 @@ public class OrganizationRepository : IDisposable, IAsyncDisposable, IOrganizati
         }
     }
 
+    public async Task<List<Organization>> GetAllOrganizationsForProjectId(string projectId)
+    {
+        try
+        {
+            if (_critDbContext == null)
+            {
+                throw new NullReferenceException("CritDbContext is null.");
+            }
+
+            IQueryable<Organization> organizationsQuery = _critDbContext.Organizations.Where(o => o.ProjectIds.Contains(projectId));
+
+            if (!organizationsQuery.Any())
+            {
+                throw new InvalidOperationException($"No organizations found for project with ID {projectId}.");
+            }
+
+            return await organizationsQuery.ToListAsync();
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Error retrieving organizations for project with ID {projectId}.", ex);
+        }
+    }
+
+    public async Task<List<Organization>> GetAllOrganizationsForUserId(string userId)
+    {
+        try
+        {
+            if (_critDbContext == null)
+            {
+                throw new NullReferenceException("CritDbContext is null.");
+            }
+
+            IQueryable<Organization> organizationsQuery = _critDbContext.Organizations.Where(o =>
+            o.AdminUserIds.Contains(userId) ||
+            o.MemberUserIds.Contains(userId) ||
+            o.AffiliatedUserIds.Contains(userId));
+
+            if (!organizationsQuery.Any())
+            {
+                throw new InvalidOperationException($"No organizations found for user with ID {userId}.");
+            }
+
+            return await organizationsQuery.ToListAsync();
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Error retrieving organizations for user with ID {userId}.", ex);
+        }
+    }
+
     public async Task<Organization> GetOrganizationByUserId(string userId)
     {
         if (_critDbContext == null)
         {
-            throw new NullReferenceException("TenantDbContext is null.");
+            throw new NullReferenceException("CritDbContext is null.");
         }
 
         IQueryable<Organization> organizationsQuery = _critDbContext.Organizations.Where(o => o.AdminUserIds.Contains(userId) || o.MemberUserIds.Contains(userId));
@@ -142,7 +193,7 @@ public class OrganizationRepository : IDisposable, IAsyncDisposable, IOrganizati
         {
             if (_critDbContext == null)
             {
-                throw new NullReferenceException("TenantDbContext is null.");
+                throw new NullReferenceException("CritDbContext is null.");
             }
 
             ApplicationUser? applicationUser = await _userRepository.GetLoggedInUser();

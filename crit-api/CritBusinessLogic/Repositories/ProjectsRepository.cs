@@ -126,7 +126,7 @@ public class ProjectsRepository : IDisposable, IAsyncDisposable, IProjectsReposi
                 throw new Exception("Organization ID is not valid.");
             }
 
-            Project newProject = new Project(project.Name, project.Description, organization.Id, applicationUser.Id);
+            Project newProject = new Project(project.Name, project.Description, project.OwningOrganizationId ?? organization.Id, applicationUser.Id);
 
             foreach (string userId in project.ProjectUserIds)
             {

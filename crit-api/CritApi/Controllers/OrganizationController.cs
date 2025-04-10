@@ -43,7 +43,6 @@ public class OrganizationController : ControllerBase
         }
     }
 
-
     [HttpGet]
     [ProducesResponseType<List<Organization>>(StatusCodes.Status200OK)]
     [ProducesErrorResponseType(typeof(string))]
@@ -57,6 +56,57 @@ public class OrganizationController : ControllerBase
         {
             _logger.LogException(ex);
             return StatusCode(StatusCodes.Status500InternalServerError, $"Error retrieving organizations: {ex.Message}");
+        }
+    }
+
+    [HttpGet]
+    [Route("GetAllOrganizationsForProjectId/{projectId}")]
+    [ProducesResponseType<List<Organization>>(StatusCodes.Status200OK)]
+    [ProducesErrorResponseType(typeof(string))]
+    public async Task<IActionResult> GetAllOrganizationsForProjectId([FromRoute] string projectId)
+    {
+        try
+        {
+            return Ok(await _organizationRepository.GetAllOrganizationsForProjectId(projectId));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogException(ex);
+            return StatusCode(StatusCodes.Status500InternalServerError, $"Error retrieving organizations: {ex.Message}");
+        }
+    }
+
+    [HttpGet]
+    [Route("GetAllOrganizationsForUserId/{userId}")]
+    [ProducesResponseType<List<Organization>>(StatusCodes.Status200OK)]
+    [ProducesErrorResponseType(typeof(string))]
+    public async Task<IActionResult> GetAllOrganizationsForUserId([FromRoute] string userId)
+    {
+        try
+        {
+            return Ok(await _organizationRepository.GetAllOrganizationsForUserId(userId));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogException(ex);
+            return StatusCode(StatusCodes.Status500InternalServerError, $"Error retrieving organizations: {ex.Message}");
+        }
+    }
+
+    [HttpGet]
+    [Route("GetOrganizationByUserId/{userId}")]
+    [ProducesResponseType<Organization>(StatusCodes.Status200OK)]
+    [ProducesErrorResponseType(typeof(string))]
+    public async Task<IActionResult> GetOrganizationByUserId([FromRoute] string userId)
+    {
+        try
+        {
+            return Ok(await _organizationRepository.GetOrganizationByUserId(userId));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogException(ex);
+            return StatusCode(StatusCodes.Status500InternalServerError, $"Error retrieving organization: {ex.Message}");
         }
     }
 
@@ -84,7 +134,6 @@ public class OrganizationController : ControllerBase
     }
 
     [HttpPost]
-    [Route("CreateOrganization")]
     [ProducesResponseType<Organization>(StatusCodes.Status201Created)]
     [ProducesErrorResponseType(typeof(string))]
     public async Task<IActionResult> CreateOrganization([FromBody] Organization organization)
