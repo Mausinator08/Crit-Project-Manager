@@ -45,7 +45,7 @@ public class TasksRepository : IDisposable, IAsyncDisposable, ITasksRepository
                 throw new Exception("Tenant database context is not initialized.");
             }
 
-            IQueryable<ProjectTask> tasksQuery = _tenantDbContext.Tasks.Where(t =>
+            IQueryable<ProjectTask> tasksQuery = _tenantDbContext.Tasks.AsNoTracking().Where(t =>
             t.ProjectId == projectId &&
             t.Project != null &&
             t.Project.ProjectUserIds.Contains(applicationUser.Id) &&
@@ -85,7 +85,7 @@ public class TasksRepository : IDisposable, IAsyncDisposable, ITasksRepository
                 throw new Exception("Tenant database context is not initialized.");
             }
 
-            IQueryable<ProjectTask> taskQuery = _tenantDbContext.Tasks.Where(t =>
+            IQueryable<ProjectTask> taskQuery = _tenantDbContext.Tasks.AsNoTracking().Where(t =>
             t.Id == taskId &&
             t.ProjectId == projectId &&
             t.Project != null &&
@@ -126,7 +126,7 @@ public class TasksRepository : IDisposable, IAsyncDisposable, ITasksRepository
                 throw new Exception("Tenant database context is not initialized.");
             }
 
-            IQueryable<Project> projectQuery = _tenantDbContext.Projects.Where(p =>
+            IQueryable<Project> projectQuery = _tenantDbContext.Projects.AsNoTracking().Where(p =>
             p.Id == task.ProjectId &&
             p.ProjectAdminUserIds.Contains(applicationUser.Id) &&
             p.OrganizationIds.Contains(organization.Id!));
@@ -173,7 +173,7 @@ public class TasksRepository : IDisposable, IAsyncDisposable, ITasksRepository
                 throw new Exception("Tenant database context is not initialized.");
             }
 
-            IQueryable<Project> projectQuery = _tenantDbContext.Projects.Where(p =>
+            IQueryable<Project> projectQuery = _tenantDbContext.Projects.AsNoTracking().Where(p =>
             p.Id == task.ProjectId &&
             p.ProjectAdminUserIds.Contains(applicationUser.Id) &&
             p.OrganizationIds.Contains(organization.Id!));
@@ -218,7 +218,7 @@ public class TasksRepository : IDisposable, IAsyncDisposable, ITasksRepository
                 throw new Exception("Tenant database context is not initialized.");
             }
 
-            IQueryable<Project> projectQuery = _tenantDbContext.Projects.Where(p =>
+            IQueryable<Project> projectQuery = _tenantDbContext.Projects.AsNoTracking().Where(p =>
             p.Id == projectId &&
             p.ProjectAdminUserIds.Contains(applicationUser.Id) &&
             p.OrganizationIds.Contains(organization.Id!));
@@ -228,7 +228,7 @@ public class TasksRepository : IDisposable, IAsyncDisposable, ITasksRepository
                 throw new Exception($"User {applicationUser.Id} is not an admin of project {projectId}.");
             }
 
-            IQueryable<ProjectTask> taskQuery = _tenantDbContext.Tasks.Where(t => t.Id == taskId && t.ProjectId == projectId);
+            IQueryable<ProjectTask> taskQuery = _tenantDbContext.Tasks.AsNoTracking().Where(t => t.Id == taskId && t.ProjectId == projectId);
 
             if (!taskQuery.Any())
             {

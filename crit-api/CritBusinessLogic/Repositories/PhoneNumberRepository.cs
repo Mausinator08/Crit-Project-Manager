@@ -62,7 +62,7 @@ public class PhoneNumberRepository : IPhoneNumberRepository
     {
         try
         {
-            IQueryable<PhoneNumber> phoneNumber = _critDbContext.PhoneNumbers.Where(p => p.UserId == userId);
+            IQueryable<PhoneNumber> phoneNumber = _critDbContext.PhoneNumbers.AsNoTracking().Where(p => p.UserId == userId);
             if (!phoneNumber.Any())
             {
                 throw new Exception($"Phone number not found for user id {userId}");

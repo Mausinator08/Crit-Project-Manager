@@ -92,7 +92,7 @@ public class OrganizationRepository : IDisposable, IAsyncDisposable, IOrganizati
 
             if (organization != null && applicationUser != null)
             {
-                IQueryable<Organization> organizationsQuery = _critDbContext.Organizations.Where(o =>
+                IQueryable<Organization> organizationsQuery = _critDbContext.Organizations.AsNoTracking().AsNoTracking().Where(o =>
                 o.Id == organization.Id &&
                 o.AffiliatedUserIds.Contains(applicationUser.Id));
 
@@ -128,7 +128,7 @@ public class OrganizationRepository : IDisposable, IAsyncDisposable, IOrganizati
                 throw new NullReferenceException("CritDbContext is null.");
             }
 
-            IQueryable<Organization> organizationsQuery = _critDbContext.Organizations.Where(o => o.ProjectIds.Contains(projectId));
+            IQueryable<Organization> organizationsQuery = _critDbContext.Organizations.AsNoTracking().AsNoTracking().Where(o => o.ProjectIds.Contains(projectId));
 
             if (!organizationsQuery.Any())
             {
@@ -152,7 +152,7 @@ public class OrganizationRepository : IDisposable, IAsyncDisposable, IOrganizati
                 throw new NullReferenceException("CritDbContext is null.");
             }
 
-            IQueryable<Organization> organizationsQuery = _critDbContext.Organizations.Where(o =>
+            IQueryable<Organization> organizationsQuery = _critDbContext.Organizations.AsNoTracking().Where(o =>
             o.AdminUserIds.Contains(userId) ||
             o.MemberUserIds.Contains(userId) ||
             o.AffiliatedUserIds.Contains(userId));
@@ -177,7 +177,7 @@ public class OrganizationRepository : IDisposable, IAsyncDisposable, IOrganizati
             throw new NullReferenceException("CritDbContext is null.");
         }
 
-        IQueryable<Organization> organizationsQuery = _critDbContext.Organizations.Where(o => o.AdminUserIds.Contains(userId) || o.MemberUserIds.Contains(userId));
+        IQueryable<Organization> organizationsQuery = _critDbContext.Organizations.AsNoTracking().Where(o => o.AdminUserIds.Contains(userId) || o.MemberUserIds.Contains(userId));
 
         if (!organizationsQuery.Any())
         {
@@ -200,7 +200,7 @@ public class OrganizationRepository : IDisposable, IAsyncDisposable, IOrganizati
 
             if (applicationUser != null)
             {
-                IQueryable<Organization> organizationsQuery = _critDbContext.Organizations.Where(o =>
+                IQueryable<Organization> organizationsQuery = _critDbContext.Organizations.AsNoTracking().Where(o =>
                 o.Id == organizationId &&
                 o.AffiliatedUserIds.Contains(applicationUser.Id));
 
@@ -246,7 +246,7 @@ public class OrganizationRepository : IDisposable, IAsyncDisposable, IOrganizati
                 throw new InvalidOperationException($"An organization with the name '{organization.Name}' already exists.");
             }
 
-            IQueryable<Organization> organizationsQuery = _critDbContext.Organizations.Where(o =>
+            IQueryable<Organization> organizationsQuery = _critDbContext.Organizations.AsNoTracking().Where(o =>
             o.AdminUserIds.Where(a => organization.AdminUserIds.Contains(a)).Any() ||
             o.MemberUserIds.Where(m => organization.MemberUserIds.Contains(m)).Any());
 
@@ -285,7 +285,7 @@ public class OrganizationRepository : IDisposable, IAsyncDisposable, IOrganizati
                 throw new ArgumentException("Organization name cannot be empty.", nameof(organization.Name));
             }
 
-            IQueryable<Organization> organizationsQuery = _critDbContext.Organizations.Where(o =>
+            IQueryable<Organization> organizationsQuery = _critDbContext.Organizations.AsNoTracking().Where(o =>
             o.Id == organization.Id &&
             o.AdminUserIds.Where(a => organization.AdminUserIds.Contains(a)).Any() ||
             o.MemberUserIds.Where(m => organization.MemberUserIds.Contains(m)).Any());
@@ -325,7 +325,7 @@ public class OrganizationRepository : IDisposable, IAsyncDisposable, IOrganizati
                 throw new UnauthorizedAccessException("User is not logged in.");
             }
 
-            IQueryable<Organization> organizationsQuery = _critDbContext.Organizations.Where(o => o.Id == organizationId && o.AdminUserIds.Contains(applicationUser.Id));
+            IQueryable<Organization> organizationsQuery = _critDbContext.Organizations.AsNoTracking().Where(o => o.Id == organizationId && o.AdminUserIds.Contains(applicationUser.Id));
 
             if (!organizationsQuery.Any())
             {
@@ -344,7 +344,7 @@ public class OrganizationRepository : IDisposable, IAsyncDisposable, IOrganizati
                 throw new NullReferenceException("TenantDbContext is null.");
             }
 
-            IQueryable<Project> projectsQuery = _tenantDbContext.Projects.Where(p => p.OwningOrganizationId == organizationId);
+            IQueryable<Project> projectsQuery = _tenantDbContext.Projects.AsNoTracking().Where(p => p.OwningOrganizationId == organizationId);
 
             if (projectsQuery.Any())
             {

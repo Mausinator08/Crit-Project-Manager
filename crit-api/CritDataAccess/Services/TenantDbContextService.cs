@@ -66,8 +66,8 @@ public class TenantDbContextService : ITenantDbContextService
                 throw new ArgumentNullException(nameof(applicationUser));
             }
 
-            IQueryable<Organization> organizationsMemberQuery = _critDbContext.Organizations.Where(o => o.MemberUserIds.Contains(applicationUser.Id));
-            IQueryable<Organization> organizationsAdminQuery = _critDbContext.Organizations.Where(o => o.AdminUserIds.Contains(applicationUser.Id));
+            IQueryable<Organization> organizationsMemberQuery = _critDbContext.Organizations.AsNoTracking().Where(o => o.MemberUserIds.Contains(applicationUser.Id));
+            IQueryable<Organization> organizationsAdminQuery = _critDbContext.Organizations.AsNoTracking().Where(o => o.AdminUserIds.Contains(applicationUser.Id));
 
             Organization? organization = null;
 
