@@ -12,6 +12,10 @@ import { OrganizationService } from "../../services/OrganizationService";
 import { Organization } from "../../models/organization.model";
 import { USER_ROLES } from "../../constants/user-roles";
 import { User } from "../../models/user.model";
+import { Status } from "../../models/status.model";
+import { StatusService } from "../../services/StatusService.service";
+import { PriorityService } from "../../services/PriorityService.service";
+import { Priority } from "../../models/priority.model";
 
 function ProjectOptions(): JSX.Element {
     const { projectId } = useParams();
@@ -23,11 +27,15 @@ function ProjectOptions(): JSX.Element {
     const [organizationAdminUsers, setOrganizationAdminUsers] = useState<User[]>([]);
     const [organizationUsers, setOrganizationUsers] = useState<User[]>([]);
     const [isViewOnly, setIsViewOnly] = useState<boolean>(false);
+    const [statuses, setStatuses] = useState<Status[]>([]);
+    const [priorities, setPriorities] = useState<Priority[]>([]);
     const moduleContext = useRef(GetModuleContext("app"));
     const { getService } = useContext(moduleContext.current.context);
     const projectService: ProjectService = getService("ProjectService");
     const userService: UserService = getService("UserService");
     const organizationService: OrganizationService = getService("OrganizationService");
+    const statusService: StatusService = getService("StatusService");
+    const priorityService: PriorityService = getService("PriorityService");
 
     useEffect(() => {
         if (hasFetched) {
@@ -68,6 +76,24 @@ function ProjectOptions(): JSX.Element {
                 (error.errors && error.errors.length > 0) && error.errors.forEach((err) => {
                     console.error(err);
                 });
+                setError(error.message);
+            });
+
+        statusService.GetAllStatuses(projectId)
+            .then((result) => {
+                setStatuses(result);
+            })
+            .catch((error: Error) => {
+                console.error(error.message);
+                setError(error.message);
+            });
+
+        priorityService.GetAllPriorities(projectId)
+            .then((result) => {
+                setPriorities(result);
+            })
+            .catch((error: Error) => {
+                console.error(error.message);
                 setError(error.message);
             });
     }, [projectId]);
@@ -231,6 +257,58 @@ function ProjectOptions(): JSX.Element {
                             }} value={project.organizationIds}>
                                 {projectOrganizations.map((org) => (
                                     <option key={org.id} value={org.id}>{org.name}</option>
+                                ))}
+                            </Form.Control>
+                        </Form.Group>
+                    </div>
+                    <div>
+                        <Form.Group as={Col} controlId="statuses">
+                            <Form.Label>Project Statuses</Form.Label>
+                            <Form.Control as="select" multiple disabled={isViewOnly} onChange={(e) => {
+                                const selectedOptions = Array.from((e.target as unknown as HTMLSelectElement).selectedOptions).map((option) => option.value);
+                                project.statuses = statuses.filter((status) => selectedOptions.includes(status.id!));
+                                statuses.filter((status) => !selectedOptions.includes(status.id!)).forEach((status) => {
+                                    statusService.DeleteStatus(status.id!)
+                                        .then(() => {
+                                            setStatuses(statuses.filter((s) => s.id !== status.id));
+                                        })
+                                        .catch((error: Error) => {
+                                            console.error(error.message);
+                                            setError(error.message);
+                                        });
+                                });
+                            }} value={project.statuses.map((status) => status.id!)}>
+                                {statuses.map((status) => (
+                                    <option key={status.id} value={status.id}><div style={{
+                                        color: status.color,
+                                        backgroundColor: status.backgroundColor
+                                    }}>{status.name}</div></option>
+                                ))}
+                            </Form.Control>
+                        </Form.Group>
+                    </div>
+                    <div>
+                        <Form.Group as={Col} controlId="priorities">
+                            <Form.Label>Project Priorities</Form.Label>
+                            <Form.Control as="select" multiple disabled={isViewOnly} onChange={(e) => {
+                                const selectedOptions = Array.from((e.target as unknown as HTMLSelectElement).selectedOptions).map((option) => option.value);
+                                project.priorities = priorities.filter((priority) => selectedOptions.includes(priority.id!));
+                                priorities.filter((priority) => !selectedOptions.includes(priority.id!)).forEach((priority) => {
+                                    priorityService.DeletePriority(priority.id!)
+                                        .then(() => {
+                                            setPriorities(priorities.filter((s) => s.id !== priority.id));
+                                        })
+                                        .catch((error: Error) => {
+                                            console.error(error.message);
+                                            setError(error.message);
+                                        });
+                                });
+                            }} value={project.priorities.map((priority) => priority.id!)}>
+                                {priorities.map((priority) => (
+                                    <option key={priority.id} value={priority.id}><div style={{
+                                        color: priority.color,
+                                        backgroundColor: priority.backgroundColor
+                                    }}>{priority.name}</div></option>
                                 ))}
                             </Form.Control>
                         </Form.Group>
