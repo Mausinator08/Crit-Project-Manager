@@ -88,14 +88,14 @@ public class ProjectController : ControllerBase
 
     [HttpDelete]
     [Route("{projectId}")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesErrorResponseType(typeof(string))]
     public async Task<IActionResult> DeleteProject([FromRoute] string projectId)
     {
         try
         {
             await _projectsRepository.DeleteProject(projectId);
-            return Ok();
+            return NoContent();
         }
         catch (Exception ex)
         {

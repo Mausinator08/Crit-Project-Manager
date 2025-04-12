@@ -113,7 +113,7 @@ public class TaskController : ControllerBase
     }
 
     [HttpDelete]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesErrorResponseType(typeof(string))]
     [Authorize(Roles = "ProjectAdmin,ProjectOwner,OrganizationAdmin,OrganizationOwner,SuperAdmin")]
     public async Task<IActionResult> DeleteTask([FromQuery] string projectId, [FromQuery] string taskId)
@@ -121,7 +121,7 @@ public class TaskController : ControllerBase
         try
         {
             await _tasksRepository.DeleteTask(projectId, taskId);
-            return Ok();
+            return NoContent();
         }
         catch (Exception ex)
         {
