@@ -16,6 +16,8 @@ import { Status } from "../../models/status.model";
 import { StatusService } from "../../services/StatusService.service";
 import { PriorityService } from "../../services/PriorityService.service";
 import { Priority } from "../../models/priority.model";
+import { CustomFieldType } from "../../models/custom-field-type.model";
+import { CustomFieldTypeService } from "../../services/CustomFieldTypeService.service";
 
 function ProjectOptions(): JSX.Element {
     const { projectId } = useParams();
@@ -29,6 +31,8 @@ function ProjectOptions(): JSX.Element {
     const [isViewOnly, setIsViewOnly] = useState<boolean>(false);
     const [statuses, setStatuses] = useState<Status[]>([]);
     const [priorities, setPriorities] = useState<Priority[]>([]);
+    const [customFieldTypes, setCustomFieldTypes] = useState<CustomFieldType[]>([]);
+    const [hiddenCustomFieldTypeIds, setHiddenCustomFieldTypeIds] = useState<string[]>([]);
     const moduleContext = useRef(GetModuleContext("app"));
     const { getService } = useContext(moduleContext.current.context);
     const projectService: ProjectService = getService("ProjectService");
@@ -36,6 +40,7 @@ function ProjectOptions(): JSX.Element {
     const organizationService: OrganizationService = getService("OrganizationService");
     const statusService: StatusService = getService("StatusService");
     const priorityService: PriorityService = getService("PriorityService");
+    const customFieldTypeService: CustomFieldTypeService = getService("CustomFieldTypeService");
 
     useEffect(() => {
         if (hasFetched) {
@@ -91,6 +96,15 @@ function ProjectOptions(): JSX.Element {
         priorityService.GetAllPriorities(projectId)
             .then((result) => {
                 setPriorities(result);
+            })
+            .catch((error: Error) => {
+                console.error(error.message);
+                setError(error.message);
+            });
+
+        customFieldTypeService.GetAllCustomFieldTypes(projectId)
+            .then((result) => {
+                setCustomFieldTypes(result);
             })
             .catch((error: Error) => {
                 console.error(error.message);
@@ -181,15 +195,15 @@ function ProjectOptions(): JSX.Element {
             {project && (
                 <div>
                     <div>
-                        <label htmlFor="project-name">Project Name</label>
+                        <label htmlFor="project-name">Name</label>
                         <input type="text" id="project-name" value={project.name} disabled={isViewOnly} />
                     </div>
                     <div>
-                        <label htmlFor="project-description">Project Description</label>
+                        <label htmlFor="project-description">Description</label>
                         <textarea id="project-description" value={project.description} disabled={isViewOnly} />
                     </div>
                     <div>
-                        <label htmlFor="project-owning-organization">Project Owning Organization</label>
+                        <label htmlFor="project-owning-organization">Owning Organization</label>
                         <Dropdown key={'project-owning-organization'} onSelect={(value) => {
                             if (value && !isViewOnly) {
                                 project.owningOrganizationId = value;
@@ -206,7 +220,7 @@ function ProjectOptions(): JSX.Element {
                         </Dropdown>
                     </div>
                     <div>
-                        <label htmlFor="project-owner-userid">Project Owning User</label>
+                        <label htmlFor="project-owner-userid">Owning User</label>
                         <Dropdown key={'project-owner-userid'} onSelect={(value) => {
                             if (value && !isViewOnly) {
                                 project.projectOwnerUserId = value;
@@ -224,7 +238,7 @@ function ProjectOptions(): JSX.Element {
                     </div>
                     <div>
                         <Form.Group as={Col} controlId="project-admin-users">
-                            <Form.Label>Project Admin Users</Form.Label>
+                            <Form.Label>Admin Users</Form.Label>
                             <Form.Control as="select" multiple disabled={isViewOnly} onChange={(e) => {
                                 const selectedOptions = Array.from((e.target as unknown as HTMLSelectElement).selectedOptions).map((option) => option.value);
                                 project.projectAdminUserIds = selectedOptions;
@@ -237,7 +251,7 @@ function ProjectOptions(): JSX.Element {
                     </div>
                     <div>
                         <Form.Group as={Col} controlId="project-users">
-                            <Form.Label>Project Users</Form.Label>
+                            <Form.Label>Users</Form.Label>
                             <Form.Control as="select" multiple disabled={isViewOnly} onChange={(e) => {
                                 const selectedOptions = Array.from((e.target as unknown as HTMLSelectElement).selectedOptions).map((option) => option.value);
                                 project.projectUserIds = selectedOptions;
@@ -250,7 +264,7 @@ function ProjectOptions(): JSX.Element {
                     </div>
                     <div>
                         <Form.Group as={Col} controlId="organizations">
-                            <Form.Label>Project Organizations</Form.Label>
+                            <Form.Label>Organizations</Form.Label>
                             <Form.Control as="select" multiple disabled={isViewOnly} onChange={(e) => {
                                 const selectedOptions = Array.from((e.target as unknown as HTMLSelectElement).selectedOptions).map((option) => option.value);
                                 project.organizationIds = selectedOptions;
@@ -263,7 +277,7 @@ function ProjectOptions(): JSX.Element {
                     </div>
                     <div>
                         <Form.Group as={Col} controlId="statuses">
-                            <Form.Label>Project Statuses</Form.Label>
+                            <Form.Label>Statuses</Form.Label>
                             <Form.Control as="select" multiple disabled={isViewOnly} onChange={(e) => {
                                 const selectedOptions = Array.from((e.target as unknown as HTMLSelectElement).selectedOptions).map((option) => option.value);
                                 project.statuses = statuses.filter((status) => selectedOptions.includes(status.id!));
@@ -289,14 +303,14 @@ function ProjectOptions(): JSX.Element {
                     </div>
                     <div>
                         <Form.Group as={Col} controlId="priorities">
-                            <Form.Label>Project Priorities</Form.Label>
+                            <Form.Label>Priorities</Form.Label>
                             <Form.Control as="select" multiple disabled={isViewOnly} onChange={(e) => {
                                 const selectedOptions = Array.from((e.target as unknown as HTMLSelectElement).selectedOptions).map((option) => option.value);
                                 project.priorities = priorities.filter((priority) => selectedOptions.includes(priority.id!));
                                 priorities.filter((priority) => !selectedOptions.includes(priority.id!)).forEach((priority) => {
                                     priorityService.DeletePriority(priority.id!)
                                         .then(() => {
-                                            setPriorities(priorities.filter((s) => s.id !== priority.id));
+                                            setPriorities(priorities.filter((p) => p.id !== priority.id));
                                         })
                                         .catch((error: Error) => {
                                             console.error(error.message);
@@ -309,6 +323,42 @@ function ProjectOptions(): JSX.Element {
                                         color: priority.color,
                                         backgroundColor: priority.backgroundColor
                                     }}>{priority.name}</div></option>
+                                ))}
+                            </Form.Control>
+                        </Form.Group>
+                    </div>
+                    <div>
+                        <Form.Group as={Col} controlId="customFieldTypes">
+                            <Form.Label>Custom Field Types</Form.Label>
+                            <Form.Control as="select" multiple disabled={isViewOnly} onChange={(e) => {
+                                const selectedOptions = Array.from((e.target as unknown as HTMLSelectElement).selectedOptions).map((option) => option.value);
+                                project.customFieldTypes = customFieldTypes.filter((customFieldType) => selectedOptions.includes(customFieldType.id!));
+                                customFieldTypes.filter((customFieldType) => !selectedOptions.includes(customFieldType.id!)).forEach((customFieldType) => {
+                                    customFieldTypeService.DeleteCustomFieldType(customFieldType.id!)
+                                        .then(() => {
+                                            setCustomFieldTypes(customFieldTypes.filter((c) => c.id !== customFieldType.id));
+                                        })
+                                        .catch((error: Error) => {
+                                            console.error(error.message);
+                                            setError(error.message);
+                                        });
+                                });
+                            }} value={project.customFieldTypes.map((customFieldType) => customFieldType.id!)}>
+                                {customFieldTypes.map((customFieldType) => (
+                                    <option key={customFieldType.id} value={customFieldType.id}>{customFieldType.name}</option>
+                                ))}
+                            </Form.Control>
+                        </Form.Group>
+                    </div>
+                    <div>
+                        <Form.Group as={Col} controlId="hiddenCustomFieldTypes">
+                            <Form.Label>Hidden Custom Field Types From Task Table</Form.Label>
+                            <Form.Control as="select" multiple disabled={isViewOnly} onChange={(e) => {
+                                const selectedOptions = Array.from((e.target as unknown as HTMLSelectElement).selectedOptions).map((option) => option.value);
+                                project.hiddenCustomFieldTypeIds = customFieldTypes.filter((customFieldType) => selectedOptions.includes(customFieldType.id!)).map((customFieldType) => customFieldType.id!);
+                            }} value={project.customFieldTypes.map((customFieldType) => customFieldType.id!)}>
+                                {customFieldTypes.map((customFieldType) => (
+                                    <option key={customFieldType.id} value={customFieldType.id}>{customFieldType.name}</option>
                                 ))}
                             </Form.Control>
                         </Form.Group>
