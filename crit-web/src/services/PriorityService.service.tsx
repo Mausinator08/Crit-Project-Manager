@@ -90,8 +90,8 @@ export class PriorityService {
                 return;
             }
 
-            const createdPriority: Priority = await response.json();
-            resolve(createdPriority);
+            const updatedPriority: Priority = await response.json();
+            resolve(updatedPriority);
         });
     }
 

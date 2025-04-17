@@ -90,8 +90,8 @@ export class StatusService {
                 return;
             }
 
-            const createdStatus: Status = await response.json();
-            resolve(createdStatus);
+            const updatedStatus: Status = await response.json();
+            resolve(updatedStatus);
         });
     }
 
