@@ -29,3 +29,28 @@
     overflow-y: auto;
     overflow-x: hidden;
 }
+
+.create-icon {
+    display: inline-block;
+    position: relative;
+    color: $secondary;
+    background-color: transparent;
+    cursor: pointer;
+}
+
+.create-icon-disabled {
+    @extend .project-action-icon;
+    cursor: default;
+    opacity: 0.2;
+}
+
+.control-row {
+    display: flex;
+    flex-direction: row;
+    align-items: left;
+    justify-content: space-evenly;
+    padding: 5px;
+    max-width: 100%;
+    max-height: fit-content;
+    vertical-align: middle;
+}

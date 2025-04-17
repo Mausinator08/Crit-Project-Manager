@@ -18,6 +18,8 @@ import { PriorityService } from "../../services/PriorityService.service";
 import { Priority } from "../../models/priority.model";
 import { CustomFieldType } from "../../models/custom-field-type.model";
 import { CustomFieldTypeService } from "../../services/CustomFieldTypeService.service";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlus } from "@fortawesome/free-solid-svg-icons";
 
 function ProjectOptions(): JSX.Element {
     const { projectId } = useParams();
@@ -30,6 +32,10 @@ function ProjectOptions(): JSX.Element {
     const [organizationUsers, setOrganizationUsers] = useState<User[]>([]);
     const [isViewOnly, setIsViewOnly] = useState<boolean>(false);
     const [statuses, setStatuses] = useState<Status[]>([]);
+    const [statusColor, setStatusColor] = useState<string>("#FFFFFFFF");
+    const [statusBackgroundColor, setStatusBackgroundColor] = useState<string>("#00000000");
+    const [priorityColor, setPriorityColor] = useState<string>("#FFFFFFFF");
+    const [priorityBackgroundColor, setPriorityBackgroundColor] = useState<string>("#00000000");
     const [priorities, setPriorities] = useState<Priority[]>([]);
     const [customFieldTypes, setCustomFieldTypes] = useState<CustomFieldType[]>([]);
     const [hiddenCustomFieldTypeIds, setHiddenCustomFieldTypeIds] = useState<string[]>([]);
@@ -299,6 +305,43 @@ function ProjectOptions(): JSX.Element {
                                     }}>{status.name}</div></option>
                                 ))}
                             </Form.Control>
+                            <Form.Label>New Status</Form.Label>
+                            <Form.Control as="input" type="color" value={statuses[0]?.color} onChange={(e) => {
+                                const newColor = e.target.value;
+                                setStatusColor(newColor);
+                            }} />
+                            <Form.Control as="input" type="color" value={statuses[0]?.backgroundColor} onChange={(e) => {
+                                const newBackgroundColor = e.target.value;
+                                setStatusBackgroundColor(newBackgroundColor);
+                            }} />
+                            <div className="control-row">
+                                <FontAwesomeIcon icon={faPlus} onClick={() => {
+                                    if (isViewOnly) {
+                                        return;
+                                    }
+
+                                    const newStatus = new Status();
+                                    const name = document.getElementById("statusName") as HTMLInputElement;
+                                    const description = document.getElementById("statusDescription") as HTMLInputElement;
+                                    newStatus.name = name?.value ?? "New Status";
+                                    newStatus.description = description?.value ?? "New Status Description";
+                                    newStatus.color = statusColor;
+                                    newStatus.backgroundColor = statusBackgroundColor;
+                                    newStatus.projectId = projectId!;
+                                    statusService.CreateStatus(newStatus)
+                                        .then((result) => {
+                                            setStatuses([...statuses, result]);
+                                            (document.getElementById("statusName") as HTMLInputElement).value = "New Status Name";
+                                            (document.getElementById("statusDescription") as HTMLInputElement).value = "New Status Description";
+                                        })
+                                        .catch((error: Error) => {
+                                            console.error(error.message);
+                                            setError(error.message);
+                                        });
+                                }} className={isViewOnly ? "create-icon-new-disabled" : "create-icon"} />
+                                <Form.Control id="statusName" as="input" type="text" placeholder="New Status Name" disabled={isViewOnly} />
+                                <Form.Control id="statusDescription" as="input" type="text" placeholder="New Status Description" disabled={isViewOnly} />
+                            </div>
                         </Form.Group>
                     </div>
                     <div>
@@ -325,6 +368,39 @@ function ProjectOptions(): JSX.Element {
                                     }}>{priority.name}</div></option>
                                 ))}
                             </Form.Control>
+                            <Form.Label>New Priority</Form.Label>
+                            <Form.Control as="input" type="color" value={priorities[0]?.color} onChange={(e) => {
+                                const newColor = e.target.value;
+                                setPriorityColor(newColor);
+                            }} />
+                            <Form.Control as="input" type="color" value={priorities[0]?.backgroundColor} onChange={(e) => {
+                                const newBackgroundColor = e.target.value;
+                                setPriorityBackgroundColor(newBackgroundColor);
+                            }} />
+                            <div className="control-row">
+                                <FontAwesomeIcon icon={faPlus} onClick={() => {
+                                    if (isViewOnly) {
+                                        return;
+                                    }
+
+                                    const newPriority = new Priority();
+                                    const name = document.getElementById("priorityName") as HTMLInputElement;
+                                    newPriority.name = name?.value ?? "New Priority";
+                                    newPriority.color = priorityColor;
+                                    newPriority.backgroundColor = priorityBackgroundColor;
+                                    newPriority.projectId = projectId!;
+                                    priorityService.CreatePriority(newPriority)
+                                        .then((result) => {
+                                            setPriorities([...priorities, result]);
+                                            (document.getElementById("priorityName") as HTMLInputElement).value = "New Priority Name";
+                                        })
+                                        .catch((error: Error) => {
+                                            console.error(error.message);
+                                            setError(error.message);
+                                        });
+                                }} className={isViewOnly ? "create-icon-new-disabled" : "create-icon"} />
+                                <Form.Control id="priorityName" as="input" type="text" placeholder="New Priority Name" disabled={isViewOnly} />
+                            </div>
                         </Form.Group>
                     </div>
                     <div>
@@ -348,6 +424,28 @@ function ProjectOptions(): JSX.Element {
                                     <option key={customFieldType.id} value={customFieldType.id}>{customFieldType.name}</option>
                                 ))}
                             </Form.Control>
+                            <div className="control-row">
+                                <FontAwesomeIcon icon={faPlus} onClick={() => {
+                                    if (isViewOnly) {
+                                        return;
+                                    }
+
+                                    const newCustomFieldType = new CustomFieldType();
+                                    const name = document.getElementById("customFieldTypeName") as HTMLInputElement;
+                                    newCustomFieldType.name = name?.value ?? "New Custom Field Type";
+                                    newCustomFieldType.projectId = projectId!;
+                                    customFieldTypeService.CreateCustomFieldType(newCustomFieldType)
+                                        .then((result) => {
+                                            setCustomFieldTypes([...customFieldTypes, result]);
+                                            (document.getElementById("customFieldTypeName") as HTMLInputElement).value = "New Custom Field Type Name";
+                                        })
+                                        .catch((error: Error) => {
+                                            console.error(error.message);
+                                            setError(error.message);
+                                        });
+                                }} className={isViewOnly ? "create-icon-new-disabled" : "create-icon"} />
+                                <Form.Control id="customFieldTypeName" as="input" type="text" placeholder="New Custom Field Type Name" disabled={isViewOnly} />
+                            </div>
                         </Form.Group>
                     </div>
                     <div>
@@ -362,6 +460,22 @@ function ProjectOptions(): JSX.Element {
                                 ))}
                             </Form.Control>
                         </Form.Group>
+                    </div>
+                    <div>
+                        <button type="button" onClick={() => {
+                            if (isViewOnly) {
+                                return;
+                            }
+
+                            projectService.UpdateProject(project!)
+                                .then(() => {
+                                    alert("Project updated successfully.");
+                                })
+                                .catch((error: Error) => {
+                                    console.error(error.message);
+                                    setError(error.message);
+                                });
+                        }} disabled={isViewOnly}>Save</button>
                     </div>
                 </div>
             )}
