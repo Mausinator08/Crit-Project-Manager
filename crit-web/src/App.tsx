@@ -13,6 +13,7 @@ import { UserService } from "./services/UserService.service";
 import { OrganizationService } from "./services/OrganizationService";
 import { StatusService } from "./services/StatusService.service";
 import { PriorityService } from "./services/PriorityService.service";
+import { CustomFieldTypeService } from "./services/CustomFieldTypeService.service";
 
 function App(): JSX.Element {
 	const navFn = useNavigate();
@@ -47,7 +48,15 @@ function App(): JSX.Element {
 	return (
 		<div className={`body`} data-theme={theme}>
 			<ModuleProvider
-				services={[AuthService, ProjectService, UserService, OrganizationService, StatusService, PriorityService]}
+				services={[
+					AuthService,
+					ProjectService,
+					UserService,
+					OrganizationService,
+					StatusService,
+					PriorityService,
+					CustomFieldTypeService,
+				]}
 				id="app"
 				key="module_provider_app"
 			>
