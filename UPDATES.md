@@ -62,9 +62,77 @@
 
 * Projects are pulling, creating, and saving in API via UI.
 
-## 2025/03/19 12:13 CST
+## 2025/03/19 13:08 CST
 
 ### Fixes
 
 * Fixed issue where navbar collapsible items would not revert to collapsed state when the navbar is condensed.
 * Fixed some visual issues with icons and fixed the Lock Projects checkbox to save in the local storage.
+* Removed unnecessary crypto.randomUUID() calls for setting id field in models since the API already handles it.
+* Fixed string[] | undefined errors.
+
+## 2025/03/28 20:40 CST
+
+### Fixes
+
+* Fixed css for icons in projects, and started cleaning up tasks.
+* Moved project service to the app page component and fixed nav bar to refresh when new projects are added or projects are deleted.
+
+## 2025/04/04 21:32 CST
+
+### Fixes
+
+* Renamed function(s) that lists task, and removed a redundant function for task rows.
+* Fixed a few issues in the User Controller in API and cleaned up some of the task objects and names in the front-end.
+* Fixed login controller's register endpoint to detect if an organization already exists.
+* If organization exists, user is added to User role, and if organization is new, the user is added to the organization owner role.
+* Fixed CreatedAtAction in controller endpoints for resource creation.
+
+### Enhancements
+
+* Implemented the tasks table.
+
+## 2025/04/07 23:06 CST
+
+### Fixes
+
+* Fixed Authorize roles to all use commas instead of semi colons.
+* Fixed Tasks Repository to restrict what can be viewed/edited.
+* Fixed Projects and Project Tasks pages.
+* Removed collaborator user ids from Task. Too granular.
+* Fixed GetOrganization return value to not be nullable.
+* Fixed the other User Service methods to use the ApiResult\<T> response model and fixed project tasks page accordingly.
+* Project Options will now retrieve the logged in user id and added USER_ROLES constants.
+
+### Enhancements
+
+* Created scrollable panels for projects' tasks and details split panel.
+* Added new API endpoints for logged in user and user in role.
+* Added the two new endpoint calls to the User Service and added the ApiResult response model.
+
+## 2025/04/10 03:22 CST
+
+### Fixes
+
+* Removed unused import.
+* Fixed error in list tasks.
+
+### Enhancements
+
+* Enhanced Organization API.
+* Added organization service.
+* Added User and Organization fields.
+
+## 2025/04/12 17:57 CST
+
+### Fixes
+
+* Changed Ok() to NoContent() for API endpoints that return nothing successfully.
+* Added remaining AsNoTracking() to getters in API.
+
+### Enhancements
+
+* Added status controller and repository.
+* Added priority controller and repository.
+* Added Status and Priority services and implemented status and priority selection in project options.
+* Added custom field type controller and repository.
