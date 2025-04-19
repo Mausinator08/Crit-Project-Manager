@@ -1,7 +1,6 @@
 import { GetEnvValues } from "../constants/environment";
 import { Injectable } from "../functions/Dependencies/injectable";
 import { CustomFieldType } from "../models/custom-field-type.model";
-import { Status } from "../models/status.model";
 
 @Injectable()
 export class CustomFieldTypeService {
@@ -12,7 +11,7 @@ export class CustomFieldTypeService {
 
     public async GetAllCustomFieldTypes(projectId: string): Promise<CustomFieldType[]> {
         return new Promise<CustomFieldType[]>(async (resolve, reject) => {
-            const response = await fetch(new URL(`${this.customFieldTypeUrl}/${projectId}`), {
+            const response = await fetch(new URL(`${this.customFieldTypeUrl}/GetAllCustomFieldTypes/${projectId}`), {
                 method: "GET",
                 mode: "cors",
                 credentials: "include",

@@ -11,7 +11,7 @@ export class StatusService {
 
     public async GetAllStatuses(projectId: string): Promise<Status[]> {
         return new Promise<Status[]>(async (resolve, reject) => {
-            const response = await fetch(new URL(`${this.statusUrl}/${projectId}`), {
+            const response = await fetch(new URL(`${this.statusUrl}/GetAllStatuses/${projectId}`), {
                 method: "GET",
                 mode: "cors",
                 credentials: "include",

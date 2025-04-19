@@ -11,7 +11,7 @@ export class PriorityService {
 
     public async GetAllPriorities(projectId: string): Promise<Priority[]> {
         return new Promise<Priority[]>(async (resolve, reject) => {
-            const response = await fetch(new URL(`${this.priorityUrl}/${projectId}`), {
+            const response = await fetch(new URL(`${this.priorityUrl}/GetAllPriorities/${projectId}`), {
                 method: "GET",
                 mode: "cors",
                 credentials: "include",
