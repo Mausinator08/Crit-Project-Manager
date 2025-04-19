@@ -13,11 +13,11 @@ function UserSelect(props: UserSelectProps): JSX.Element {
     return (
         <Dropdown key={props.taskId + '-assignedUser'} onSelect={props.onAssignedUserSelect}>
             <Dropdown.Toggle id="assignedUser" >
-                {props.users.find(s => s.id === props.assignedUser)?.username ?? 'Not Assigned'}
+                {props.users.find(s => s.id === props.assignedUser)?.userName ?? 'Not Assigned'}
             </Dropdown.Toggle>
             <Dropdown.Menu>
                 <Dropdown.Item>Not Assigned</Dropdown.Item>
-                {props.users?.map<JSX.Element>(user => (<Dropdown.Item eventKey={user.id}>{user.username}</Dropdown.Item>))}
+                {props.users?.map<JSX.Element>(user => (<Dropdown.Item eventKey={user.id}>{user.userName}</Dropdown.Item>))}
             </Dropdown.Menu>
         </Dropdown>
     );

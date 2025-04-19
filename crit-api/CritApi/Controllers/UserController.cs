@@ -100,11 +100,6 @@ public class UserController : ControllerBase
 
             if (appUser != null)
             {
-                if ((await _userManager.GetUsersInRoleAsync("SuperAdmin")).Where(u => u.UserName == appUser.UserName).Any())
-                {
-                    return StatusCode(StatusCodes.Status403Forbidden, new ApiResult("Could not update user.", new List<string>([$"The {appUser.UserName} SuperAdmin user cannot be updated."]), user));
-                }
-
                 appUser.Email = user.Email;
                 IdentityResult result = await _userManager.UpdateAsync(appUser);
 
@@ -202,13 +197,8 @@ public class UserController : ControllerBase
 
             if (appUser != null && appUser?.Email != null && appUser?.UserName != null)
             {
-                if ((await _userManager.GetUsersInRoleAsync("SuperAdmin")).Where(u => u.UserName == appUser.UserName).Any())
-                {
-                    return StatusCode(StatusCodes.Status403Forbidden, new ApiResult("Could not get user.", new List<string>([$"The {appUser.UserName} SuperAdmin user cannot be retrieved."]), new User(appUser.UserName, appUser.Email)));
-                }
-
                 PhoneNumber phoneNumber = await _phoneNumberRepository.GetPhoneNumberByUserId(userId);
-                Organization organization = await _organizationRepository.GetOrganization(userId);
+                Organization organization = await _organizationRepository.GetOrganizationByUserId(userId);
 
                 User user = new User(appUser.UserName, appUser.Email);
 
@@ -257,11 +247,6 @@ public class UserController : ControllerBase
 
             if (appUser != null && appUser?.Email != null && appUser?.UserName != null)
             {
-                if ((await _userManager.GetUsersInRoleAsync("SuperAdmin")).Where(u => u.UserName == appUser.UserName).Any())
-                {
-                    return StatusCode(StatusCodes.Status403Forbidden, new ApiResult("Could not get user.", new List<string>([$"The {appUser.UserName} SuperAdmin user cannot be retrieved."]), new User(appUser.UserName, appUser.Email)));
-                }
-
                 PhoneNumber phoneNumber = await _phoneNumberRepository.GetPhoneNumberByUserId(appUser.Id);
                 Organization organization = await _organizationRepository.GetOrganization(appUser.Id);
 
@@ -311,11 +296,6 @@ public class UserController : ControllerBase
 
             if (appUser != null && appUser?.Email != null && appUser?.UserName != null)
             {
-                if ((await _userManager.GetUsersInRoleAsync("SuperAdmin")).Where(u => u.UserName == appUser.UserName).Any())
-                {
-                    return StatusCode(StatusCodes.Status403Forbidden, new ApiResult("Could not get user.", new List<string>([$"The {appUser.UserName} SuperAdmin user cannot be retrieved."]), new User(appUser.UserName, appUser.Email)));
-                }
-
                 PhoneNumber phoneNumber = await _phoneNumberRepository.GetPhoneNumberByUserId(appUser.Id);
                 Organization organization = await _organizationRepository.GetOrganization(appUser.Id);
 
@@ -420,11 +400,6 @@ public class UserController : ControllerBase
     {
         try
         {
-            if (role == "SuperAdmin")
-            {
-                return StatusCode(StatusCodes.Status403Forbidden, new ApiResult("Could not get all users for role.", new List<string>([$"The {role} role cannot be retrieved."])));
-            }
-
             IList<ApplicationUser> appUsers = await _userManager.GetUsersInRoleAsync(role);
 
             if (appUsers.Any())
@@ -484,11 +459,6 @@ public class UserController : ControllerBase
     {
         try
         {
-            if (role == "SuperAdmin")
-            {
-                return StatusCode(StatusCodes.Status403Forbidden, new ApiResult("Could not get user role.", new List<string>([$"The {role} role cannot be retrieved."])));
-            }
-
             ApplicationUser? appUser = await _userManager.FindByIdAsync(userId);
 
             if (appUser != null)
