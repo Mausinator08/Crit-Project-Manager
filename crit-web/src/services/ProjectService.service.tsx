@@ -10,7 +10,7 @@ export class ProjectService {
 
 	private projectIds: string[] = [];
 
-	constructor() {}
+	constructor() { }
 
 	public GetProjectIds(): string[] {
 		return this.projectIds;
@@ -36,7 +36,7 @@ export class ProjectService {
 		});
 	}
 
-	public GetProject(projectId: string): Promise<Project> {
+	public async GetProject(projectId: string): Promise<Project> {
 		return new Promise<Project>(async (resolve, reject) => {
 			const response = await fetch(
 				new URL(`${this.projectUrl}/${projectId}`),
