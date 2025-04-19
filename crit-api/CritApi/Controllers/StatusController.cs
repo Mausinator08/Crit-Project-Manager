@@ -20,7 +20,7 @@ public class StatusController : ControllerBase
     }
 
     [HttpGet]
-    [Route("{projectId}")]
+    [Route("GetAllStatuses/{projectId}")]
     [ProducesResponseType<List<Status>>(StatusCodes.Status200OK)]
     [ProducesErrorResponseType(typeof(string))]
     public async Task<IActionResult> GetAllStatuses([FromRoute] string projectId)
