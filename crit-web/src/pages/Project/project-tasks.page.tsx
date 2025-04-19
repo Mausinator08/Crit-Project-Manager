@@ -19,16 +19,10 @@ function ProjectTasks(): JSX.Element {
     const [users, setUsers] = useState<User[]>([]);
     const moduleContext = useRef(GetModuleContext('app'));
     const { getService } = useContext(moduleContext.current.context);
-    const projectService: ProjectService = getService('ProjectService');
-    const userService: UserService = getService('UserService');
+    const projectService: ProjectService = getService(ProjectService);
+    const userService: UserService = getService(UserService);
 
     useEffect(() => {
-        if (hasFetched) {
-            return;
-        }
-
-        setHasFetched(true);
-
         if (!projectId) {
             return;
         }
@@ -73,9 +67,13 @@ function ProjectTasks(): JSX.Element {
                         users={users}
                         priorities={project?.priorities} />)}
                 </div>
-                {showSidePanel && (
+                {showSidePanel ? (
                     <div className="scrollable-panel-right">
                         <Outlet />
+                    </div>
+                ) : (
+                    <div className="scrollable-panel-right">
+                        <button onClick={() => setShowSidePanel(true)}>Show Side Panel</button>
                     </div>
                 )}
             </div>

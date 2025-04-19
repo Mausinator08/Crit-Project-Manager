@@ -41,12 +41,12 @@ function ProjectOptions(): JSX.Element {
     const [hiddenCustomFieldTypeIds, setHiddenCustomFieldTypeIds] = useState<string[]>([]);
     const moduleContext = useRef(GetModuleContext("app"));
     const { getService } = useContext(moduleContext.current.context);
-    const projectService: ProjectService = getService("ProjectService");
-    const userService: UserService = getService("UserService");
-    const organizationService: OrganizationService = getService("OrganizationService");
-    const statusService: StatusService = getService("StatusService");
-    const priorityService: PriorityService = getService("PriorityService");
-    const customFieldTypeService: CustomFieldTypeService = getService("CustomFieldTypeService");
+    const projectService: ProjectService = getService(ProjectService);
+    const userService: UserService = getService(UserService);
+    const organizationService: OrganizationService = getService(OrganizationService);
+    const statusService: StatusService = getService(StatusService);
+    const priorityService: PriorityService = getService(PriorityService);
+    const customFieldTypeService: CustomFieldTypeService = getService(CustomFieldTypeService);
 
     useEffect(() => {
         if (hasFetched) {
@@ -126,7 +126,8 @@ function ProjectOptions(): JSX.Element {
         userService.IsUserIdInRole(userId, USER_ROLES.User.value)
             .then((result) => {
                 if (result) {
-                    setIsViewOnly(!result.data!);
+                    setIsViewOnly(result.data!);
+                    return;
                 }
 
                 setIsViewOnly(true);
@@ -202,11 +203,19 @@ function ProjectOptions(): JSX.Element {
                 <div>
                     <div>
                         <label htmlFor="project-name">Name</label>
-                        <input type="text" id="project-name" value={project.name} disabled={isViewOnly} />
+                        <input type="text" id="project-name" value={project.name} disabled={isViewOnly} onChange={(e) => {
+                            if (e.target.value && !isViewOnly) {
+                                project.name = e.target.value;
+                            }
+                        }} />
                     </div>
                     <div>
                         <label htmlFor="project-description">Description</label>
-                        <textarea id="project-description" value={project.description} disabled={isViewOnly} />
+                        <textarea id="project-description" value={project.description} disabled={isViewOnly} onChange={(e) => {
+                            if (e.target.value && !isViewOnly) {
+                                project.description = e.target.value;
+                            }
+                        }} />
                     </div>
                     <div>
                         <label htmlFor="project-owning-organization">Owning Organization</label>
@@ -216,11 +225,11 @@ function ProjectOptions(): JSX.Element {
                             }
                         }}>
                             <Dropdown.Toggle id="project-owning-organization" disabled={isViewOnly}>
-                                {project.owningOrganizationId ?? 'Select Organization'}
+                                {projectOrganizations.find(o => o.id === project.owningOrganizationId)?.name ?? 'Select Organization'}
                             </Dropdown.Toggle>
                             <Dropdown.Menu>
                                 {projectOrganizations.map((org) => (
-                                    <Dropdown.Item eventKey={org.id}>{org.name}</Dropdown.Item>
+                                    <Dropdown.Item key={`organization-${org.id}`} eventKey={org.id}>{org.name}</Dropdown.Item>
                                 ))}
                             </Dropdown.Menu>
                         </Dropdown>
@@ -233,11 +242,11 @@ function ProjectOptions(): JSX.Element {
                             }
                         }}>
                             <Dropdown.Toggle id="project-owner-userid" disabled={isViewOnly}>
-                                {project.projectOwnerUserId ?? 'Select User'}
+                                {organizationAdminUsers.find(u => u.id === project.projectOwnerUserId)?.userName ?? 'Select User'}
                             </Dropdown.Toggle>
                             <Dropdown.Menu>
                                 {organizationAdminUsers.map((orgUser) => (
-                                    <Dropdown.Item eventKey={orgUser.id}>{orgUser.username}</Dropdown.Item>
+                                    <Dropdown.Item key={`organizationUser-${orgUser.id}`} eventKey={orgUser.id}>{orgUser.userName}</Dropdown.Item>
                                 ))}
                             </Dropdown.Menu>
                         </Dropdown>
@@ -250,7 +259,7 @@ function ProjectOptions(): JSX.Element {
                                 project.projectAdminUserIds = selectedOptions;
                             }} value={project.projectAdminUserIds}>
                                 {organizationAdminUsers.map((orgUser) => (
-                                    <option key={orgUser.id} value={orgUser.id}>{orgUser.username}</option>
+                                    <option key={orgUser.id} value={orgUser.id}>{orgUser.userName}</option>
                                 ))}
                             </Form.Control>
                         </Form.Group>
@@ -263,7 +272,7 @@ function ProjectOptions(): JSX.Element {
                                 project.projectUserIds = selectedOptions;
                             }} value={project.projectUserIds}>
                                 {organizationUsers.map((orgUser) => (
-                                    <option key={orgUser.id} value={orgUser.id}>{orgUser.username}</option>
+                                    <option key={orgUser.id} value={orgUser.id}>{orgUser.userName}</option>
                                 ))}
                             </Form.Control>
                         </Form.Group>
@@ -282,7 +291,7 @@ function ProjectOptions(): JSX.Element {
                         </Form.Group>
                     </div>
                     <div>
-                        <Form.Group as={Col} controlId="statuses">
+                        <Form.Group as={Col}>
                             <Form.Label>Statuses</Form.Label>
                             <Form.Control as="select" multiple disabled={isViewOnly} onChange={(e) => {
                                 const selectedOptions = Array.from((e.target as unknown as HTMLSelectElement).selectedOptions).map((option) => option.value);
@@ -306,11 +315,19 @@ function ProjectOptions(): JSX.Element {
                                 ))}
                             </Form.Control>
                             <Form.Label>New Status</Form.Label>
-                            <Form.Control as="input" type="color" value={statuses[0]?.color} onChange={(e) => {
+                            <Form.Control as="input" type="color" disabled={isViewOnly} value={statuses[0]?.color} onChange={(e) => {
+                                if (isViewOnly) {
+                                    return;
+                                }
+
                                 const newColor = e.target.value;
                                 setStatusColor(newColor);
                             }} />
-                            <Form.Control as="input" type="color" value={statuses[0]?.backgroundColor} onChange={(e) => {
+                            <Form.Control as="input" type="color" disabled={isViewOnly} value={statuses[0]?.backgroundColor} onChange={(e) => {
+                                if (isViewOnly) {
+                                    return;
+                                }
+
                                 const newBackgroundColor = e.target.value;
                                 setStatusBackgroundColor(newBackgroundColor);
                             }} />
@@ -338,14 +355,14 @@ function ProjectOptions(): JSX.Element {
                                             console.error(error.message);
                                             setError(error.message);
                                         });
-                                }} className={isViewOnly ? "create-icon-new-disabled" : "create-icon"} />
-                                <Form.Control id="statusName" as="input" type="text" placeholder="New Status Name" disabled={isViewOnly} />
-                                <Form.Control id="statusDescription" as="input" type="text" placeholder="New Status Description" disabled={isViewOnly} />
+                                }} className={isViewOnly ? "create-icon-disabled" : "create-icon"} />
+                                <Form.Control id="statusName" as="input" type="text" placeholder="New Status Name" disabled={isViewOnly} defaultValue={"New Status"} />
+                                <Form.Control id="statusDescription" as="input" type="text" placeholder="New Status Description" disabled={isViewOnly} defaultValue={"New Status Description"} />
                             </div>
                         </Form.Group>
                     </div>
                     <div>
-                        <Form.Group as={Col} controlId="priorities">
+                        <Form.Group as={Col}>
                             <Form.Label>Priorities</Form.Label>
                             <Form.Control as="select" multiple disabled={isViewOnly} onChange={(e) => {
                                 const selectedOptions = Array.from((e.target as unknown as HTMLSelectElement).selectedOptions).map((option) => option.value);
@@ -369,11 +386,19 @@ function ProjectOptions(): JSX.Element {
                                 ))}
                             </Form.Control>
                             <Form.Label>New Priority</Form.Label>
-                            <Form.Control as="input" type="color" value={priorities[0]?.color} onChange={(e) => {
+                            <Form.Control as="input" type="color" disabled={isViewOnly} value={priorities[0]?.color} onChange={(e) => {
+                                if (isViewOnly) {
+                                    return;
+                                }
+
                                 const newColor = e.target.value;
                                 setPriorityColor(newColor);
                             }} />
-                            <Form.Control as="input" type="color" value={priorities[0]?.backgroundColor} onChange={(e) => {
+                            <Form.Control as="input" type="color" disabled={isViewOnly} value={priorities[0]?.backgroundColor} onChange={(e) => {
+                                if (isViewOnly) {
+                                    return;
+                                }
+
                                 const newBackgroundColor = e.target.value;
                                 setPriorityBackgroundColor(newBackgroundColor);
                             }} />
@@ -398,13 +423,13 @@ function ProjectOptions(): JSX.Element {
                                             console.error(error.message);
                                             setError(error.message);
                                         });
-                                }} className={isViewOnly ? "create-icon-new-disabled" : "create-icon"} />
-                                <Form.Control id="priorityName" as="input" type="text" placeholder="New Priority Name" disabled={isViewOnly} />
+                                }} className={isViewOnly ? "create-icon-disabled" : "create-icon"} />
+                                <Form.Control id="priorityName" as="input" type="text" placeholder="New Priority Name" disabled={isViewOnly} defaultValue={"New Priority"} />
                             </div>
                         </Form.Group>
                     </div>
                     <div>
-                        <Form.Group as={Col} controlId="customFieldTypes">
+                        <Form.Group as={Col}>
                             <Form.Label>Custom Field Types</Form.Label>
                             <Form.Control as="select" multiple disabled={isViewOnly} onChange={(e) => {
                                 const selectedOptions = Array.from((e.target as unknown as HTMLSelectElement).selectedOptions).map((option) => option.value);
@@ -443,8 +468,8 @@ function ProjectOptions(): JSX.Element {
                                             console.error(error.message);
                                             setError(error.message);
                                         });
-                                }} className={isViewOnly ? "create-icon-new-disabled" : "create-icon"} />
-                                <Form.Control id="customFieldTypeName" as="input" type="text" placeholder="New Custom Field Type Name" disabled={isViewOnly} />
+                                }} className={isViewOnly ? "create-icon-disabled" : "create-icon"} />
+                                <Form.Control id="customFieldTypeName" as="input" type="text" placeholder="New Custom Field Type Name" disabled={isViewOnly} defaultValue={"New Custom Field Type"} />
                             </div>
                         </Form.Group>
                     </div>
@@ -454,10 +479,19 @@ function ProjectOptions(): JSX.Element {
                             <Form.Control as="select" multiple disabled={isViewOnly} onChange={(e) => {
                                 const selectedOptions = Array.from((e.target as unknown as HTMLSelectElement).selectedOptions).map((option) => option.value);
                                 project.hiddenCustomFieldTypeIds = customFieldTypes.filter((customFieldType) => selectedOptions.includes(customFieldType.id!)).map((customFieldType) => customFieldType.id!);
+                                setHiddenCustomFieldTypeIds(project.hiddenCustomFieldTypeIds);
                             }} value={project.customFieldTypes.map((customFieldType) => customFieldType.id!)}>
-                                {customFieldTypes.map((customFieldType) => (
-                                    <option key={customFieldType.id} value={customFieldType.id}>{customFieldType.name}</option>
-                                ))}
+                                {customFieldTypes.map((customFieldType) => {
+                                    if (hiddenCustomFieldTypeIds.includes(customFieldType.id!)) {
+                                        return (
+                                            <option key={customFieldType.id} value={customFieldType.id} defaultChecked={true}>{customFieldType.name}</option>
+                                        );
+                                    }
+
+                                    return (
+                                        <option key={customFieldType.id} value={customFieldType.id}>{customFieldType.name}</option>
+                                    );
+                                })}
                             </Form.Control>
                         </Form.Group>
                     </div>
