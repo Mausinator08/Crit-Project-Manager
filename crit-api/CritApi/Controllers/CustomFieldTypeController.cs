@@ -20,7 +20,7 @@ public class CustomFieldTypeController : ControllerBase
     }
 
     [HttpGet]
-    [Route("{projectId}")]
+    [Route("GetAllCustomFieldTypes/{projectId}")]
     [ProducesResponseType<List<CustomFieldType>>(StatusCodes.Status200OK)]
     [ProducesErrorResponseType(typeof(string))]
     public async Task<IActionResult> GetAllCustomFieldTypes([FromRoute] string projectId)
