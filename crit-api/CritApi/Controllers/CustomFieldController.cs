@@ -20,7 +20,7 @@ public class CustomFieldController : ControllerBase
     }
 
     [HttpGet]
-    [Route("{taskId}")]
+    [Route("GetAllCustomFields/{taskId}")]
     [ProducesResponseType<List<CustomField>>(StatusCodes.Status200OK)]
     [ProducesErrorResponseType(typeof(string))]
     public async Task<IActionResult> GetAllCustomFields([FromRoute] string taskId)
