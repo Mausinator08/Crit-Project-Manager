@@ -147,6 +147,10 @@ builder.Services.AddScoped<ITasksRepository, TasksRepository>();
 builder.Services.AddScoped<IOrganizationRepository, OrganizationRepository>();
 builder.Services.AddScoped<IEmailRepository, EmailRepository>();
 builder.Services.AddScoped<IPhoneNumberRepository, PhoneNumberRepository>();
+builder.Services.AddScoped<IStatusRepository, StatusRepository>();
+builder.Services.AddScoped<IPriorityRepository, PriorityRepository>();
+builder.Services.AddScoped<ICustomFieldTypeRepository, CustomFieldTypeRepository>();
+builder.Services.AddScoped<ICustomFieldRepository, CustomFieldRepository>();
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddControllers();
