@@ -1,6 +1,8 @@
 import { GetEnvValues } from "../constants/environment";
+import { Injectable } from "../functions/Dependencies/injectable";
 import { Organization } from "../models/organization.model";
 
+@Injectable()
 export class OrganizationService {
     private readonly organizationUrl: string =
         GetEnvValues()?.critApiUrl + "/Organization";
