@@ -20,7 +20,7 @@ public class PriorityController : ControllerBase
     }
 
     [HttpGet]
-    [Route("{projectId}")]
+    [Route("GetAllPriorities/{projectId}")]
     [ProducesResponseType<List<Priority>>(StatusCodes.Status200OK)]
     [ProducesErrorResponseType(typeof(string))]
     public async Task<IActionResult> GetAllPriorities([FromRoute] string projectId)
