@@ -32,6 +32,10 @@
 
 .create-icon {
     display: inline-block;
+    font-size: 52px;
+    width: 52px;
+    height: 52px;
+    top: 10px;
     position: relative;
     color: $secondary;
     background-color: transparent;
@@ -39,7 +43,7 @@
 }
 
 .create-icon-disabled {
-    @extend .project-action-icon;
+    @extend .create-icon;
     cursor: default;
     opacity: 0.2;
 }
