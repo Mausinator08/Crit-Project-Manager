@@ -11,10 +11,12 @@
     left: 0px;
     width: 100vw;
     height: 65px;
+    z-index: 1000;
 }
 
 .nav-bar {
     @extend .grid-item;
     padding-left: 0px;
     text-align: left;
+    z-index: 1000;
 }

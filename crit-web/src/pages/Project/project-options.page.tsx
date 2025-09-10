@@ -19,7 +19,7 @@ import { Priority } from "../../models/priority.model";
 import { CustomFieldType } from "../../models/custom-field-type.model";
 import { CustomFieldTypeService } from "../../services/CustomFieldTypeService.service";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import { faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
 
 function ProjectOptions(): JSX.Element {
     const { projectId } = useParams();
@@ -32,10 +32,10 @@ function ProjectOptions(): JSX.Element {
     const [organizationUsers, setOrganizationUsers] = useState<User[]>([]);
     const [isViewOnly, setIsViewOnly] = useState<boolean>(false);
     const [statuses, setStatuses] = useState<Status[]>([]);
-    const [statusColor, setStatusColor] = useState<string>("#FFFFFFFF");
-    const [statusBackgroundColor, setStatusBackgroundColor] = useState<string>("#00000000");
-    const [priorityColor, setPriorityColor] = useState<string>("#FFFFFFFF");
-    const [priorityBackgroundColor, setPriorityBackgroundColor] = useState<string>("#00000000");
+    const [statusColor, setStatusColor] = useState<string>("#FFFFFF");
+    const [statusBackgroundColor, setStatusBackgroundColor] = useState<string>("#000000");
+    const [priorityColor, setPriorityColor] = useState<string>("#FFFFFF");
+    const [priorityBackgroundColor, setPriorityBackgroundColor] = useState<string>("#000000");
     const [priorities, setPriorities] = useState<Priority[]>([]);
     const [customFieldTypes, setCustomFieldTypes] = useState<CustomFieldType[]>([]);
     const [hiddenCustomFieldTypeIds, setHiddenCustomFieldTypeIds] = useState<string[]>([]);
@@ -203,7 +203,7 @@ function ProjectOptions(): JSX.Element {
                 <div>
                     <div>
                         <label htmlFor="project-name">Name</label>
-                        <input type="text" id="project-name" value={project.name} disabled={isViewOnly} onChange={(e) => {
+                        <input type="text" id="project-name" defaultValue={project.name} disabled={isViewOnly} onChange={(e) => {
                             if (e.target.value && !isViewOnly) {
                                 project.name = e.target.value;
                             }
@@ -211,7 +211,8 @@ function ProjectOptions(): JSX.Element {
                     </div>
                     <div>
                         <label htmlFor="project-description">Description</label>
-                        <textarea id="project-description" value={project.description} disabled={isViewOnly} onChange={(e) => {
+                        <br />
+                        <textarea id="project-description" className="project-description" defaultValue={project.description} disabled={isViewOnly} onChange={(e) => {
                             if (e.target.value && !isViewOnly) {
                                 project.description = e.target.value;
                             }
@@ -295,27 +296,36 @@ function ProjectOptions(): JSX.Element {
                             <Form.Label>Statuses</Form.Label>
                             <Form.Control as="select" multiple disabled={isViewOnly} onChange={(e) => {
                                 const selectedOptions = Array.from((e.target as unknown as HTMLSelectElement).selectedOptions).map((option) => option.value);
-                                project.statuses = statuses.filter((status) => selectedOptions.includes(status.id!));
-                                statuses.filter((status) => !selectedOptions.includes(status.id!)).forEach((status) => {
+                                statuses.filter((status) => selectedOptions.includes(status.id!)).forEach((status) => {
                                     statusService.DeleteStatus(status.id!)
                                         .then(() => {
                                             setStatuses(statuses.filter((s) => s.id !== status.id));
+                                            project.statuses = statuses;
                                         })
                                         .catch((error: Error) => {
                                             console.error(error.message);
                                             setError(error.message);
                                         });
                                 });
-                            }} value={project.statuses.map((status) => status.id!)}>
+                            }}>
                                 {statuses.map((status) => (
-                                    <option key={status.id} value={status.id}><div style={{
+                                    <option key={status.id} value={status.id} style={{
                                         color: status.color,
-                                        backgroundColor: status.backgroundColor
-                                    }}>{status.name}</div></option>
+                                        backgroundColor: status.backgroundColor,
+                                        width: "fit-content",
+                                    }}><span style={{
+                                        display: 'inline-block',
+                                        fontFamily: 'Font Awesome 5 Free',
+                                        fontWeight: '900',
+                                        content: '\f1f8',
+                                        fontSize: '14pt',
+                                        width: '14pt',
+                                        height: '14pt',
+                                    }}></span>{status.name}</option>
                                 ))}
                             </Form.Control>
                             <Form.Label>New Status</Form.Label>
-                            <Form.Control as="input" type="color" disabled={isViewOnly} value={statuses[0]?.color} onChange={(e) => {
+                            <Form.Control as="input" type="color" disabled={isViewOnly} value={statusColor} onChange={(e) => {
                                 if (isViewOnly) {
                                     return;
                                 }
@@ -323,7 +333,7 @@ function ProjectOptions(): JSX.Element {
                                 const newColor = e.target.value;
                                 setStatusColor(newColor);
                             }} />
-                            <Form.Control as="input" type="color" disabled={isViewOnly} value={statuses[0]?.backgroundColor} onChange={(e) => {
+                            <Form.Control as="input" type="color" disabled={isViewOnly} value={statusBackgroundColor} onChange={(e) => {
                                 if (isViewOnly) {
                                     return;
                                 }
@@ -348,6 +358,7 @@ function ProjectOptions(): JSX.Element {
                                     statusService.CreateStatus(newStatus)
                                         .then((result) => {
                                             setStatuses([...statuses, result]);
+                                            project.statuses = statuses;
                                             (document.getElementById("statusName") as HTMLInputElement).value = "New Status Name";
                                             (document.getElementById("statusDescription") as HTMLInputElement).value = "New Status Description";
                                         })
@@ -366,18 +377,18 @@ function ProjectOptions(): JSX.Element {
                             <Form.Label>Priorities</Form.Label>
                             <Form.Control as="select" multiple disabled={isViewOnly} onChange={(e) => {
                                 const selectedOptions = Array.from((e.target as unknown as HTMLSelectElement).selectedOptions).map((option) => option.value);
-                                project.priorities = priorities.filter((priority) => selectedOptions.includes(priority.id!));
-                                priorities.filter((priority) => !selectedOptions.includes(priority.id!)).forEach((priority) => {
+                                priorities.filter((priority) => selectedOptions.includes(priority.id!)).forEach((priority) => {
                                     priorityService.DeletePriority(priority.id!)
                                         .then(() => {
                                             setPriorities(priorities.filter((p) => p.id !== priority.id));
+                                            project.priorities = priorities;
                                         })
                                         .catch((error: Error) => {
                                             console.error(error.message);
                                             setError(error.message);
                                         });
                                 });
-                            }} value={project.priorities.map((priority) => priority.id!)}>
+                            }} value={priorities.map((priority) => priority.id!)}>
                                 {priorities.map((priority) => (
                                     <option key={priority.id} value={priority.id}><div style={{
                                         color: priority.color,
@@ -386,7 +397,7 @@ function ProjectOptions(): JSX.Element {
                                 ))}
                             </Form.Control>
                             <Form.Label>New Priority</Form.Label>
-                            <Form.Control as="input" type="color" disabled={isViewOnly} value={priorities[0]?.color} onChange={(e) => {
+                            <Form.Control as="input" type="color" disabled={isViewOnly} value={priorityColor} onChange={(e) => {
                                 if (isViewOnly) {
                                     return;
                                 }
@@ -394,7 +405,7 @@ function ProjectOptions(): JSX.Element {
                                 const newColor = e.target.value;
                                 setPriorityColor(newColor);
                             }} />
-                            <Form.Control as="input" type="color" disabled={isViewOnly} value={priorities[0]?.backgroundColor} onChange={(e) => {
+                            <Form.Control as="input" type="color" disabled={isViewOnly} value={priorityBackgroundColor} onChange={(e) => {
                                 if (isViewOnly) {
                                     return;
                                 }
@@ -417,6 +428,7 @@ function ProjectOptions(): JSX.Element {
                                     priorityService.CreatePriority(newPriority)
                                         .then((result) => {
                                             setPriorities([...priorities, result]);
+                                            project.priorities = priorities;
                                             (document.getElementById("priorityName") as HTMLInputElement).value = "New Priority Name";
                                         })
                                         .catch((error: Error) => {
@@ -511,8 +523,9 @@ function ProjectOptions(): JSX.Element {
                                 });
                         }} disabled={isViewOnly}>Save</button>
                     </div>
-                </div>
-            )}
+                </div >
+            )
+            }
         </>
     );
 }

@@ -32,10 +32,10 @@
 
 .create-icon {
     display: inline-block;
-    font-size: 52px;
-    width: 52px;
-    height: 52px;
-    top: 10px;
+    font-size: 32pt;
+    width: 32pt;
+    height: 32pt;
+    top: 8px;
     position: relative;
     color: $secondary;
     background-color: transparent;
@@ -57,4 +57,21 @@
     max-width: 100%;
     max-height: fit-content;
     vertical-align: middle;
+}
+
+.project-description {
+    height: 112pt;
+    width: 100%;
+}
+
+.delete-icon {
+    display: inline-block;
+    font-size: 14pt;
+    width: 14pt;
+    height: 14pt;
+    top: 8px;
+    position: relative;
+    color: $secondary;
+    background-color: transparent;
+    cursor: pointer;
 }
