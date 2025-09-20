@@ -1,10 +1,9 @@
-using AspNetCore.Identity.MongoDbCore.Models;
-using MongoDB.Bson.Serialization.Attributes;
-using MongoDbGenericRepository.Attributes;
+using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.AspNetCore.Identity;
 
 namespace CritDTO.Identity;
 
-[CollectionName("Roles")]
-public class ApplicationRole : MongoIdentityRole<string>
+[Table("Roles")]
+public class ApplicationRole : IdentityRole<Guid>
 {
 }

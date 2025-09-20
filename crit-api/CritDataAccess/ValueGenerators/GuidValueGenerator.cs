@@ -1,15 +1,14 @@
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.ValueGeneration;
-using MongoDB.Bson;
 
 namespace CritDataAccess.ValueGenerators;
 
-public class ObjectIdValueGenerator : ValueGenerator<string>
+public class GuidValueGenerator : ValueGenerator<Guid>
 {
     public override bool GeneratesTemporaryValues => false;
 
-    public override string Next(EntityEntry entry)
+    public override Guid Next(EntityEntry entry)
     {
-        return ObjectId.GenerateNewId().ToString();
+        return Guid.NewGuid();
     }
 }

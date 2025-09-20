@@ -1,8 +1,6 @@
 using CritBusinessLogic.RepositoryInterfaces;
 using CritDataAccess.Contexts;
-using CritDataAccess.Services;
 using CritDTO.Models;
-using Microsoft.AspNetCore.Http;
 
 namespace CritBusinessLogic.Repositories;
 
@@ -37,7 +35,7 @@ public class EmailRepository : IEmailRepository
         }
     }
 
-    public async System.Threading.Tasks.Task DeleteEmail(string emailId)
+    public async Task DeleteEmail(Guid emailId)
     {
         try
         {
@@ -56,7 +54,7 @@ public class EmailRepository : IEmailRepository
         }
     }
 
-    public async Task<Email> GetEmailById(string emailId)
+    public async Task<Email> GetEmailById(Guid emailId)
     {
         try
         {
@@ -74,7 +72,7 @@ public class EmailRepository : IEmailRepository
         }
     }
 
-    public async System.Threading.Tasks.Task UpdateEmail(Email email)
+    public async Task UpdateEmail(Email email)
     {
         try
         {

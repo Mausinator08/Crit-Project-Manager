@@ -4,8 +4,8 @@ namespace CritBusinessLogic.RepositoryInterfaces;
 
 public interface IEmailRepository
 {
-    Task<Email> GetEmailById(string emailId);
+    Task<Email> GetEmailById(Guid emailId);
     Task<Email> CreateEmail(Email email);
-    System.Threading.Tasks.Task UpdateEmail(Email email);
-    System.Threading.Tasks.Task DeleteEmail(string emailId);
+    Task UpdateEmail(Email email);
+    Task DeleteEmail(Guid emailId);
 }

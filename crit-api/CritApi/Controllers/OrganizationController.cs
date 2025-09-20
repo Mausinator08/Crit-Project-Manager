@@ -1,6 +1,4 @@
 using CritBusinessLogic.RepositoryInterfaces;
-using CritDataAccess.Contexts;
-using CritDataAccess.Services;
 using CritDTO.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,9 +10,9 @@ namespace CritApi.Controllers;
 [Authorize]
 public class OrganizationController : ControllerBase
 {
-    private readonly Logging.ILogger _logger;
+    private readonly Logging.IFileLogger _logger;
     private readonly IOrganizationRepository _organizationRepository;
-    public OrganizationController(Logging.ILogger logger, IOrganizationRepository organizationRepository)
+    public OrganizationController(Logging.IFileLogger logger, IOrganizationRepository organizationRepository)
     {
         _logger = logger;
         _organizationRepository = organizationRepository;
@@ -63,7 +61,7 @@ public class OrganizationController : ControllerBase
     [Route("GetAllOrganizationsForProjectId/{projectId}")]
     [ProducesResponseType<List<Organization>>(StatusCodes.Status200OK)]
     [ProducesErrorResponseType(typeof(string))]
-    public async Task<IActionResult> GetAllOrganizationsForProjectId([FromRoute] string projectId)
+    public async Task<IActionResult> GetAllOrganizationsForProjectId([FromRoute] Guid projectId)
     {
         try
         {
@@ -80,7 +78,7 @@ public class OrganizationController : ControllerBase
     [Route("GetAllOrganizationsForUserId/{userId}")]
     [ProducesResponseType<List<Organization>>(StatusCodes.Status200OK)]
     [ProducesErrorResponseType(typeof(string))]
-    public async Task<IActionResult> GetAllOrganizationsForUserId([FromRoute] string userId)
+    public async Task<IActionResult> GetAllOrganizationsForUserId([FromRoute] Guid userId)
     {
         try
         {
@@ -97,7 +95,7 @@ public class OrganizationController : ControllerBase
     [Route("GetOrganizationByUserId/{userId}")]
     [ProducesResponseType<Organization>(StatusCodes.Status200OK)]
     [ProducesErrorResponseType(typeof(string))]
-    public async Task<IActionResult> GetOrganizationByUserId([FromRoute] string userId)
+    public async Task<IActionResult> GetOrganizationByUserId([FromRoute] Guid userId)
     {
         try
         {
@@ -114,12 +112,12 @@ public class OrganizationController : ControllerBase
     [Route("{organizationId}")]
     [ProducesResponseType<Organization>(StatusCodes.Status200OK)]
     [ProducesErrorResponseType(typeof(string))]
-    public async Task<IActionResult> GetOrganization(string organizationId)
+    public async Task<IActionResult> GetOrganization(Guid organizationId)
     {
         try
         {
             Organization? organization = await _organizationRepository.GetOrganization(organizationId);
-            if (organization == null)
+            if (organization == null || organization.Id == null || organization.Id == Guid.Empty)
             {
                 return NotFound($"Organization with ID {organizationId} not found.");
             }
@@ -162,7 +160,7 @@ public class OrganizationController : ControllerBase
     {
         try
         {
-            if (organization == null)
+            if (organization == null || organization.Id == null || organization.Id == Guid.Empty)
             {
                 return BadRequest("Invalid organization data.");
             }
@@ -181,7 +179,7 @@ public class OrganizationController : ControllerBase
     [Route("{organizationId}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesErrorResponseType(typeof(string))]
-    public async Task<IActionResult> DeleteOrganization(string organizationId)
+    public async Task<IActionResult> DeleteOrganization(Guid organizationId)
     {
         try
         {

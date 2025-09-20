@@ -11,9 +11,9 @@ namespace CritApi.Controllers;
 [Authorize]
 public class ProjectController : ControllerBase
 {
-    private readonly Logging.ILogger _logger;
+    private readonly Logging.IFileLogger _logger;
     private readonly IProjectsRepository _projectsRepository;
-    public ProjectController(Logging.ILogger logger, IProjectsRepository projectsRepository)
+    public ProjectController(Logging.IFileLogger logger, IProjectsRepository projectsRepository)
     {
         _logger = logger;
         _projectsRepository = projectsRepository;
@@ -39,7 +39,7 @@ public class ProjectController : ControllerBase
     [Route("{projectId}")]
     [ProducesResponseType<Project>(StatusCodes.Status200OK)]
     [ProducesErrorResponseType(typeof(string))]
-    public async Task<IActionResult> GetProject([FromRoute] string projectId)
+    public async Task<IActionResult> GetProject([FromRoute] Guid projectId)
     {
         try
         {
@@ -90,7 +90,7 @@ public class ProjectController : ControllerBase
     [Route("{projectId}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesErrorResponseType(typeof(string))]
-    public async Task<IActionResult> DeleteProject([FromRoute] string projectId)
+    public async Task<IActionResult> DeleteProject([FromRoute] Guid projectId)
     {
         try
         {

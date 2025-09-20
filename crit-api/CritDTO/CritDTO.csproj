@@ -3,9 +3,9 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <DebugType>embedded</DebugType>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="AspNetCore.Identity.Mongo" Version="8.3.5" />
-    <PackageReference Include="AspNetCore.Identity.MongoDBCore" Version="3.1.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.20" />
   </ItemGroup>
 </Project>

@@ -1,6 +1,5 @@
 using CritBusinessLogic.RepositoryInterfaces;
 using CritDataAccess.Contexts;
-using CritDataAccess.Services;
 using CritDTO.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -9,32 +8,27 @@ namespace CritBusinessLogic.Repositories;
 
 public class PriorityRepository : IPriorityRepository
 {
-    private TenantDbContext? _tenantDbContext = null;
-    public PriorityRepository(ITenantDbContextService tenantDbContextService, IHttpContextAccessor httpContextAccessor)
+    private readonly CritDbContext _critDbContext;
+    public PriorityRepository(CritDbContext critDbContext)
     {
-        if (httpContextAccessor.HttpContext?.User?.Identity?.IsAuthenticated == true)
-        {
-            Task<TenantDbContext> tenantDbContextTask = tenantDbContextService.GetAuthenticatedTenantDb(httpContextAccessor.HttpContext.User);
-            tenantDbContextTask.Wait();
-            _tenantDbContext = tenantDbContextTask.Result;
-        }
+        _critDbContext = critDbContext;
     }
 
-    public async Task<List<Priority>> GetAllPriorities(string projectId)
+    public async Task<List<Priority>> GetAllPriorities(Guid projectId)
     {
         try
         {
-            if (_tenantDbContext == null)
+            if (_critDbContext == null)
             {
-                throw new InvalidOperationException("TenantDbContext is not initialized.");
+                throw new InvalidOperationException("CritDbContext is not initialized.");
             }
 
-            if (string.IsNullOrEmpty(projectId))
+            if (projectId == Guid.Empty)
             {
                 throw new ArgumentException("Project ID cannot be null or empty.", nameof(projectId));
             }
 
-            List<Priority> priorities = await _tenantDbContext.Priorities.AsNoTracking().Where(priority => priority.ProjectId == projectId).ToListAsync();
+            List<Priority> priorities = await _critDbContext.Priorities.AsNoTracking().Where(priority => priority.ProjectId == projectId).ToListAsync();
             return priorities;
         }
         catch (Exception ex)
@@ -43,21 +37,21 @@ public class PriorityRepository : IPriorityRepository
         }
     }
 
-    public async Task<Priority> GetPriority(string priorityId)
+    public async Task<Priority> GetPriority(Guid priorityId)
     {
         try
         {
-            if (_tenantDbContext == null)
+            if (_critDbContext == null)
             {
-                throw new InvalidOperationException("TenantDbContext is not initialized.");
+                throw new InvalidOperationException("CritDbContext is not initialized.");
             }
 
-            if (string.IsNullOrEmpty(priorityId))
+            if (priorityId == Guid.Empty)
             {
                 throw new ArgumentException("Priority ID cannot be null or empty.", nameof(priorityId));
             }
 
-            IQueryable<Priority> priority = _tenantDbContext.Priorities.AsNoTracking().Where(priority => priority.Id == priorityId);
+            List<Priority> priority = await _critDbContext.Priorities.AsNoTracking().Where(priority => priority.Id == priorityId).ToListAsync();
             if (!priority.Any())
             {
                 throw new KeyNotFoundException($"Priority with ID {priorityId} not found.");
@@ -75,9 +69,9 @@ public class PriorityRepository : IPriorityRepository
     {
         try
         {
-            if (_tenantDbContext == null)
+            if (_critDbContext == null)
             {
-                throw new InvalidOperationException("TenantDbContext is not initialized.");
+                throw new InvalidOperationException("CritDbContext is not initialized.");
             }
 
             if (priority == null)
@@ -85,8 +79,8 @@ public class PriorityRepository : IPriorityRepository
                 throw new ArgumentNullException(nameof(priority), "Priority cannot be null.");
             }
 
-            await _tenantDbContext.Priorities.AddAsync(priority);
-            await _tenantDbContext.SaveChangesAsync();
+            await _critDbContext.Priorities.AddAsync(priority);
+            await _critDbContext.SaveChangesAsync();
             return priority;
         }
         catch (Exception ex)
@@ -99,9 +93,9 @@ public class PriorityRepository : IPriorityRepository
     {
         try
         {
-            if (_tenantDbContext == null)
+            if (_critDbContext == null)
             {
-                throw new InvalidOperationException("TenantDbContext is not initialized.");
+                throw new InvalidOperationException("CritDbContext is not initialized.");
             }
 
             if (priority == null)
@@ -109,8 +103,8 @@ public class PriorityRepository : IPriorityRepository
                 throw new ArgumentNullException(nameof(priority), "Priority cannot be null.");
             }
 
-            _tenantDbContext.Priorities.Update(priority);
-            await _tenantDbContext.SaveChangesAsync();
+            _critDbContext.Priorities.Update(priority);
+            await _critDbContext.SaveChangesAsync();
             return priority;
         }
         catch (Exception ex)
@@ -119,43 +113,27 @@ public class PriorityRepository : IPriorityRepository
         }
     }
 
-    public async Task DeletePriority(string priorityId)
+    public async Task DeletePriority(Guid priorityId)
     {
         try
         {
-            if (_tenantDbContext == null)
+            if (_critDbContext == null)
             {
-                throw new InvalidOperationException("TenantDbContext is not initialized.");
+                throw new InvalidOperationException("CritDbContext is not initialized.");
             }
 
-            if (string.IsNullOrEmpty(priorityId))
+            if (priorityId == Guid.Empty)
             {
                 throw new ArgumentException("Priority ID cannot be null or empty.", nameof(priorityId));
             }
 
             Priority priority = await GetPriority(priorityId);
-            _tenantDbContext.Priorities.Remove(priority);
-            await _tenantDbContext.SaveChangesAsync();
+            _critDbContext.Priorities.Remove(priority);
+            await _critDbContext.SaveChangesAsync();
         }
         catch (Exception ex)
         {
             throw new Exception($"Error deleting priority with ID {priorityId}.", ex);
-        }
-    }
-
-    public void Dispose()
-    {
-        if (_tenantDbContext != null)
-        {
-            _tenantDbContext?.Dispose();
-        }
-    }
-
-    public async ValueTask DisposeAsync()
-    {
-        if (_tenantDbContext != null)
-        {
-            await _tenantDbContext.DisposeAsync();
         }
     }
 }

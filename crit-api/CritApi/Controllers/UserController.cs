@@ -14,7 +14,7 @@ namespace CritApi.Controllers;
 [Authorize()]
 public class UserController : ControllerBase
 {
-    private readonly Logging.ILogger _logger;
+    private readonly Logging.IFileLogger _logger;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly RoleManager<ApplicationRole> _roleManager;
     private readonly IPhoneNumberRepository _phoneNumberRepository;
@@ -22,7 +22,7 @@ public class UserController : ControllerBase
 
     public UserController(UserManager<ApplicationUser> userManager,
     RoleManager<ApplicationRole> roleManager,
-    Logging.ILogger logger,
+    Logging.IFileLogger logger,
     IPhoneNumberRepository phoneNumberRepository,
     IOrganizationRepository organizationRepository)
     {
@@ -145,7 +145,7 @@ public class UserController : ControllerBase
                 return StatusCode(StatusCodes.Status400BadRequest, new ApiResult("Could not delete user.", new List<string>([$"The user {userName} could not be found."])));
             }
 
-            if (appUser.UserName == null && appUser.Email == null)
+            if (appUser.UserName == null || appUser.Email == null)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, new ApiResult("Could not delete user.", new List<string>([$"The user {userName} has no stored user name or email."])));
             }
@@ -189,11 +189,11 @@ public class UserController : ControllerBase
     [HttpGet]
     [Route("{userId}")]
     [Authorize(Roles = "User,ProjectAdmin,ProjectOwner,OrganizationAdmin,OrganizationOwner,SuperAdmin")]
-    public async Task<IActionResult> GetUserByUserId([FromRoute] string userId)
+    public async Task<IActionResult> GetUserByUserId([FromRoute] Guid userId)
     {
         try
         {
-            ApplicationUser? appUser = await _userManager.FindByIdAsync(userId);
+            ApplicationUser? appUser = await _userManager.FindByIdAsync(userId.ToString());
 
             if (appUser != null && appUser?.Email != null && appUser?.UserName != null)
             {
@@ -455,11 +455,11 @@ public class UserController : ControllerBase
     [HttpGet]
     [Route("IsUserIdInRole")]
     [Authorize(Roles = "User,ProjectAdmin,ProjectOwner,OrganizationAdmin,OrganizationOwner,SuperAdmin")]
-    public async Task<IActionResult> IsUserIdInRole([FromQuery] string userId, [FromQuery] string role)
+    public async Task<IActionResult> IsUserIdInRole([FromQuery] Guid userId, [FromQuery] string role)
     {
         try
         {
-            ApplicationUser? appUser = await _userManager.FindByIdAsync(userId);
+            ApplicationUser? appUser = await _userManager.FindByIdAsync(userId.ToString());
 
             if (appUser != null)
             {
@@ -497,7 +497,7 @@ public class UserController : ControllerBase
 
             if (userId != null)
             {
-                return Ok(new ApiResult("Logged in user id retrieved successfully.", null, userId));
+                return Ok(new ApiResult("Logged in user id retrieved successfully.", null, Guid.Parse(userId)));
             }
             else
             {

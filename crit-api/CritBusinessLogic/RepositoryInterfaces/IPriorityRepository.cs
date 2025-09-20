@@ -4,9 +4,9 @@ namespace CritBusinessLogic.RepositoryInterfaces;
 
 public interface IPriorityRepository
 {
-    Task<List<Priority>> GetAllPriorities(string projectId);
-    Task<Priority> GetPriority(string priorityId);
+    Task<List<Priority>> GetAllPriorities(Guid projectId);
+    Task<Priority> GetPriority(Guid priorityId);
     Task<Priority> CreatePriority(Priority priority);
     Task<Priority> UpdatePriority(Priority priority);
-    Task DeletePriority(string priorityId);
+    Task DeletePriority(Guid priorityId);
 }

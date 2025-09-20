@@ -1,5 +1,5 @@
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Identity;
-using MongoDbGenericRepository.Attributes;
 
 namespace CritDTO.Models;
 
@@ -28,10 +28,10 @@ public class PhoneNumber
         Type = PhoneNumberType.Mobile;
         CountryCode = "+1";
         Number = "000-000-0000";
-        OrganizationId = string.Empty;
+        OrganizationId = Guid.Empty;
     }
 
-    public string? Id { get; set; }
+    public Guid? Id { get; set; }
     public PhoneNumberType Type { get; set; }
     [PersonalData]
     public string CountryCode { get; set; }
@@ -39,8 +39,9 @@ public class PhoneNumber
     public string Number { get; set; }
     [PersonalData]
     public string? Extension { get; set; }
-    public string OrganizationId { get; set; }
-    public string? UserId { get; set; }
+    public Guid OrganizationId { get; set; }
+    public Guid? UserId { get; set; }
 
-    public Organization? Organization { get; set; }
+    [JsonIgnore]
+    public virtual Organization? Organization { get; set; }
 }

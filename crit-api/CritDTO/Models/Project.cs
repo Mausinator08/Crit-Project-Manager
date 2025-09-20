@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
-using MongoDbGenericRepository.Attributes;
+using CritDTO.Identity;
+using CritDTO.Models.BaseModels;
 
 namespace CritDTO.Models;
 
@@ -9,54 +10,74 @@ public class Project : AuditInformation
     {
         Name = "";
         Tasks = new List<ProjectTask>();
-        OwningOrganizationId = string.Empty;
-        ProjectOwnerUserId = string.Empty;
-        ProjectAdminUserIds = new List<string>();
-        ProjectUserIds = new List<string>();
-        OrganizationIds = new List<string>();
+        OwningOrganizationId = Guid.Empty;
+        ProjectOwnerUserId = Guid.Empty;
+        Organizations = new List<Organization>();
         CustomFieldTypes = new List<CustomFieldType>();
-        HiddenCustomFieldTypeIds = new List<string>();
         Statuses = new List<Status>();
         Priorities = new List<Priority>();
-        DateTime now = DateTime.Now;
+        HiddenCustomFieldTypes = new List<CustomFieldType>();
+        Comments = new List<Comment>();
+        OrganizationProjects = new List<OrganizationProject>();
+        ProjectUsers = new List<ProjectUser>();
+        ProjectAdmins = new List<ProjectAdmin>();
+        DateTime now = DateTime.UtcNow;
         DateCreated = now;
         DateUpdated = now;
     }
 
     [JsonConstructor]
-    public Project(string name, string? description, string owningOrganizationId, string projectOwnerUserId)
+    public Project(string name, string? description, Guid owningOrganizationId, Guid projectOwnerUserId)
     {
         Name = name;
         Description = description;
         Tasks = new List<ProjectTask>();
         OwningOrganizationId = owningOrganizationId;
         ProjectOwnerUserId = projectOwnerUserId;
-        ProjectAdminUserIds = new List<string>([projectOwnerUserId]);
-        ProjectUserIds = new List<string>([projectOwnerUserId]);
-        OrganizationIds = new List<string>([owningOrganizationId]);
+        Organizations = new List<Organization>();
         CustomFieldTypes = new List<CustomFieldType>();
-        HiddenCustomFieldTypeIds = new List<string>();
         Statuses = new List<Status>();
         Priorities = new List<Priority>();
-        DateTime now = DateTime.Now;
+        HiddenCustomFieldTypes = new List<CustomFieldType>();
+        Comments = new List<Comment>();
+        OrganizationProjects = new List<OrganizationProject>();
+        ProjectUsers = new List<ProjectUser>();
+        ProjectAdmins = new List<ProjectAdmin>();
+        DateTime now = DateTime.UtcNow;
         DateCreated = now;
         DateUpdated = now;
         CreatedByUserId = projectOwnerUserId;
         UpdatedByUserId = projectOwnerUserId;
     }
 
-    public string? Id { get; set; }
+    public Guid? Id { get; set; }
     public string Name { get; set; }
     public string? Description { get; set; }
-    public string OwningOrganizationId { get; set; }
-    public string ProjectOwnerUserId { get; set; }
-    public List<string> ProjectAdminUserIds { get; set; }
-    public List<string> ProjectUserIds { get; set; }
-    public List<string> OrganizationIds { get; set; }
-    public List<string> HiddenCustomFieldTypeIds { get; set; }
+    public Guid OwningOrganizationId { get; set; }
+    public Guid ProjectOwnerUserId { get; set; }
 
-    public List<Status> Statuses { get; set; }
-    public List<Priority> Priorities { get; set; }
-    public List<CustomFieldType> CustomFieldTypes { get; set; }
-    public List<ProjectTask> Tasks { get; set; }
+    [JsonIgnore]
+    public virtual Organization? OwningOrganization { get; set; }
+    [JsonIgnore]
+    public virtual ApplicationUser? ProjectOwner { get; set; }
+    [JsonIgnore]
+    public virtual List<Status> Statuses { get; set; }
+    [JsonIgnore]
+    public virtual List<Priority> Priorities { get; set; }
+    [JsonIgnore]
+    public virtual List<CustomFieldType> CustomFieldTypes { get; set; }
+    [JsonIgnore]
+    public virtual List<ProjectTask> Tasks { get; set; }
+    [JsonIgnore]
+    public virtual List<Organization> Organizations { get; set; }
+    [JsonIgnore]
+    public virtual List<CustomFieldType> HiddenCustomFieldTypes { get; set; }
+    [JsonIgnore]
+    public virtual List<Comment> Comments { get; set; }
+    [JsonIgnore]
+    public virtual List<OrganizationProject> OrganizationProjects { get; set; }
+    [JsonIgnore]
+    public virtual List<ProjectUser> ProjectUsers { get; set; }
+    [JsonIgnore]
+    public virtual List<ProjectAdmin> ProjectAdmins { get; set; }
 }

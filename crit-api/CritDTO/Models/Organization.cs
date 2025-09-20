@@ -1,5 +1,5 @@
 using System.Text.Json.Serialization;
-using MongoDbGenericRepository.Attributes;
+using CritDTO.Identity;
 
 namespace CritDTO.Models;
 
@@ -8,43 +8,48 @@ public class Organization
     public Organization()
     {
         Name = "";
-        PhoneNumberIds = new List<string>();
-        EmailIds = new List<string>();
-        ProjectIds = new List<string>();
-        AdminUserIds = new List<string>();
-        MemberUserIds = new List<string>();
-        AffiliatedUserIds = new List<string>();
         Emails = new List<Email>();
         PhoneNumbers = new List<PhoneNumber>();
-        OwnerUserId = string.Empty;
+        OwnerUserId = Guid.Empty;
+        Projects = new List<Project>();
+        OrganizationProjects = new List<OrganizationProject>();
+        OrganizationAdmins = new List<OrganizationAdmin>();
+        OrganizationMembers = new List<OrganizationMember>();
+        OrganizationAffiliates = new List<OrganizationAffiliate>();
     }
 
     [JsonConstructor]
-    public Organization(string name, string ownerUserId)
+    public Organization(string name, Guid ownerUserId)
     {
         Name = name;
         OwnerUserId = ownerUserId;
-        PhoneNumberIds = new List<string>();
-        EmailIds = new List<string>();
-        ProjectIds = new List<string>();
-        AdminUserIds = new List<string>([ownerUserId]);
-        MemberUserIds = new List<string>([ownerUserId]);
-        AffiliatedUserIds = new List<string>([ownerUserId]);
         Emails = new List<Email>();
         PhoneNumbers = new List<PhoneNumber>();
+        Projects = new List<Project>();
+        OrganizationProjects = new List<OrganizationProject>();
+        OrganizationAdmins = new List<OrganizationAdmin>();
+        OrganizationMembers = new List<OrganizationMember>();
+        OrganizationAffiliates = new List<OrganizationAffiliate>();
     }
 
-    public string? Id { get; set; }
+    public Guid? Id { get; set; }
     public string Name { get; set; }
-    public string OwnerUserId { get; set; }
-    public List<string> PhoneNumberIds { get; set; }
-    public List<string> EmailIds { get; set; }
-    public List<string> ProjectIds { get; set; }
-    public List<string> AdminUserIds { get; set; }
-    public List<string> MemberUserIds { get; set; }
-    public List<string> AffiliatedUserIds { get; set; }
-    public string DatabaseName { get => $"crit_{Id}"; }
+    public Guid OwnerUserId { get; set; }
 
-    public List<Email> Emails { get; set; }
-    public List<PhoneNumber> PhoneNumbers { get; set; }
+    [JsonIgnore]
+    public virtual List<Email> Emails { get; set; }
+    [JsonIgnore]
+    public virtual List<PhoneNumber> PhoneNumbers { get; set; }
+    [JsonIgnore]
+    public virtual List<Project> Projects { get; set; }
+    [JsonIgnore]
+    public virtual ApplicationUser? Owner { get; set; }
+    [JsonIgnore]
+    public virtual List<OrganizationProject> OrganizationProjects { get; set; }
+    [JsonIgnore]
+    public virtual List<OrganizationAdmin> OrganizationAdmins { get; set; }
+    [JsonIgnore]
+    public virtual List<OrganizationMember> OrganizationMembers { get; set; }
+    [JsonIgnore]
+    public virtual List<OrganizationAffiliate> OrganizationAffiliates { get; set; }
 }

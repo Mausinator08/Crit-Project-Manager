@@ -2,11 +2,11 @@ using System.Text;
 
 namespace CritApi.Logging;
 
-public class Logger : ILogger
+public class FileLogger : IFileLogger
 {
     private readonly int maxExceptionDepth = 5;
 
-    public Logger(string? path)
+    public FileLogger(string? path)
     {
         if (path != null)
         {
@@ -20,7 +20,7 @@ public class Logger : ILogger
         }
     }
 
-    private Logger()
+    private FileLogger()
     {
         Directory.CreateDirectory(Path.Combine(Environment.CurrentDirectory, "Logs"));
         filePath = Path.Combine(Environment.CurrentDirectory, "Logs", "CritApi.log");

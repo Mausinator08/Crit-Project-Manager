@@ -10,9 +10,9 @@ namespace CritApi.Controllers;
 [Authorize]
 public class TaskController : ControllerBase
 {
-    private readonly Logging.ILogger _logger;
+    private readonly Logging.IFileLogger _logger;
     private readonly ITasksRepository _tasksRepository;
-    public TaskController(ITasksRepository tasksRepository, Logging.ILogger logger)
+    public TaskController(ITasksRepository tasksRepository, Logging.IFileLogger logger)
     {
         _logger = logger;
         _tasksRepository = tasksRepository;
@@ -23,7 +23,7 @@ public class TaskController : ControllerBase
     [ProducesResponseType<List<Task>>(StatusCodes.Status200OK)]
     [ProducesErrorResponseType(typeof(string))]
     [Authorize(Roles = "User,ProjectAdmin,ProjectOwner,OrganizationAdmin,OrganizationOwner,SuperAdmin")]
-    public async Task<IActionResult> GetTasks([FromRoute] string projectId)
+    public async Task<IActionResult> GetTasks([FromRoute] Guid projectId)
     {
         try
         {
@@ -42,7 +42,7 @@ public class TaskController : ControllerBase
     [ProducesResponseType<Task>(StatusCodes.Status200OK)]
     [ProducesErrorResponseType(typeof(string))]
     [Authorize(Roles = "User,ProjectAdmin,ProjectOwner,OrganizationAdmin,OrganizationOwner,SuperAdmin")]
-    public async Task<IActionResult> GetTask([FromRoute] string projectId, [FromRoute] string taskId)
+    public async Task<IActionResult> GetTask([FromRoute] Guid projectId, [FromRoute] Guid taskId)
     {
         try
         {
@@ -116,7 +116,7 @@ public class TaskController : ControllerBase
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesErrorResponseType(typeof(string))]
     [Authorize(Roles = "ProjectAdmin,ProjectOwner,OrganizationAdmin,OrganizationOwner,SuperAdmin")]
-    public async Task<IActionResult> DeleteTask([FromQuery] string projectId, [FromQuery] string taskId)
+    public async Task<IActionResult> DeleteTask([FromQuery] Guid projectId, [FromQuery] Guid taskId)
     {
         try
         {

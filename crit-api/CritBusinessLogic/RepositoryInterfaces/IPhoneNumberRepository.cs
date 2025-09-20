@@ -4,9 +4,9 @@ namespace CritBusinessLogic.RepositoryInterfaces;
 
 public interface IPhoneNumberRepository
 {
-    Task<PhoneNumber> GetPhoneNumberById(string phoneNumberId);
-    Task<PhoneNumber> GetPhoneNumberByUserId(string userId);
+    Task<PhoneNumber> GetPhoneNumberById(Guid phoneNumberId);
+    Task<PhoneNumber> GetPhoneNumberByUserId(Guid userId);
     Task<PhoneNumber> CreatePhoneNumber(PhoneNumber phoneNumber);
-    System.Threading.Tasks.Task UpdatePhoneNumber(PhoneNumber phoneNumber);
-    System.Threading.Tasks.Task DeletePhoneNumber(string phoneNumberId);
+    Task UpdatePhoneNumber(PhoneNumber phoneNumber);
+    Task DeletePhoneNumber(Guid phoneNumberId);
 }

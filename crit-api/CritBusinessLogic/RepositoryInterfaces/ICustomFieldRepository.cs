@@ -4,9 +4,9 @@ namespace CritBusinessLogic.RepositoryInterfaces;
 
 public interface ICustomFieldRepository
 {
-    Task<List<CustomField>> GetAllCustomFields(string taskId);
-    Task<CustomField> GetCustomField(string customFieldId);
+    Task<List<CustomField>> GetAllCustomFields(Guid taskId);
+    Task<CustomField> GetCustomField(Guid customFieldId);
     Task<CustomField> CreateCustomField(CustomField customField);
     Task<CustomField> UpdateCustomField(CustomField customField);
-    Task DeleteCustomField(string customFieldId);
+    Task DeleteCustomField(Guid customFieldId);
 }

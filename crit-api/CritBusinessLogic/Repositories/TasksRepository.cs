@@ -1,35 +1,27 @@
 using CritBusinessLogic.RepositoryInterfaces;
 using CritDataAccess.Contexts;
-using CritDataAccess.Services;
 using CritDTO.Identity;
 using CritDTO.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
 namespace CritBusinessLogic.Repositories;
 
-public class TasksRepository : IDisposable, IAsyncDisposable, ITasksRepository
+public class TasksRepository : ITasksRepository
 {
-    private TenantDbContext? _tenantDbContext = null;
+    private CritDbContext? _critDbContext = null;
     private readonly IUserRepository _userRepository;
-    public TasksRepository(ITenantDbContextService tenantDbContextService, IUserRepository userRepository, IHttpContextAccessor httpContextAccessor)
+    public TasksRepository(CritDbContext critDbContext, IUserRepository userRepository)
     {
-        if (httpContextAccessor.HttpContext?.User?.Identity?.IsAuthenticated == true)
-        {
-            Task<TenantDbContext> tenantDbContextTask = tenantDbContextService.GetAuthenticatedTenantDb(httpContextAccessor.HttpContext.User);
-            tenantDbContextTask.Wait();
-            _tenantDbContext = tenantDbContextTask.Result;
-        }
-
+        _critDbContext = critDbContext;
         _userRepository = userRepository;
     }
 
-    public async Task<List<ProjectTask>> GetAllTasks(string projectId)
+    public async Task<List<ProjectTask>> GetAllTasks(Guid projectId)
     {
         try
         {
             Organization? organization = await _userRepository.GetLoggedInUserOrganization();
-            if (organization == null)
+            if (organization == null || organization.Id == null || organization.Id == Guid.Empty)
             {
                 throw new Exception("User is not a member of any organization and therefore cannot create projects.");
             }
@@ -40,20 +32,20 @@ public class TasksRepository : IDisposable, IAsyncDisposable, ITasksRepository
                 throw new Exception("User is not logged in.");
             }
 
-            if (_tenantDbContext == null)
+            if (_critDbContext == null)
             {
                 throw new Exception("Tenant database context is not initialized.");
             }
 
-            IQueryable<ProjectTask> tasksQuery = _tenantDbContext.Tasks.AsNoTracking().Where(t =>
+            List<ProjectTask> tasksQuery = await _critDbContext.Tasks.AsNoTracking().Where(t =>
             t.ProjectId == projectId &&
             t.Project != null &&
-            t.Project.ProjectUserIds.Contains(applicationUser.Id) &&
-            t.Project.OrganizationIds.Contains(organization.Id!));
+            t.Project.ProjectUsers.Any(pu => pu.UserId == applicationUser.Id) &&
+            t.Project.OrganizationProjects.Any(op => op.OrganizationId == organization.Id)).ToListAsync();
 
             if (tasksQuery.Any())
             {
-                return await tasksQuery.ToListAsync();
+                return tasksQuery;
             }
 
             return new List<ProjectTask>();
@@ -64,12 +56,12 @@ public class TasksRepository : IDisposable, IAsyncDisposable, ITasksRepository
         }
     }
 
-    public async Task<ProjectTask?> GetTask(string projectId, string taskId)
+    public async Task<ProjectTask?> GetTask(Guid projectId, Guid taskId)
     {
         try
         {
             Organization? organization = await _userRepository.GetLoggedInUserOrganization();
-            if (organization == null)
+            if (organization == null || organization.Id == null || organization.Id == Guid.Empty)
             {
                 throw new Exception("User is not a member of any organization and therefore cannot create projects.");
             }
@@ -80,21 +72,21 @@ public class TasksRepository : IDisposable, IAsyncDisposable, ITasksRepository
                 throw new Exception("User is not logged in.");
             }
 
-            if (_tenantDbContext == null)
+            if (_critDbContext == null)
             {
                 throw new Exception("Tenant database context is not initialized.");
             }
 
-            IQueryable<ProjectTask> taskQuery = _tenantDbContext.Tasks.AsNoTracking().Where(t =>
+            List<ProjectTask> taskQuery = await _critDbContext.Tasks.AsNoTracking().Where(t =>
             t.Id == taskId &&
             t.ProjectId == projectId &&
             t.Project != null &&
-            t.Project.ProjectUserIds.Contains(applicationUser.Id) &&
-            t.Project.OrganizationIds.Contains(organization.Id!));
+            t.Project.ProjectUsers.Any(pu => pu.UserId == applicationUser.Id) &&
+            t.Project.OrganizationProjects.Any(op => op.OrganizationId == organization.Id)).ToListAsync();
 
             if (taskQuery.Any())
             {
-                return await taskQuery.FirstAsync();
+                return taskQuery.First();
             }
 
             return null;
@@ -110,7 +102,7 @@ public class TasksRepository : IDisposable, IAsyncDisposable, ITasksRepository
         try
         {
             Organization? organization = await _userRepository.GetLoggedInUserOrganization();
-            if (organization == null)
+            if (organization == null || organization.Id == null || organization.Id == Guid.Empty)
             {
                 throw new Exception("User is not a member of any organization and therefore cannot create projects.");
             }
@@ -121,23 +113,23 @@ public class TasksRepository : IDisposable, IAsyncDisposable, ITasksRepository
                 throw new Exception("User is not logged in.");
             }
 
-            if (_tenantDbContext == null)
+            if (_critDbContext == null)
             {
                 throw new Exception("Tenant database context is not initialized.");
             }
 
-            IQueryable<Project> projectQuery = _tenantDbContext.Projects.AsNoTracking().Where(p =>
+            List<Project> projectQuery = await _critDbContext.Projects.AsNoTracking().Where(p =>
             p.Id == task.ProjectId &&
-            p.ProjectAdminUserIds.Contains(applicationUser.Id) &&
-            p.OrganizationIds.Contains(organization.Id!));
+            p.ProjectAdmins.Any(pa => pa.AdminId == applicationUser.Id) &&
+            p.OrganizationProjects.Any(op => op.OrganizationId == organization.Id)).ToListAsync();
 
             if (!projectQuery.Any())
             {
                 throw new Exception($"User {applicationUser.Id} is not an admin of project {task.ProjectId} or {task.ProjectId} does not exist.");
             }
 
-            _tenantDbContext.Tasks.Add(task);
-            int savedChanges = await _tenantDbContext.SaveChangesAsync();
+            _critDbContext.Tasks.Add(task);
+            int savedChanges = await _critDbContext.SaveChangesAsync();
 
             if (savedChanges <= 0)
             {
@@ -152,12 +144,12 @@ public class TasksRepository : IDisposable, IAsyncDisposable, ITasksRepository
         }
     }
 
-    public async System.Threading.Tasks.Task UpdateTask(ProjectTask task)
+    public async Task UpdateTask(ProjectTask task)
     {
         try
         {
             Organization? organization = await _userRepository.GetLoggedInUserOrganization();
-            if (organization == null)
+            if (organization == null || organization.Id == null || organization.Id == Guid.Empty)
             {
                 throw new Exception("User is not a member of any organization and therefore cannot create projects.");
             }
@@ -168,23 +160,23 @@ public class TasksRepository : IDisposable, IAsyncDisposable, ITasksRepository
                 throw new Exception("User is not logged in.");
             }
 
-            if (_tenantDbContext == null)
+            if (_critDbContext == null)
             {
                 throw new Exception("Tenant database context is not initialized.");
             }
 
-            IQueryable<Project> projectQuery = _tenantDbContext.Projects.AsNoTracking().Where(p =>
+            List<Project> projectQuery = await _critDbContext.Projects.AsNoTracking().Where(p =>
             p.Id == task.ProjectId &&
-            p.ProjectAdminUserIds.Contains(applicationUser.Id) &&
-            p.OrganizationIds.Contains(organization.Id!));
+            p.ProjectAdmins.Any(pa => pa.AdminId == applicationUser.Id) &&
+            p.OrganizationProjects.Any(op => op.OrganizationId == organization.Id)).ToListAsync();
 
             if (!projectQuery.Any())
             {
                 throw new Exception($"User {applicationUser.Id} is not an admin of project {task.ProjectId}.");
             }
 
-            _tenantDbContext.Tasks.Update(task);
-            int savedChanges = await _tenantDbContext.SaveChangesAsync();
+            _critDbContext.Tasks.Update(task);
+            int savedChanges = await _critDbContext.SaveChangesAsync();
 
             if (savedChanges <= 0)
             {
@@ -197,12 +189,12 @@ public class TasksRepository : IDisposable, IAsyncDisposable, ITasksRepository
         }
     }
 
-    public async System.Threading.Tasks.Task DeleteTask(string projectId, string taskId)
+    public async Task DeleteTask(Guid projectId, Guid taskId)
     {
         try
         {
             Organization? organization = await _userRepository.GetLoggedInUserOrganization();
-            if (organization == null)
+            if (organization == null || organization.Id == null || organization.Id == Guid.Empty)
             {
                 throw new Exception("User is not a member of any organization and therefore cannot create projects.");
             }
@@ -213,30 +205,30 @@ public class TasksRepository : IDisposable, IAsyncDisposable, ITasksRepository
                 throw new Exception("User is not logged in.");
             }
 
-            if (_tenantDbContext == null)
+            if (_critDbContext == null)
             {
                 throw new Exception("Tenant database context is not initialized.");
             }
 
-            IQueryable<Project> projectQuery = _tenantDbContext.Projects.AsNoTracking().Where(p =>
+            List<Project> projectQuery = await _critDbContext.Projects.AsNoTracking().Where(p =>
             p.Id == projectId &&
-            p.ProjectAdminUserIds.Contains(applicationUser.Id) &&
-            p.OrganizationIds.Contains(organization.Id!));
+            p.ProjectAdmins.Any(pa => pa.AdminId == applicationUser.Id) &&
+            p.OrganizationProjects.Any(op => op.OrganizationId == organization.Id)).ToListAsync();
 
             if (!projectQuery.Any())
             {
                 throw new Exception($"User {applicationUser.Id} is not an admin of project {projectId}.");
             }
 
-            IQueryable<ProjectTask> taskQuery = _tenantDbContext.Tasks.AsNoTracking().Where(t => t.Id == taskId && t.ProjectId == projectId);
+            List<ProjectTask> taskQuery = await _critDbContext.Tasks.AsNoTracking().Where(t => t.Id == taskId && t.ProjectId == projectId).ToListAsync();
 
             if (!taskQuery.Any())
             {
                 throw new Exception($"Task {taskId} does not exist in project {projectId}.");
             }
 
-            _tenantDbContext.Tasks.Remove(taskQuery.First());
-            int savedChanges = await _tenantDbContext.SaveChangesAsync();
+            _critDbContext.Tasks.Remove(taskQuery.First());
+            int savedChanges = await _critDbContext.SaveChangesAsync();
 
             if (savedChanges <= 0)
             {
@@ -246,22 +238,6 @@ public class TasksRepository : IDisposable, IAsyncDisposable, ITasksRepository
         catch (Exception ex)
         {
             throw new Exception($"Could not delete task {taskId} from project {projectId}.", ex);
-        }
-    }
-
-    public void Dispose()
-    {
-        if (_tenantDbContext != null)
-        {
-            _tenantDbContext?.Dispose();
-        }
-    }
-
-    public async ValueTask DisposeAsync()
-    {
-        if (_tenantDbContext != null)
-        {
-            await _tenantDbContext.DisposeAsync();
         }
     }
 }

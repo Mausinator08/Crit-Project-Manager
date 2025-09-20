@@ -39,7 +39,7 @@ public class PhoneNumberRepository : IPhoneNumberRepository
         }
     }
 
-    public async System.Threading.Tasks.Task DeletePhoneNumber(string phoneNumberId)
+    public async Task DeletePhoneNumber(Guid phoneNumberId)
     {
         try
         {
@@ -58,17 +58,17 @@ public class PhoneNumberRepository : IPhoneNumberRepository
         }
     }
 
-    public async Task<PhoneNumber> GetPhoneNumberByUserId(string userId)
+    public async Task<PhoneNumber> GetPhoneNumberByUserId(Guid userId)
     {
         try
         {
-            IQueryable<PhoneNumber> phoneNumber = _critDbContext.PhoneNumbers.AsNoTracking().Where(p => p.UserId == userId);
+            List<PhoneNumber> phoneNumber = await _critDbContext.PhoneNumbers.AsNoTracking().Where(p => p.UserId == userId).ToListAsync();
             if (!phoneNumber.Any())
             {
                 throw new Exception($"Phone number not found for user id {userId}");
             }
 
-            return await phoneNumber.FirstAsync();
+            return phoneNumber.First();
         }
         catch (Exception e)
         {
@@ -76,7 +76,7 @@ public class PhoneNumberRepository : IPhoneNumberRepository
         }
     }
 
-    public async Task<PhoneNumber> GetPhoneNumberById(string phoneNumberId)
+    public async Task<PhoneNumber> GetPhoneNumberById(Guid phoneNumberId)
     {
         try
         {
@@ -94,7 +94,7 @@ public class PhoneNumberRepository : IPhoneNumberRepository
         }
     }
 
-    public async System.Threading.Tasks.Task UpdatePhoneNumber(PhoneNumber phoneNumber)
+    public async Task UpdatePhoneNumber(PhoneNumber phoneNumber)
     {
         try
         {

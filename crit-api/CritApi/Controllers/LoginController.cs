@@ -1,8 +1,6 @@
 using System.Text;
-using System.Text.Json.Nodes;
 using CritApi.Models;
 using CritBusinessLogic.RepositoryInterfaces;
-using CritDataAccess.Services;
 using CritDTO.Identity;
 using CritDTO.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -15,7 +13,7 @@ namespace CritApi.Controllers;
 [Route("api")]
 public class LoginController : ControllerBase
 {
-    private readonly Logging.ILogger _logger;
+    private readonly Logging.IFileLogger _logger;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly SignInManager<ApplicationUser> _signInManager;
     private readonly IUserRepository _userRepository;
@@ -27,7 +25,7 @@ public class LoginController : ControllerBase
         UserManager<ApplicationUser> userManager,
         RoleManager<ApplicationRole> roleManager,
         SignInManager<ApplicationUser> signInManager,
-        Logging.ILogger logger,
+        Logging.IFileLogger logger,
         IUserRepository userRepository,
         IOrganizationRepository organizationRepository,
         IEmailRepository emailRepository,
@@ -90,7 +88,7 @@ public class LoginController : ControllerBase
 
                 Organization organization = await _organizationRepository.CreateOrganization(new Organization(user.Organization, appUser.Id));
 
-                if (organization == null || string.IsNullOrWhiteSpace(organization.Id))
+                if (organization == null || organization.Id == null || organization.Id == Guid.Empty)
                 {
                     throw new Exception("Failed to create organization.");
                 }
@@ -98,7 +96,7 @@ public class LoginController : ControllerBase
                 Email email = await _emailRepository.CreateEmail(new Email()
                 {
                     EmailAddress = user.Email,
-                    OrganizationId = organization.Id,
+                    OrganizationId = organization.Id.Value,
                     Organization = organization,
                     UserId = appUser.Id
                 });
@@ -106,11 +104,12 @@ public class LoginController : ControllerBase
                 PhoneNumber phoneNumber = await _phoneNumberRepository.CreatePhoneNumber(new PhoneNumber()
                 {
                     Number = user.PhoneNumber ?? string.Empty,
-                    OrganizationId = organization.Id,
+                    OrganizationId = organization.Id.Value,
                     Organization = organization,
                     CountryCode = user.CountryCode ?? "+1",
                     Extension = user.Extension,
-                    Type = user.PhoneType.HasValue ? user.PhoneType.Value : PhoneNumberType.Mobile
+                    Type = user.PhoneType.HasValue ? user.PhoneType.Value : PhoneNumberType.Mobile,
+                    UserId = appUser.Id
                 });
 
                 if (string.IsNullOrWhiteSpace(user.Organization))
@@ -243,7 +242,7 @@ public class LoginController : ControllerBase
                 }
 
                 Organization? organization = null;
-                IEnumerable<Organization> organizationQuery = (await _organizationRepository.GetAllOrganizations()).Where(o => o.Name == user.Organization);
+                List<Organization> organizationQuery = (await _organizationRepository.GetAllOrganizations()).Where(o => o.Name == user.Organization).ToList();
 
                 if (!organizationQuery.Any())
                 {
@@ -280,7 +279,7 @@ public class LoginController : ControllerBase
                     }
                 }
 
-                if (organization == null || string.IsNullOrWhiteSpace(organization.Id))
+                if (organization == null || organization.Id == null || organization.Id == Guid.Empty)
                 {
                     throw new Exception("Failed to get or create organization.");
                 }
@@ -288,7 +287,7 @@ public class LoginController : ControllerBase
                 Email email = await _emailRepository.CreateEmail(new Email()
                 {
                     EmailAddress = user.Email,
-                    OrganizationId = organization.Id,
+                    OrganizationId = organization.Id.Value,
                     Organization = organization,
                     UserId = appUser.Id
                 });
@@ -296,7 +295,7 @@ public class LoginController : ControllerBase
                 PhoneNumber phoneNumber = await _phoneNumberRepository.CreatePhoneNumber(new PhoneNumber()
                 {
                     Number = user.PhoneNumber ?? string.Empty,
-                    OrganizationId = organization.Id,
+                    OrganizationId = organization.Id.Value,
                     Organization = organization,
                     CountryCode = user.CountryCode ?? "+1",
                     Extension = user.Extension,

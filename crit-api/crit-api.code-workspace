@@ -17,6 +17,9 @@
 		"scss.lint.validProperties": [
 			"composes"
 		],
-		"editor.trimAutoWhitespace": true
+		"editor.trimAutoWhitespace": true,
+		"debug.onTaskErrors": "abort",
+		"dotnet.backgroundAnalysis.analyzerDiagnosticsScope": "fullSolution",
+		"dotnet.backgroundAnalysis.compilerDiagnosticsScope": "fullSolution"
 	}
 }

@@ -1,61 +1,30 @@
-using System.Net;
 using System.Text;
+using CritApi.Logging;
+using CritApi.Middleware;
 using CritBusinessLogic;
 using CritBusinessLogic.Repositories;
 using CritBusinessLogic.RepositoryInterfaces;
 using CritDataAccess.Contexts;
-using CritDataAccess.Services;
 using CritDTO.Identity;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.CookiePolicy;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using MongoDB.Bson;
-using MongoDB.Bson.Serialization;
-using MongoDB.Bson.Serialization.Serializers;
+using Microsoft.EntityFrameworkCore.Proxies;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
-StringBuilder? connectionString = new StringBuilder().Append("mongodb://");
-string? userNameEnvVar = builder.Configuration.GetValue<string>("MongoDB:UserName");
-string? passwordEnvVar = builder.Configuration.GetValue<string>("MongoDB:Password");
+StringBuilder? connectionString = new StringBuilder();
+string? userNameEnvVar = builder.Configuration.GetValue<string>("PostgreSQL:Username");
+string? passwordEnvVar = builder.Configuration.GetValue<string>("PostgreSQL:Password");
 // Can be name of server or an IP address.
-string? serverName = builder.Configuration.GetValue<string>("MongoDB:ServerName");
-int? port = builder.Configuration.GetValue<int>("MongoDB:Port");
-string? database = builder.Configuration.GetValue<string>("MongoDB:Database");
+string? serverName = builder.Configuration.GetValue<string>("PostgreSQL:ServerName");
+int? port = builder.Configuration.GetValue<int>("PostgreSQL:Port");
+string? database = builder.Configuration.GetValue<string>("PostgreSQL:Database");
 
-if (userNameEnvVar != null && passwordEnvVar != null)
+if (serverName == null)
 {
-    connectionString.Append(Environment.GetEnvironmentVariable(userNameEnvVar))
-    .Append(":")
-    .Append(Environment.GetEnvironmentVariable(passwordEnvVar))
-    .Append("@");
-}
-else if (userNameEnvVar != null && passwordEnvVar == null)
-{
-    connectionString.Append(Environment.GetEnvironmentVariable(userNameEnvVar))
-    .Append("@");
-}
-else if (userNameEnvVar == null && passwordEnvVar != null)
-{
-    throw new Exception("Cannot connect to Mongo DB with a password and no user name.");
-}
-
-if (serverName != null)
-{
-    connectionString.Append(serverName);
-
-    if (port != null)
-    {
-        connectionString.Append(":")
-        .Append(port.ToString());
-    }
-}
-else
-{
-    throw new Exception("Cannot connect to Mongo DB with no server name or IP address.");
+    throw new Exception("Cannot connect to PostgreSQL DB with no server name or IP address.");
 }
 
 if (database == null)
@@ -63,12 +32,48 @@ if (database == null)
     throw new Exception("A database was not configured.");
 }
 
-BsonSerializer.RegisterSerializer(new GuidSerializer(GuidRepresentation.Standard));
+if (userNameEnvVar != null && passwordEnvVar != null)
+{
+    connectionString.Append(";Host=")
+    .Append(serverName)
+    .Append(port.HasValue ? ";Port=" : "")
+    .Append(port.HasValue ? port.Value.ToString() : "")
+    .Append(";Database=")
+    .Append(database)
+    .Append(";Username=")
+    .Append(Environment.GetEnvironmentVariable(userNameEnvVar, EnvironmentVariableTarget.User))
+    .Append(";Password=")
+    .Append(Environment.GetEnvironmentVariable(passwordEnvVar, EnvironmentVariableTarget.User));
+}
+else if (userNameEnvVar != null && passwordEnvVar == null)
+{
+    connectionString.Append(";Host=")
+    .Append(serverName)
+    .Append(port.HasValue ? ";Port=" : "")
+    .Append(port.HasValue ? port.Value.ToString() : "")
+    .Append(";Database=")
+    .Append(database)
+    .Append(";Username=")
+    .Append(Environment.GetEnvironmentVariable(userNameEnvVar, EnvironmentVariableTarget.User));
+}
+else if (userNameEnvVar == null && passwordEnvVar != null)
+{
+    throw new Exception("Cannot connect to PostgreSQL DB with a password and no user name.");
+}
+
+if (builder.Environment.IsDevelopment())
+{
+    connectionString.Append(";Include Error Detail=true");
+}
 
 builder.Services.AddDbContext<CritDbContext>(options =>
 {
-    options.UseMongoDB(connectionString.ToString(), database);
+    options.UseNpgsql(connectionString.ToString(), options =>
+    {
+        options.UseAdminDatabase("postgres");
+    });
     options.EnableSensitiveDataLogging();
+    options.UseLazyLoadingProxies();
 });
 
 builder.Services.AddIdentityCore<ApplicationUser>(setupAction =>
@@ -80,7 +85,8 @@ builder.Services.AddIdentityCore<ApplicationUser>(setupAction =>
     setupAction.Password.RequiredLength = 8;
 })
 .AddRoles<ApplicationRole>()
-.AddMongoDbStores<ApplicationUser, ApplicationRole, string>(connectionString.ToString(), database).AddSignInManager();
+.AddEntityFrameworkStores<CritDbContext>()
+.AddSignInManager();
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
@@ -126,12 +132,6 @@ builder.Services.AddCors(options =>
         });
 });
 
-builder.Services.AddScoped<ITenantDbContextService, TenantDbContextService>(x =>
-{
-    var userManager = x.GetService<UserManager<ApplicationUser>>() ?? throw new ArgumentNullException(nameof(UserManager<ApplicationUser>));
-    var critDbContext = x.GetService<CritDbContext>() ?? throw new ArgumentNullException(nameof(CritDbContext));
-    return new TenantDbContextService(connectionString.ToString(), userManager, critDbContext);
-});
 string? logPath = builder.Configuration.GetValue<string>("Logging:File:Path");
 
 if (logPath == null)
@@ -139,7 +139,7 @@ if (logPath == null)
     throw new Exception("Logging path was not configured.");
 }
 
-builder.Services.AddSingleton<CritApi.Logging.ILogger, CritApi.Logging.Logger>(x => new CritApi.Logging.Logger(logPath));
+builder.Services.AddSingleton<IFileLogger, FileLogger>(x => new FileLogger(logPath));
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IProjectsRepository, ProjectsRepository>();
@@ -159,12 +159,23 @@ builder.Services.AddSwaggerGen();
 
 WebApplication? app = builder.Build();
 
+using (IServiceScope? scope = app.Services.CreateScope())
+{
+    CritDbContext critDbContext = scope.ServiceProvider.GetRequiredService<CritDbContext>();
+
+    if (critDbContext.Database.GetPendingMigrations().Any())
+    {
+        critDbContext.ConfigureDefault();
+    }
+}
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
+app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
 app.UseCors("CorsPolicy");
 app.UseHttpsRedirection();
 app.UseRouting();

@@ -1,40 +1,33 @@
 using CritBusinessLogic.RepositoryInterfaces;
 using CritDataAccess.Contexts;
-using CritDataAccess.Services;
 using CritDTO.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
 namespace CritBusinessLogic.Repositories;
 
 public class StatusRepository : IStatusRepository
 {
-    private TenantDbContext? _tenantDbContext = null;
-    public StatusRepository(ITenantDbContextService tenantDbContextService, IHttpContextAccessor httpContextAccessor)
+    private readonly CritDbContext _critDbContext;
+    public StatusRepository(CritDbContext critDbContext)
     {
-        if (httpContextAccessor.HttpContext?.User?.Identity?.IsAuthenticated == true)
-        {
-            Task<TenantDbContext> tenantDbContextTask = tenantDbContextService.GetAuthenticatedTenantDb(httpContextAccessor.HttpContext.User);
-            tenantDbContextTask.Wait();
-            _tenantDbContext = tenantDbContextTask.Result;
-        }
+        _critDbContext = critDbContext;
     }
 
-    public async Task<List<Status>> GetAllStatuses(string projectId)
+    public async Task<List<Status>> GetAllStatuses(Guid projectId)
     {
         try
         {
-            if (_tenantDbContext == null)
+            if (_critDbContext == null)
             {
-                throw new InvalidOperationException("TenantDbContext is not initialized.");
+                throw new InvalidOperationException("CritDbContext is not initialized.");
             }
 
-            if (string.IsNullOrEmpty(projectId))
+            if (projectId == Guid.Empty)
             {
                 throw new ArgumentException("Project ID cannot be null or empty.", nameof(projectId));
             }
 
-            List<Status> statuses = await _tenantDbContext.Statuses.AsNoTracking().Where(status => status.ProjectId == projectId).ToListAsync();
+            List<Status> statuses = await _critDbContext.Statuses.AsNoTracking().Where(status => status.ProjectId == projectId).ToListAsync();
             return statuses;
         }
         catch (Exception ex)
@@ -43,21 +36,21 @@ public class StatusRepository : IStatusRepository
         }
     }
 
-    public async Task<Status> GetStatus(string statusId)
+    public async Task<Status> GetStatus(Guid statusId)
     {
         try
         {
-            if (_tenantDbContext == null)
+            if (_critDbContext == null)
             {
-                throw new InvalidOperationException("TenantDbContext is not initialized.");
+                throw new InvalidOperationException("CritDbContext is not initialized.");
             }
 
-            if (string.IsNullOrEmpty(statusId))
+            if (statusId == Guid.Empty)
             {
                 throw new ArgumentException("Status ID cannot be null or empty.", nameof(statusId));
             }
 
-            IQueryable<Status> status = _tenantDbContext.Statuses.AsNoTracking().Where(status => status.Id == statusId);
+            List<Status> status = await _critDbContext.Statuses.AsNoTracking().Where(status => status.Id == statusId).ToListAsync();
             if (!status.Any())
             {
                 throw new KeyNotFoundException($"Status with ID {statusId} not found.");
@@ -75,9 +68,9 @@ public class StatusRepository : IStatusRepository
     {
         try
         {
-            if (_tenantDbContext == null)
+            if (_critDbContext == null)
             {
-                throw new InvalidOperationException("TenantDbContext is not initialized.");
+                throw new InvalidOperationException("CritDbContext is not initialized.");
             }
 
             if (status == null)
@@ -85,8 +78,14 @@ public class StatusRepository : IStatusRepository
                 throw new ArgumentNullException(nameof(status), "Status cannot be null.");
             }
 
-            await _tenantDbContext.Statuses.AddAsync(status);
-            await _tenantDbContext.SaveChangesAsync();
+            await _critDbContext.Statuses.AddAsync(status);
+            int savedChanges = await _critDbContext.SaveChangesAsync();
+
+            if (savedChanges <= 0)
+            {
+                throw new Exception("Failed to create status.");
+            }
+
             return status;
         }
         catch (Exception ex)
@@ -99,9 +98,9 @@ public class StatusRepository : IStatusRepository
     {
         try
         {
-            if (_tenantDbContext == null)
+            if (_critDbContext == null)
             {
-                throw new InvalidOperationException("TenantDbContext is not initialized.");
+                throw new InvalidOperationException("CritDbContext is not initialized.");
             }
 
             if (status == null)
@@ -109,8 +108,14 @@ public class StatusRepository : IStatusRepository
                 throw new ArgumentNullException(nameof(status), "Status cannot be null.");
             }
 
-            _tenantDbContext.Statuses.Update(status);
-            await _tenantDbContext.SaveChangesAsync();
+            _critDbContext.Statuses.Update(status);
+            int savedChanges = await _critDbContext.SaveChangesAsync();
+
+            if (savedChanges <= 0)
+            {
+                throw new Exception("Failed to update status.");
+            }
+
             return status;
         }
         catch (Exception ex)
@@ -119,43 +124,32 @@ public class StatusRepository : IStatusRepository
         }
     }
 
-    public async Task DeleteStatus(string statusId)
+    public async Task DeleteStatus(Guid statusId)
     {
         try
         {
-            if (_tenantDbContext == null)
+            if (_critDbContext == null)
             {
-                throw new InvalidOperationException("TenantDbContext is not initialized.");
+                throw new InvalidOperationException("CritDbContext is not initialized.");
             }
 
-            if (string.IsNullOrEmpty(statusId))
+            if (statusId == Guid.Empty)
             {
                 throw new ArgumentException("Status ID cannot be null or empty.", nameof(statusId));
             }
 
             Status status = await GetStatus(statusId);
-            _tenantDbContext.Statuses.Remove(status);
-            await _tenantDbContext.SaveChangesAsync();
+            _critDbContext.Statuses.Remove(status);
+            int savedChanges = await _critDbContext.SaveChangesAsync();
+
+            if (savedChanges <= 0)
+            {
+                throw new Exception("Failed to delete status.");
+            }
         }
         catch (Exception ex)
         {
             throw new Exception($"Error deleting status with ID {statusId}.", ex);
-        }
-    }
-
-    public void Dispose()
-    {
-        if (_tenantDbContext != null)
-        {
-            _tenantDbContext?.Dispose();
-        }
-    }
-
-    public async ValueTask DisposeAsync()
-    {
-        if (_tenantDbContext != null)
-        {
-            await _tenantDbContext.DisposeAsync();
         }
     }
 }

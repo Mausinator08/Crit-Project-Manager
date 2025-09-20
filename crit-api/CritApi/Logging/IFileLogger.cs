@@ -1,6 +1,6 @@
 namespace CritApi.Logging;
 
-public interface ILogger
+public interface IFileLogger
 {
     string FilePath { get; }
     void LogInfo(string formattedMessage, params object?[] args);

@@ -1,40 +1,33 @@
 using CritBusinessLogic.RepositoryInterfaces;
 using CritDataAccess.Contexts;
-using CritDataAccess.Services;
 using CritDTO.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
 namespace CritBusinessLogic.Repositories;
 
 public class CustomFieldRepository : ICustomFieldRepository
 {
-    private TenantDbContext? _tenantDbContext = null;
-    public CustomFieldRepository(ITenantDbContextService tenantDbContextService, IHttpContextAccessor httpContextAccessor)
+    private readonly CritDbContext _critDbContext;
+    public CustomFieldRepository(CritDbContext critDbContext)
     {
-        if (httpContextAccessor.HttpContext?.User?.Identity?.IsAuthenticated == true)
-        {
-            Task<TenantDbContext> tenantDbContextTask = tenantDbContextService.GetAuthenticatedTenantDb(httpContextAccessor.HttpContext.User);
-            tenantDbContextTask.Wait();
-            _tenantDbContext = tenantDbContextTask.Result;
-        }
+        _critDbContext = critDbContext;
     }
 
-    public async Task<List<CustomField>> GetAllCustomFields(string taskId)
+    public async Task<List<CustomField>> GetAllCustomFields(Guid taskId)
     {
         try
         {
-            if (_tenantDbContext == null)
+            if (_critDbContext == null)
             {
-                throw new InvalidOperationException("TenantDbContext is not initialized.");
+                throw new InvalidOperationException("CritDbContext is not initialized.");
             }
 
-            if (string.IsNullOrEmpty(taskId))
+            if (taskId == Guid.Empty)
             {
                 throw new ArgumentException("Task ID cannot be null or empty.", nameof(taskId));
             }
 
-            List<CustomField> customFields = await _tenantDbContext.CustomFields.AsNoTracking().Where(status => status.TaskId == taskId).ToListAsync();
+            List<CustomField> customFields = await _critDbContext.CustomFields.AsNoTracking().Where(status => status.TaskId == taskId).ToListAsync();
             return customFields;
         }
         catch (Exception ex)
@@ -43,21 +36,21 @@ public class CustomFieldRepository : ICustomFieldRepository
         }
     }
 
-    public async Task<CustomField> GetCustomField(string customFieldId)
+    public async Task<CustomField> GetCustomField(Guid customFieldId)
     {
         try
         {
-            if (_tenantDbContext == null)
+            if (_critDbContext == null)
             {
-                throw new InvalidOperationException("TenantDbContext is not initialized.");
+                throw new InvalidOperationException("CritDbContext is not initialized.");
             }
 
-            if (string.IsNullOrEmpty(customFieldId))
+            if (customFieldId == Guid.Empty)
             {
                 throw new ArgumentException("Custom Field ID cannot be null or empty.", nameof(customFieldId));
             }
 
-            IQueryable<CustomField> customField = _tenantDbContext.CustomFields.AsNoTracking().Where(customFieldType => customFieldType.Id == customFieldId);
+            List<CustomField> customField = await _critDbContext.CustomFields.AsNoTracking().Where(customFieldType => customFieldType.Id == customFieldId).ToListAsync();
             if (!customField.Any())
             {
                 throw new KeyNotFoundException($"Custom Field with ID {customFieldId} not found.");
@@ -75,9 +68,9 @@ public class CustomFieldRepository : ICustomFieldRepository
     {
         try
         {
-            if (_tenantDbContext == null)
+            if (_critDbContext == null)
             {
-                throw new InvalidOperationException("TenantDbContext is not initialized.");
+                throw new InvalidOperationException("CritDbContext is not initialized.");
             }
 
             if (customField == null)
@@ -85,8 +78,8 @@ public class CustomFieldRepository : ICustomFieldRepository
                 throw new ArgumentNullException(nameof(customField), "Custom Field cannot be null.");
             }
 
-            await _tenantDbContext.CustomFields.AddAsync(customField);
-            await _tenantDbContext.SaveChangesAsync();
+            await _critDbContext.CustomFields.AddAsync(customField);
+            await _critDbContext.SaveChangesAsync();
             return customField;
         }
         catch (Exception ex)
@@ -99,9 +92,9 @@ public class CustomFieldRepository : ICustomFieldRepository
     {
         try
         {
-            if (_tenantDbContext == null)
+            if (_critDbContext == null)
             {
-                throw new InvalidOperationException("TenantDbContext is not initialized.");
+                throw new InvalidOperationException("CritDbContext is not initialized.");
             }
 
             if (customField == null)
@@ -109,8 +102,8 @@ public class CustomFieldRepository : ICustomFieldRepository
                 throw new ArgumentNullException(nameof(customField), "Custom Field cannot be null.");
             }
 
-            _tenantDbContext.CustomFields.Update(customField);
-            await _tenantDbContext.SaveChangesAsync();
+            _critDbContext.CustomFields.Update(customField);
+            await _critDbContext.SaveChangesAsync();
             return customField;
         }
         catch (Exception ex)
@@ -119,43 +112,27 @@ public class CustomFieldRepository : ICustomFieldRepository
         }
     }
 
-    public async Task DeleteCustomField(string customFieldId)
+    public async Task DeleteCustomField(Guid customFieldId)
     {
         try
         {
-            if (_tenantDbContext == null)
+            if (_critDbContext == null)
             {
-                throw new InvalidOperationException("TenantDbContext is not initialized.");
+                throw new InvalidOperationException("CritDbContext is not initialized.");
             }
 
-            if (string.IsNullOrEmpty(customFieldId))
+            if (customFieldId == Guid.Empty)
             {
                 throw new ArgumentException("Custom Field ID cannot be null or empty.", nameof(customFieldId));
             }
 
             CustomField customField = await GetCustomField(customFieldId);
-            _tenantDbContext.CustomFields.Remove(customField);
-            await _tenantDbContext.SaveChangesAsync();
+            _critDbContext.CustomFields.Remove(customField);
+            await _critDbContext.SaveChangesAsync();
         }
         catch (Exception ex)
         {
             throw new Exception($"Error deleting Custom Field with ID {customFieldId}.", ex);
-        }
-    }
-
-    public void Dispose()
-    {
-        if (_tenantDbContext != null)
-        {
-            _tenantDbContext?.Dispose();
-        }
-    }
-
-    public async ValueTask DisposeAsync()
-    {
-        if (_tenantDbContext != null)
-        {
-            await _tenantDbContext.DisposeAsync();
         }
     }
 }

@@ -76,8 +76,8 @@ public class UserRepository : IUserRepository
                 throw new ArgumentNullException(nameof(applicationUser));
             }
 
-            IQueryable<Organization> organizationsMemberQuery = _critDbContext.Organizations.AsNoTracking().Where(o => o.MemberUserIds.Contains(applicationUser.Id));
-            IQueryable<Organization> organizationsAdminQuery = _critDbContext.Organizations.AsNoTracking().Where(o => o.AdminUserIds.Contains(applicationUser.Id));
+            List<Organization> organizationsMemberQuery = await _critDbContext.Organizations.AsNoTracking().Where(o => o.OrganizationMembers.Any(ou => ou.MemberUserId == applicationUser.Id)).ToListAsync();
+            List<Organization> organizationsAdminQuery = await _critDbContext.Organizations.AsNoTracking().Where(o => o.OrganizationAdmins.Any(ou => ou.AdminUserId == applicationUser.Id)).ToListAsync();
 
             Organization? organization = null;
 

@@ -10,10 +10,10 @@ namespace CritApi.Controllers;
 [Authorize]
 public class CustomFieldTypeController : ControllerBase
 {
-    private readonly Logging.ILogger _logger;
+    private readonly Logging.IFileLogger _logger;
     private readonly ICustomFieldTypeRepository _customFieldTypeRepository;
 
-    public CustomFieldTypeController(Logging.ILogger logger, ICustomFieldTypeRepository customFieldTypeRepository)
+    public CustomFieldTypeController(Logging.IFileLogger logger, ICustomFieldTypeRepository customFieldTypeRepository)
     {
         _logger = logger;
         _customFieldTypeRepository = customFieldTypeRepository;
@@ -23,7 +23,7 @@ public class CustomFieldTypeController : ControllerBase
     [Route("GetAllCustomFieldTypes/{projectId}")]
     [ProducesResponseType<List<CustomFieldType>>(StatusCodes.Status200OK)]
     [ProducesErrorResponseType(typeof(string))]
-    public async Task<IActionResult> GetAllCustomFieldTypes([FromRoute] string projectId)
+    public async Task<IActionResult> GetAllCustomFieldTypes([FromRoute] Guid projectId)
     {
         try
         {
@@ -40,7 +40,7 @@ public class CustomFieldTypeController : ControllerBase
     [Route("{customFieldTypeId}")]
     [ProducesResponseType<CustomFieldType>(StatusCodes.Status200OK)]
     [ProducesErrorResponseType(typeof(string))]
-    public async Task<IActionResult> GetCustomFieldType([FromRoute] string customFieldTypeId)
+    public async Task<IActionResult> GetCustomFieldType([FromRoute] Guid customFieldTypeId)
     {
         try
         {
@@ -91,7 +91,7 @@ public class CustomFieldTypeController : ControllerBase
     [Route("{customFieldTypeId}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesErrorResponseType(typeof(string))]
-    public async Task<IActionResult> DeleteCustomFieldType([FromRoute] string customFieldTypeId)
+    public async Task<IActionResult> DeleteCustomFieldType([FromRoute] Guid customFieldTypeId)
     {
         try
         {

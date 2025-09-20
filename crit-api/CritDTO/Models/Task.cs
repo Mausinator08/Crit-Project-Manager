@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using CritDTO.Models.BaseModels;
 
 namespace CritDTO.Models;
 
@@ -6,42 +7,52 @@ public class ProjectTask : AuditInformation
 {
     public ProjectTask()
     {
-        ProjectId = string.Empty;
+        ProjectId = Guid.Empty;
         SubTasks = new List<ProjectTask>();
         CustomFields = new List<CustomField>();
-        DateTime now = DateTime.Now;
+        Comments = new List<Comment>();
+        DateTime now = DateTime.UtcNow;
         DateCreated = now;
         DateUpdated = now;
     }
 
     [JsonConstructor]
-    public ProjectTask(string projectId, string createdByUserId)
+    public ProjectTask(Guid projectId, Guid createdByUserId)
     {
         ProjectId = projectId;
         SubTasks = new List<ProjectTask>();
         CustomFields = new List<CustomField>();
-        DateTime now = DateTime.Now;
+        Comments = new List<Comment>();
+        DateTime now = DateTime.UtcNow;
         DateCreated = now;
         DateUpdated = now;
         CreatedByUserId = createdByUserId;
         UpdatedByUserId = createdByUserId;
     }
 
-    public string? Id { get; set; }
+    public Guid? Id { get; set; }
     public string? Title { get; set; }
     public string? Details { get; set; }
-    public string ProjectId { get; set; }
-    public string? AssignedUserId { get; set; }
-    public string? StatusId { get; set; }
-    public string? PriorityId { get; set; }
+    public Guid ProjectId { get; set; }
+    public Guid? AssignedUserId { get; set; }
+    public Guid? StatusId { get; set; }
+    public Guid? PriorityId { get; set; }
     public int? Complexity { get; set; }
     public DateTime? DueDate { get; set; }
-    public string? ParentTaskId { get; set; }
+    public Guid? ParentTaskId { get; set; }
 
-    public List<CustomField> CustomFields { get; set; }
-    public Project? Project { get; set; }
-    public Status? Status { get; set; }
-    public Priority? Priority { get; set; }
-    public List<ProjectTask> SubTasks { get; set; }
-    public ProjectTask? ParentTask { get; set; }
+    [JsonIgnore]
+    public virtual List<CustomField> CustomFields { get; set; }
+    [JsonIgnore]
+    public virtual Project? Project { get; set; }
+    [JsonIgnore]
+    public virtual Status? Status { get; set; }
+    [JsonIgnore]
+    public virtual Priority? Priority { get; set; }
+    [JsonIgnore]
+    public virtual List<ProjectTask> SubTasks { get; set; }
+    [JsonIgnore]
+    public virtual ProjectTask? ParentTask { get; set; }
+    [JsonIgnore]
+    public virtual List<Comment> Comments { get; set; }
 }

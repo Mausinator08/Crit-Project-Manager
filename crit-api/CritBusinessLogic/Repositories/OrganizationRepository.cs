@@ -1,37 +1,21 @@
 using CritBusinessLogic.RepositoryInterfaces;
 using CritDataAccess.Contexts;
-using CritDataAccess.Services;
 using CritDTO.Identity;
 using CritDTO.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace CritBusinessLogic.Repositories;
 
-public class OrganizationRepository : IDisposable, IAsyncDisposable, IOrganizationRepository
+public class OrganizationRepository : IOrganizationRepository
 {
     private readonly CritDbContext _critDbContext;
-    private TenantDbContext? _tenantDbContext = null;
-    private readonly ITenantDbContextService _tenantDbContextService;
     private readonly IUserRepository _userRepository;
-    private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IProjectsRepository _projectsRepository;
 
-    public OrganizationRepository(CritDbContext critDbContext, ITenantDbContextService tenantDbContextService, IUserRepository userRepository, IHttpContextAccessor httpContextAccessor, IProjectsRepository projectsRepository)
+    public OrganizationRepository(CritDbContext critDbContext, IUserRepository userRepository, IProjectsRepository projectsRepository)
     {
         _critDbContext = critDbContext;
-        _tenantDbContextService = tenantDbContextService;
-        _httpContextAccessor = httpContextAccessor;
-        if (_httpContextAccessor.HttpContext?.User?.Identity?.IsAuthenticated == true)
-        {
-            if (_critDbContext.Organizations.Any())
-            {
-                Task<TenantDbContext> tenantDbContextTask = tenantDbContextService.GetAuthenticatedTenantDb(_httpContextAccessor.HttpContext.User);
-                tenantDbContextTask.Wait();
-                _tenantDbContext = tenantDbContextTask.Result;
-            }
-        }
-
         _userRepository = userRepository;
         _projectsRepository = projectsRepository;
     }
@@ -55,15 +39,33 @@ public class OrganizationRepository : IDisposable, IAsyncDisposable, IOrganizati
                 throw new InvalidOperationException($"An organization with the name '{organization.Name}' already exists.");
             }
 
-            _critDbContext.Organizations.Add(organization);
-            await _critDbContext.SaveChangesAsync();
-
-            if (_httpContextAccessor.HttpContext == null)
+            if (organization.OwnerUserId == Guid.Empty)
             {
-                throw new UnauthorizedAccessException("User is not logged in.");
+                throw new Exception("All organizations must have an owner.");
             }
 
-            _tenantDbContext = await _tenantDbContextService.GetAuthenticatedTenantDb(_httpContextAccessor.HttpContext.User);
+            EntityEntry<Organization> savedOrganization = _critDbContext.Organizations.Add(organization);
+
+            if (savedOrganization == null || savedOrganization.Entity == null)
+            {
+                throw new Exception($"The organization {organization.Name} did not save correctly.");
+            }
+
+            if (savedOrganization.Entity.Id == null || savedOrganization.Entity.Id == Guid.Empty)
+            {
+                throw new Exception($"The project {organization.Name} did not generate the Id correctly.");
+            }
+
+            _critDbContext.OrganizationAdmins.Add(new OrganizationAdmin(savedOrganization.Entity.Id.Value, organization.OwnerUserId));
+            _critDbContext.OrganizationMembers.Add(new OrganizationMember(savedOrganization.Entity.Id.Value, organization.OwnerUserId));
+            _critDbContext.OrganizationAffiliates.Add(new OrganizationAffiliate(savedOrganization.Entity.Id.Value, organization.OwnerUserId));
+
+            int savedChanges = await _critDbContext.SaveChangesAsync();
+
+            if (savedChanges <= 0)
+            {
+                throw new Exception("Failed to save organization.");
+            }
 
             return organization;
         }
@@ -92,16 +94,16 @@ public class OrganizationRepository : IDisposable, IAsyncDisposable, IOrganizati
 
             if (organization != null && applicationUser != null)
             {
-                IQueryable<Organization> organizationsQuery = _critDbContext.Organizations.AsNoTracking().AsNoTracking().Where(o =>
+                List<Organization> organizationsQuery = await _critDbContext.Organizations.AsNoTracking().Where(o =>
                 o.Id == organization.Id &&
-                o.AffiliatedUserIds.Contains(applicationUser.Id));
+                o.OrganizationAffiliates.Any(ou => ou.AffiliateUserId == applicationUser.Id)).ToListAsync();
 
                 if (organizationsQuery.Any())
                 {
-                    return await organizationsQuery.ToListAsync();
+                    return organizationsQuery;
                 }
             }
-            else if (organization == null)
+            else if (organization == null || organization.Id == null || organization.Id == Guid.Empty)
             {
                 throw new UnauthorizedAccessException("User is not a member of any organization.");
             }
@@ -119,7 +121,7 @@ public class OrganizationRepository : IDisposable, IAsyncDisposable, IOrganizati
         }
     }
 
-    public async Task<List<Organization>> GetAllOrganizationsForProjectId(string projectId)
+    public async Task<List<Organization>> GetAllOrganizationsForProjectId(Guid projectId)
     {
         try
         {
@@ -128,14 +130,14 @@ public class OrganizationRepository : IDisposable, IAsyncDisposable, IOrganizati
                 throw new NullReferenceException("CritDbContext is null.");
             }
 
-            IQueryable<Organization> organizationsQuery = _critDbContext.Organizations.AsNoTracking().AsNoTracking().Where(o => o.ProjectIds.Contains(projectId));
+            List<Organization> organizationsQuery = await _critDbContext.Organizations.AsNoTracking().Where(o => o.Projects.Any(p => p.Id == projectId)).ToListAsync();
 
             if (!organizationsQuery.Any())
             {
                 throw new InvalidOperationException($"No organizations found for project with ID {projectId}.");
             }
 
-            return await organizationsQuery.ToListAsync();
+            return organizationsQuery;
         }
         catch (Exception ex)
         {
@@ -143,7 +145,7 @@ public class OrganizationRepository : IDisposable, IAsyncDisposable, IOrganizati
         }
     }
 
-    public async Task<List<Organization>> GetAllOrganizationsForUserId(string userId)
+    public async Task<List<Organization>> GetAllOrganizationsForUserId(Guid userId)
     {
         try
         {
@@ -152,17 +154,17 @@ public class OrganizationRepository : IDisposable, IAsyncDisposable, IOrganizati
                 throw new NullReferenceException("CritDbContext is null.");
             }
 
-            IQueryable<Organization> organizationsQuery = _critDbContext.Organizations.AsNoTracking().Where(o =>
-            o.AdminUserIds.Contains(userId) ||
-            o.MemberUserIds.Contains(userId) ||
-            o.AffiliatedUserIds.Contains(userId));
+            List<Organization> organizationsQuery = await _critDbContext.Organizations.AsNoTracking().Where(o =>
+            o.OrganizationAdmins.Any(ou => ou.AdminUserId == userId) ||
+            o.OrganizationMembers.Any(ou => ou.MemberUserId == userId) ||
+            o.OrganizationAffiliates.Any(ou => ou.AffiliateUserId == userId)).ToListAsync();
 
             if (!organizationsQuery.Any())
             {
                 throw new InvalidOperationException($"No organizations found for user with ID {userId}.");
             }
 
-            return await organizationsQuery.ToListAsync();
+            return organizationsQuery;
         }
         catch (Exception ex)
         {
@@ -170,24 +172,26 @@ public class OrganizationRepository : IDisposable, IAsyncDisposable, IOrganizati
         }
     }
 
-    public async Task<Organization> GetOrganizationByUserId(string userId)
+    public async Task<Organization> GetOrganizationByUserId(Guid userId)
     {
         if (_critDbContext == null)
         {
             throw new NullReferenceException("CritDbContext is null.");
         }
 
-        IQueryable<Organization> organizationsQuery = _critDbContext.Organizations.AsNoTracking().Where(o => o.AdminUserIds.Contains(userId) || o.MemberUserIds.Contains(userId));
+        List<Organization> organizationsQuery = await _critDbContext.Organizations.AsNoTracking().Where(o =>
+        o.OrganizationAdmins.Any(ou => ou.AdminUserId == userId) ||
+        o.OrganizationMembers.Any(ou => ou.MemberUserId == userId)).ToListAsync();
 
         if (!organizationsQuery.Any())
         {
             throw new InvalidOperationException($"User with ID {userId} is not a member of any organization.");
         }
 
-        return await organizationsQuery.FirstAsync();
+        return organizationsQuery.First();
     }
 
-    public async Task<Organization> GetOrganization(string organizationId)
+    public async Task<Organization> GetOrganization(Guid organizationId)
     {
         try
         {
@@ -200,13 +204,13 @@ public class OrganizationRepository : IDisposable, IAsyncDisposable, IOrganizati
 
             if (applicationUser != null)
             {
-                IQueryable<Organization> organizationsQuery = _critDbContext.Organizations.AsNoTracking().Where(o =>
+                List<Organization> organizationsQuery = await _critDbContext.Organizations.AsNoTracking().Where(o =>
                 o.Id == organizationId &&
-                o.AffiliatedUserIds.Contains(applicationUser.Id));
+                o.OrganizationAffiliates.Any(ou => ou.AffiliateUserId == applicationUser.Id)).ToListAsync();
 
                 if (organizationsQuery.Any())
                 {
-                    return await organizationsQuery.FirstAsync();
+                    return organizationsQuery.First();
                 }
 
                 throw new InvalidOperationException($"User with ID {applicationUser.Id} is not a member or affilate of organization with ID {organizationId}.");
@@ -246,17 +250,37 @@ public class OrganizationRepository : IDisposable, IAsyncDisposable, IOrganizati
                 throw new InvalidOperationException($"An organization with the name '{organization.Name}' already exists.");
             }
 
-            IQueryable<Organization> organizationsQuery = _critDbContext.Organizations.AsNoTracking().Where(o =>
-            o.AdminUserIds.Where(a => organization.AdminUserIds.Contains(a)).Any() ||
-            o.MemberUserIds.Where(m => organization.MemberUserIds.Contains(m)).Any());
+            List<Organization> organizationsQuery = _critDbContext.Organizations.AsNoTracking().AsEnumerable().Where(o =>
+            o.OrganizationAdmins.Where(a => organization.OrganizationAdmins.Any(ou => ou.AdminUserId == a.AdminUserId)).Any() ||
+            o.OrganizationMembers.Where(m => organization.OrganizationMembers.Any(ou => ou.MemberUserId == m.MemberUserId)).Any()).ToList();
 
             if (organizationsQuery.Any())
             {
-                throw new InvalidOperationException($"Admin and/or member user for organization {organization.Id} is already in another oganization.");
+                throw new InvalidOperationException($"Admin and/or member user for organization {organization.Id} is already in another oganization. Consider adding the user as an affiliate.");
             }
 
-            _critDbContext.Organizations.Add(organization);
-            await _critDbContext.SaveChangesAsync();
+            EntityEntry<Organization> savedOrganization = _critDbContext.Organizations.Add(organization);
+
+            if (savedOrganization == null || savedOrganization.Entity == null)
+            {
+                throw new Exception($"The organization {organization.Name} did not save correctly.");
+            }
+
+            if (savedOrganization.Entity.Id == null || savedOrganization.Entity.Id == Guid.Empty)
+            {
+                throw new Exception($"The project {organization.Name} did not generate the Id correctly.");
+            }
+
+            _critDbContext.OrganizationAdmins.Add(new OrganizationAdmin(savedOrganization.Entity.Id.Value, organization.OwnerUserId));
+            _critDbContext.OrganizationMembers.Add(new OrganizationMember(savedOrganization.Entity.Id.Value, organization.OwnerUserId));
+            _critDbContext.OrganizationAffiliates.Add(new OrganizationAffiliate(savedOrganization.Entity.Id.Value, organization.OwnerUserId));
+
+            int savedChanges = await _critDbContext.SaveChangesAsync();
+
+            if (savedChanges <= 0)
+            {
+                throw new Exception("Failed to save organization.");
+            }
 
             return organization;
         }
@@ -271,11 +295,11 @@ public class OrganizationRepository : IDisposable, IAsyncDisposable, IOrganizati
         }
     }
 
-    public async System.Threading.Tasks.Task UpdateOrganization(Organization organization)
+    public async Task UpdateOrganization(Organization organization)
     {
         try
         {
-            if (organization == null)
+            if (organization == null || organization.Id == null || organization.Id == Guid.Empty)
             {
                 throw new ArgumentNullException(nameof(organization), "Organization cannot be null.");
             }
@@ -285,14 +309,14 @@ public class OrganizationRepository : IDisposable, IAsyncDisposable, IOrganizati
                 throw new ArgumentException("Organization name cannot be empty.", nameof(organization.Name));
             }
 
-            IQueryable<Organization> organizationsQuery = _critDbContext.Organizations.AsNoTracking().Where(o =>
+            List<Organization> organizationsQuery = _critDbContext.Organizations.AsNoTracking().AsEnumerable().Where(o =>
             o.Id == organization.Id &&
-            o.AdminUserIds.Where(a => organization.AdminUserIds.Contains(a)).Any() ||
-            o.MemberUserIds.Where(m => organization.MemberUserIds.Contains(m)).Any());
+            o.OrganizationAdmins.Where(a => organization.OrganizationAdmins.Any(ou => ou.AdminUserId == a.AdminUserId)).Any() ||
+            o.OrganizationMembers.Where(m => organization.OrganizationMembers.Any(ou => ou.MemberUserId == m.MemberUserId)).Any()).ToList();
 
             if (organizationsQuery.Any())
             {
-                throw new InvalidOperationException($"Admin and/or member user for organization {organization.Id} is already in another oganization.");
+                throw new InvalidOperationException($"Admin and/or member user for organization {organization.Id} is already in another oganization. Consider adding the user as an affiliate.");
             }
 
             _critDbContext.Organizations.Update(organization);
@@ -309,7 +333,7 @@ public class OrganizationRepository : IDisposable, IAsyncDisposable, IOrganizati
         }
     }
 
-    public async System.Threading.Tasks.Task DeleteOrganization(string organizationId)
+    public async Task DeleteOrganization(Guid organizationId)
     {
         try
         {
@@ -325,26 +349,26 @@ public class OrganizationRepository : IDisposable, IAsyncDisposable, IOrganizati
                 throw new UnauthorizedAccessException("User is not logged in.");
             }
 
-            IQueryable<Organization> organizationsQuery = _critDbContext.Organizations.AsNoTracking().Where(o => o.Id == organizationId && o.AdminUserIds.Contains(applicationUser.Id));
+            List<Organization> organizationsQuery = await _critDbContext.Organizations.AsNoTracking().Where(o => o.Id == organizationId && o.OrganizationAdmins.Any(ou => ou.AdminUserId == applicationUser.Id)).ToListAsync();
 
             if (!organizationsQuery.Any())
             {
                 throw new InvalidOperationException($"User with ID {applicationUser.Id} is not an administrator of organization with ID {organizationId}.");
             }
 
-            Organization organization = await organizationsQuery.FirstAsync();
+            Organization organization = organizationsQuery.First();
 
-            if (organization == null)
+            if (organization == null || organization.Id == null || organization.Id == Guid.Empty)
             {
                 throw new InvalidOperationException($"Organization with ID {organizationId} does not exist.");
             }
 
-            if (_tenantDbContext == null)
+            if (_critDbContext == null)
             {
-                throw new NullReferenceException("TenantDbContext is null.");
+                throw new NullReferenceException("CritDbContext is null.");
             }
 
-            IQueryable<Project> projectsQuery = _tenantDbContext.Projects.AsNoTracking().Where(p => p.OwningOrganizationId == organizationId);
+            List<Project> projectsQuery = await _critDbContext.Projects.AsNoTracking().Where(p => p.OwningOrganizationId == organizationId).ToListAsync();
 
             if (projectsQuery.Any())
             {
@@ -362,22 +386,6 @@ public class OrganizationRepository : IDisposable, IAsyncDisposable, IOrganizati
             }
 
             throw new Exception($"Error deleting organization with ID {organizationId}.", ex);
-        }
-    }
-
-    public void Dispose()
-    {
-        if (_tenantDbContext != null)
-        {
-            _tenantDbContext?.Dispose();
-        }
-    }
-
-    public async ValueTask DisposeAsync()
-    {
-        if (_tenantDbContext != null)
-        {
-            await _tenantDbContext.DisposeAsync();
         }
     }
 }

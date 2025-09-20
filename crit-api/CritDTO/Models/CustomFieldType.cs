@@ -1,8 +1,10 @@
+using System.Text.Json.Serialization;
+
 namespace CritDTO.Models;
 
 public class CustomFieldType
 {
-    public CustomFieldType(string name, string projectId)
+    public CustomFieldType(string name, Guid projectId)
     {
         Name = name;
         ProjectId = projectId;
@@ -12,14 +14,19 @@ public class CustomFieldType
     private CustomFieldType()
     {
         Name = string.Empty;
-        ProjectId = string.Empty;
+        ProjectId = Guid.Empty;
         CustomFields = new List<CustomField>();
     }
 
-    public string? Id { get; set; }
+    public Guid? Id { get; set; }
     public string Name { get; set; }
-    public string ProjectId { get; set; }
+    public Guid ProjectId { get; set; }
+    public Guid? HiddenProjectId { get; set; }
 
-    public Project? Project { get; set; }
-    public List<CustomField> CustomFields { get; set; }
+    [JsonIgnore]
+    public virtual Project? Project { get; set; }
+    [JsonIgnore]
+    public virtual Project? HiddenProject { get; set; }
+    [JsonIgnore]
+    public virtual List<CustomField> CustomFields { get; set; }
 }

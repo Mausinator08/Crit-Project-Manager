@@ -1,8 +1,10 @@
+using System.Text.Json.Serialization;
+
 namespace CritDTO.Models;
 
 public class Priority
 {
-    public Priority(string name, string? backgroundColor, string? color, string projectId)
+    public Priority(string name, string? backgroundColor, string? color, Guid projectId)
     {
         Name = name;
         BackgroundColor = backgroundColor;
@@ -15,16 +17,18 @@ public class Priority
     {
         Name = string.Empty;
         Tasks = new List<ProjectTask>();
-        ProjectId = string.Empty;
+        ProjectId = Guid.Empty;
     }
 
-    public string? Id { get; set; }
+    public Guid? Id { get; set; }
     public string Name { get; set; }
     public string? BackgroundColor { get; set; }
     public string? Color { get; set; }
-    public string ProjectId { get; set; }
-    public string? TaskId { get; set; }
+    public Guid ProjectId { get; set; }
+    public Guid? TaskId { get; set; }
 
-    public Project? Project { get; set; }
-    public List<ProjectTask> Tasks { get; set; }
+    [JsonIgnore]
+    public virtual Project? Project { get; set; }
+    [JsonIgnore]
+    public virtual List<ProjectTask> Tasks { get; set; }
 }

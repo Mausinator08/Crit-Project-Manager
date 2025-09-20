@@ -10,10 +10,10 @@ namespace CritApi.Controllers;
 [Authorize]
 public class PriorityController : ControllerBase
 {
-    private readonly Logging.ILogger _logger;
+    private readonly Logging.IFileLogger _logger;
     private readonly IPriorityRepository _priorityRepository;
 
-    public PriorityController(Logging.ILogger logger, IPriorityRepository priorityRepository)
+    public PriorityController(Logging.IFileLogger logger, IPriorityRepository priorityRepository)
     {
         _logger = logger;
         _priorityRepository = priorityRepository;
@@ -23,7 +23,7 @@ public class PriorityController : ControllerBase
     [Route("GetAllPriorities/{projectId}")]
     [ProducesResponseType<List<Priority>>(StatusCodes.Status200OK)]
     [ProducesErrorResponseType(typeof(string))]
-    public async Task<IActionResult> GetAllPriorities([FromRoute] string projectId)
+    public async Task<IActionResult> GetAllPriorities([FromRoute] Guid projectId)
     {
         try
         {
@@ -40,7 +40,7 @@ public class PriorityController : ControllerBase
     [Route("{priorityId}")]
     [ProducesResponseType<Status>(StatusCodes.Status200OK)]
     [ProducesErrorResponseType(typeof(string))]
-    public async Task<IActionResult> GetPriority([FromRoute] string priorityId)
+    public async Task<IActionResult> GetPriority([FromRoute] Guid priorityId)
     {
         try
         {
@@ -91,7 +91,7 @@ public class PriorityController : ControllerBase
     [Route("{priorityId}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesErrorResponseType(typeof(string))]
-    public async Task<IActionResult> DeletePriority([FromRoute] string priorityId)
+    public async Task<IActionResult> DeletePriority([FromRoute] Guid priorityId)
     {
         try
         {

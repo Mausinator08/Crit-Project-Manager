@@ -10,10 +10,10 @@ namespace CritApi.Controllers;
 [Authorize]
 public class StatusController : ControllerBase
 {
-    private readonly Logging.ILogger _logger;
+    private readonly Logging.IFileLogger _logger;
     private readonly IStatusRepository _statusRepository;
 
-    public StatusController(Logging.ILogger logger, IStatusRepository statusRepository)
+    public StatusController(Logging.IFileLogger logger, IStatusRepository statusRepository)
     {
         _logger = logger;
         _statusRepository = statusRepository;
@@ -23,7 +23,7 @@ public class StatusController : ControllerBase
     [Route("GetAllStatuses/{projectId}")]
     [ProducesResponseType<List<Status>>(StatusCodes.Status200OK)]
     [ProducesErrorResponseType(typeof(string))]
-    public async Task<IActionResult> GetAllStatuses([FromRoute] string projectId)
+    public async Task<IActionResult> GetAllStatuses([FromRoute] Guid projectId)
     {
         try
         {
@@ -40,7 +40,7 @@ public class StatusController : ControllerBase
     [Route("{statusId}")]
     [ProducesResponseType<Status>(StatusCodes.Status200OK)]
     [ProducesErrorResponseType(typeof(string))]
-    public async Task<IActionResult> GetStatus([FromRoute] string statusId)
+    public async Task<IActionResult> GetStatus([FromRoute] Guid statusId)
     {
         try
         {
@@ -91,7 +91,7 @@ public class StatusController : ControllerBase
     [Route("{statusId}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesErrorResponseType(typeof(string))]
-    public async Task<IActionResult> DeleteStatus([FromRoute] string statusId)
+    public async Task<IActionResult> DeleteStatus([FromRoute] Guid statusId)
     {
         try
         {
