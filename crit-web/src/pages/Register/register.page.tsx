@@ -3,7 +3,7 @@ import { Button, Form } from "react-bootstrap";
 import { NavLink } from "react-router-dom";
 import { GetEnvValues } from "../../constants/environment";
 import { navigate } from "../../functions/Utils/navigation-utils";
-import { User } from "../../models/user.model";
+import { User } from "../../models/requests/user.model";
 
 import "./register.scss";
 import PhoneInputWithCountrySelect, { isValidPhoneNumber, parsePhoneNumber, Value } from "react-phone-number-input";
@@ -21,7 +21,8 @@ function Register(): JSX.Element {
                 },
                 credentials: 'include',
             }).then(async (response) => {
-                alert(await response.text());
+                const result = await response.json();
+                alert(result?.message);
                 if (response.status === 200) {
                     resolve();
                     navigate(`/Login`);

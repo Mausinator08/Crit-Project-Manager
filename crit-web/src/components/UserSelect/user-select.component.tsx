@@ -1,6 +1,6 @@
 import { JSX } from "react";
 import { Dropdown } from "react-bootstrap";
-import { User } from "../../models/user.model";
+import { User } from "../../models/requests/user.model";
 
 type UserSelectProps = {
     users: User[];

@@ -1,8 +1,7 @@
 import { JSX, useContext, useRef } from "react";
 import { GetEnvValues } from "../../constants/environment";
-import { Button, Form } from "react-bootstrap";
 import { navigate } from "../../functions/Utils/navigation-utils";
-import { User } from "../../models/user.model";
+import { User } from "../../models/requests/user.model";
 import "./login.scss";
 import { NavLink } from "react-router-dom";
 import { GetModuleContext } from "../../contexts/Module/module-context";
@@ -70,17 +69,19 @@ function Login(): JSX.Element {
                     name="password"
                     placeholder="Password" />
                 <br />
-                <label htmlFor="useCookies" className="checkbox-label"><input
-                    type="checkbox"
-                    id="useCookies"
-                    name="useCookies"
-                /><span className="checkbox-span">Remember Me</span></label>
+                <label htmlFor="useCookies" className="checkbox-label">
+                    <input
+                        type="checkbox"
+                        id="useCookies"
+                        name="useCookies"
+                    />
+                    <span className="checkbox-span">Remember Me</span>
+                </label>
                 <div className="login-form-grid">
-                    <button type="submit">Login</button>
                     <NavLink className="login-form-item" to={'/Register'}>Register</NavLink>
                     <NavLink className="login-form-item" to={'/Forgot-Password'}>Forgot Password</NavLink>
+                    <button className="login-form-item" type="submit">Login</button>
                 </div>
-
             </form>
         </div >
     );

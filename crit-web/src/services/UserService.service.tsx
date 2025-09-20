@@ -1,7 +1,7 @@
 import { GetEnvValues } from "../constants/environment";
 import { Injectable } from "../functions/Dependencies/injectable";
 import { ApiResult } from "../models/responses/api-result.model";
-import { User } from "../models/user.model";
+import { User } from "../models/requests/user.model";
 
 @Injectable()
 export class UserService {

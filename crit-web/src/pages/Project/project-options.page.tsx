@@ -11,7 +11,7 @@ import { Col, Dropdown, Form } from "react-bootstrap";
 import { OrganizationService } from "../../services/OrganizationService";
 import { Organization } from "../../models/organization.model";
 import { USER_ROLES } from "../../constants/user-roles";
-import { User } from "../../models/user.model";
+import { User } from "../../models/requests/user.model";
 import { Status } from "../../models/status.model";
 import { StatusService } from "../../services/StatusService.service";
 import { PriorityService } from "../../services/PriorityService.service";
@@ -20,6 +20,8 @@ import { CustomFieldType } from "../../models/custom-field-type.model";
 import { CustomFieldTypeService } from "../../services/CustomFieldTypeService.service";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { ProjectAdmin } from "../../models/project-admin.model";
+import { ProjectUser } from "../../models/project-user.model";
 
 function ProjectOptions(): JSX.Element {
     const { projectId } = useParams();
@@ -38,7 +40,7 @@ function ProjectOptions(): JSX.Element {
     const [priorityBackgroundColor, setPriorityBackgroundColor] = useState<string>("#000000");
     const [priorities, setPriorities] = useState<Priority[]>([]);
     const [customFieldTypes, setCustomFieldTypes] = useState<CustomFieldType[]>([]);
-    const [hiddenCustomFieldTypeIds, setHiddenCustomFieldTypeIds] = useState<string[]>([]);
+    const [hiddenCustomFieldTypes, setHiddenCustomFieldTypes] = useState<CustomFieldType[]>([]);
     const moduleContext = useRef(GetModuleContext("app"));
     const { getService } = useContext(moduleContext.current.context);
     const projectService: ProjectService = getService(ProjectService);
@@ -159,8 +161,8 @@ function ProjectOptions(): JSX.Element {
 
         organizationService.GetOrganization(project.owningOrganizationId)
             .then((result) => {
-                result.memberUserIds.forEach((userId) => {
-                    userService.GetUserByUserId(userId)
+                result.organizationMembers.forEach((member) => {
+                    userService.GetUserByUserId(member.memberUserId)
                         .then((userResult) => {
                             setOrganizationUsers([...organizationUsers, userResult.data!]);
                         })
@@ -173,8 +175,8 @@ function ProjectOptions(): JSX.Element {
                         });
                 });
 
-                result.adminUserIds.forEach((adminUserId) => {
-                    userService.GetUserByUserId(adminUserId)
+                result.organizationAdmins.forEach((admin) => {
+                    userService.GetUserByUserId(admin.adminUserId)
                         .then((userResult) => {
                             setOrganizationAdminUsers([...organizationAdminUsers, userResult.data!]);
                         })
@@ -257,8 +259,8 @@ function ProjectOptions(): JSX.Element {
                             <Form.Label>Admin Users</Form.Label>
                             <Form.Control as="select" multiple disabled={isViewOnly} onChange={(e) => {
                                 const selectedOptions = Array.from((e.target as unknown as HTMLSelectElement).selectedOptions).map((option) => option.value);
-                                project.projectAdminUserIds = selectedOptions;
-                            }} value={project.projectAdminUserIds}>
+                                project.projectAdmins = selectedOptions.map(so => new ProjectAdmin(projectId!, so));
+                            }} value={project.projectAdmins.map(pa => pa.adminId)}>
                                 {organizationAdminUsers.map((orgUser) => (
                                     <option key={orgUser.id} value={orgUser.id}>{orgUser.userName}</option>
                                 ))}
@@ -270,8 +272,8 @@ function ProjectOptions(): JSX.Element {
                             <Form.Label>Users</Form.Label>
                             <Form.Control as="select" multiple disabled={isViewOnly} onChange={(e) => {
                                 const selectedOptions = Array.from((e.target as unknown as HTMLSelectElement).selectedOptions).map((option) => option.value);
-                                project.projectUserIds = selectedOptions;
-                            }} value={project.projectUserIds}>
+                                project.projectUsers = selectedOptions.map(so => new ProjectUser(projectId!, so));
+                            }} value={project.projectUsers.map(pu => pu.userId)}>
                                 {organizationUsers.map((orgUser) => (
                                     <option key={orgUser.id} value={orgUser.id}>{orgUser.userName}</option>
                                 ))}
@@ -283,8 +285,8 @@ function ProjectOptions(): JSX.Element {
                             <Form.Label>Organizations</Form.Label>
                             <Form.Control as="select" multiple disabled={isViewOnly} onChange={(e) => {
                                 const selectedOptions = Array.from((e.target as unknown as HTMLSelectElement).selectedOptions).map((option) => option.value);
-                                project.organizationIds = selectedOptions;
-                            }} value={project.organizationIds}>
+                                project.organizations = selectedOptions.map(so => projectOrganizations.find(po => po.id === so)!);
+                            }} value={project.organizations.map(o => o.id!)}>
                                 {projectOrganizations.map((org) => (
                                     <option key={org.id} value={org.id}>{org.name}</option>
                                 ))}
@@ -490,11 +492,11 @@ function ProjectOptions(): JSX.Element {
                             <Form.Label>Hidden Custom Field Types From Task Table</Form.Label>
                             <Form.Control as="select" multiple disabled={isViewOnly} onChange={(e) => {
                                 const selectedOptions = Array.from((e.target as unknown as HTMLSelectElement).selectedOptions).map((option) => option.value);
-                                project.hiddenCustomFieldTypeIds = customFieldTypes.filter((customFieldType) => selectedOptions.includes(customFieldType.id!)).map((customFieldType) => customFieldType.id!);
-                                setHiddenCustomFieldTypeIds(project.hiddenCustomFieldTypeIds);
+                                project.hiddenCustomFieldTypes = customFieldTypes.filter((customFieldType) => selectedOptions.includes(customFieldType.id!)).map((customFieldType) => customFieldType);
+                                setHiddenCustomFieldTypes(project.hiddenCustomFieldTypes);
                             }} value={project.customFieldTypes.map((customFieldType) => customFieldType.id!)}>
                                 {customFieldTypes.map((customFieldType) => {
-                                    if (hiddenCustomFieldTypeIds.includes(customFieldType.id!)) {
+                                    if (hiddenCustomFieldTypes.includes(customFieldType)) {
                                         return (
                                             <option key={customFieldType.id} value={customFieldType.id} defaultChecked={true}>{customFieldType.name}</option>
                                         );

@@ -5,9 +5,11 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { GetModuleContext } from "../../contexts/Module/module-context";
 import { ProjectService } from "../../services/ProjectService.service";
+
 import "./projects.scss";
 
-export interface ProjectCreationProps {
+export interface ProjectCreationProps
+{
 	setProjects: (projects: Project[]) => void;
 	setError: (error: string | null) => void;
 }
@@ -15,7 +17,8 @@ export interface ProjectCreationProps {
 function ProjectCreation({
 	setProjects,
 	setError,
-}: ProjectCreationProps): JSX.Element {
+}: ProjectCreationProps): JSX.Element
+{
 	const moduleContext = useRef(GetModuleContext("app"));
 	const { getService } = useContext(moduleContext.current.context);
 	const projectService: ProjectService = getService(ProjectService);
@@ -29,8 +32,10 @@ function ProjectCreation({
 			<div className="project-row" key={`project_row_new_project`}>
 				<FontAwesomeIcon
 					icon={faPlus}
-					onClick={() => {
-						if (newProjectName === "") {
+					onClick={() =>
+					{
+						if (newProjectName === "")
+						{
 							return;
 						}
 
@@ -40,7 +45,8 @@ function ProjectCreation({
 						};
 						projectService
 							.CreateNewProject(newProject)
-							.then((createdProject) => {
+							.then((createdProject) =>
+							{
 								setNewProjectName("");
 								setNewProjectDescription("");
 								let newProjectNameInput =
@@ -51,24 +57,29 @@ function ProjectCreation({
 									document.getElementById(
 										"newProjectDescripton"
 									) as HTMLInputElement | null;
-								if (newProjectNameInput) {
+								if (newProjectNameInput)
+								{
 									newProjectNameInput.value = "";
 								}
-								if (newProjectDescriptionInput) {
+								if (newProjectDescriptionInput)
+								{
 									newProjectDescriptionInput.value = "";
 								}
 								projectService
 									.GetAllProjects()
-									.then((value) => {
+									.then((value) =>
+									{
 										setProjects(value);
 									})
-									.catch((error: Error) => {
+									.catch((error: Error) =>
+									{
 										console.error(error);
 										setError(error.message);
 										setProjects([]);
 									});
 							})
-							.catch((error: Error) => {
+							.catch((error: Error) =>
+							{
 								console.error(error);
 								setError(error.message);
 							});
@@ -82,14 +93,16 @@ function ProjectCreation({
 				<input
 					type="text"
 					id="newProjectName"
-					onBlur={(e) => {
+					onBlur={(e) =>
+					{
 						setNewProjectName(e.target.value);
 					}}
 				/>
 				<input
 					type="text"
 					id="newProjectDescription"
-					onBlur={(e) => {
+					onBlur={(e) =>
+					{
 						setNewProjectDescription(e.target.value);
 					}}
 				/>

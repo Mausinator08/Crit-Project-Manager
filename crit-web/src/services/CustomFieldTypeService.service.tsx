@@ -3,14 +3,17 @@ import { Injectable } from "../functions/Dependencies/injectable";
 import { CustomFieldType } from "../models/custom-field-type.model";
 
 @Injectable()
-export class CustomFieldTypeService {
+export class CustomFieldTypeService
+{
     private readonly customFieldTypeUrl: string =
         GetEnvValues()?.critApiUrl + "/CustomFieldType";
 
     private constructor() { }
 
-    public async GetAllCustomFieldTypes(projectId: string): Promise<CustomFieldType[]> {
-        return new Promise<CustomFieldType[]>(async (resolve, reject) => {
+    public async GetAllCustomFieldTypes(projectId: string): Promise<CustomFieldType[]>
+    {
+        return new Promise<CustomFieldType[]>(async (resolve, reject) =>
+        {
             const response = await fetch(new URL(`${this.customFieldTypeUrl}/GetAllCustomFieldTypes/${projectId}`), {
                 method: "GET",
                 mode: "cors",
@@ -20,7 +23,8 @@ export class CustomFieldTypeService {
                 },
             });
 
-            if (!response.ok) {
+            if (!response.ok)
+            {
                 reject(new Error(await response.text()));
                 return;
             }
@@ -30,8 +34,10 @@ export class CustomFieldTypeService {
         });
     }
 
-    public async GetCustomFieldType(customFieldTypeId: string): Promise<CustomFieldType> {
-        return new Promise<CustomFieldType>(async (resolve, reject) => {
+    public async GetCustomFieldType(customFieldTypeId: string): Promise<CustomFieldType>
+    {
+        return new Promise<CustomFieldType>(async (resolve, reject) =>
+        {
             const response = await fetch(new URL(`${this.customFieldTypeUrl}/${customFieldTypeId}`), {
                 method: "GET",
                 mode: "cors",
@@ -41,7 +47,8 @@ export class CustomFieldTypeService {
                 },
             });
 
-            if (!response.ok) {
+            if (!response.ok)
+            {
                 reject(new Error(await response.text()));
                 return;
             }
@@ -51,8 +58,10 @@ export class CustomFieldTypeService {
         });
     }
 
-    public async CreateCustomFieldType(customFieldType: CustomFieldType): Promise<CustomFieldType> {
-        return new Promise<CustomFieldType>(async (resolve, reject) => {
+    public async CreateCustomFieldType(customFieldType: CustomFieldType): Promise<CustomFieldType>
+    {
+        return new Promise<CustomFieldType>(async (resolve, reject) =>
+        {
             const response = await fetch(new URL(`${this.customFieldTypeUrl}`), {
                 method: "POST",
                 mode: "cors",
@@ -63,7 +72,8 @@ export class CustomFieldTypeService {
                 body: JSON.stringify(customFieldType),
             });
 
-            if (!response.ok) {
+            if (!response.ok)
+            {
                 reject(new Error(await response.text()));
                 return;
             }
@@ -73,8 +83,10 @@ export class CustomFieldTypeService {
         });
     }
 
-    public async UpdateCustomFieldType(customFieldType: CustomFieldType): Promise<CustomFieldType> {
-        return new Promise<CustomFieldType>(async (resolve, reject) => {
+    public async UpdateCustomFieldType(customFieldType: CustomFieldType): Promise<CustomFieldType>
+    {
+        return new Promise<CustomFieldType>(async (resolve, reject) =>
+        {
             const response = await fetch(new URL(`${this.customFieldTypeUrl}`), {
                 method: "PUT",
                 mode: "cors",
@@ -85,7 +97,8 @@ export class CustomFieldTypeService {
                 body: JSON.stringify(customFieldType),
             });
 
-            if (!response.ok) {
+            if (!response.ok)
+            {
                 reject(new Error(await response.text()));
                 return;
             }
@@ -95,8 +108,10 @@ export class CustomFieldTypeService {
         });
     }
 
-    public async DeleteCustomFieldType(customFieldTypeId: string): Promise<void> {
-        return new Promise<void>(async (resolve, reject) => {
+    public async DeleteCustomFieldType(customFieldTypeId: string): Promise<void>
+    {
+        return new Promise<void>(async (resolve, reject) =>
+        {
             const response = await fetch(new URL(`${this.customFieldTypeUrl}/${customFieldTypeId}`), {
                 method: "DELETE",
                 mode: "cors",
@@ -106,7 +121,8 @@ export class CustomFieldTypeService {
                 },
             });
 
-            if (!response.ok) {
+            if (!response.ok)
+            {
                 reject(new Error(await response.text()));
                 return;
             }

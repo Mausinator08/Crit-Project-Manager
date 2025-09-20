@@ -9,7 +9,7 @@ import UserSelect from "../../components/UserSelect/user-select.component";
 import StatusSelect from "../../components/StatusSelect/status-select.component";
 import { faClipboardCheck } from "@fortawesome/free-solid-svg-icons";
 import { Priority } from "../../models/priority.model";
-import { User } from "../../models/user.model";
+import { User } from "../../models/requests/user.model";
 import PrioritySelect from "../../components/PrioritySelect/priority-select.component";
 import ComplexitySelect from "../../components/ComplexitySelect/complexity-select.component";
 import DueDateSelect from "../../components/DueDateSelect/due-date-select.component";
@@ -22,7 +22,7 @@ export function ListTasks(
     statuses: Status[],
     priorities: Priority[],
     customFieldTypes: CustomFieldType[],
-    hiddenCustomFieldTypeIds: string[],
+    hiddenCustomFieldTypes: CustomFieldType[],
     isSubtask?: boolean,
 ): JSX.Element {
     const [assignedUser, setAssignedUser] = useState<string | undefined>(undefined);
@@ -172,7 +172,7 @@ export function ListTasks(
                 </td>
                 <td>
                     {customFieldTypes.length > 0 &&
-                        customFieldTypes.filter(fieldType => !hiddenCustomFieldTypeIds.find(typeId => typeId === fieldType.id)).map<JSX.Element>(fieldType =>
+                        customFieldTypes.filter(fieldType => !hiddenCustomFieldTypes.find(type => type.id === fieldType.id)).map<JSX.Element>(fieldType =>
                             <>
                                 <CustomFieldSelect
                                     taskId={task.id!}
@@ -199,7 +199,7 @@ export function ListTasks(
                     priorities={priorities}
                     isSubtask={isSubtask}
                     customFieldTypes={customFieldTypes}
-                    hiddenCustomFieldTypeIds={hiddenCustomFieldTypeIds}>
+                    hiddenCustomFieldTypes={hiddenCustomFieldTypes}>
                     <TaskTableRow />
                 </CollapsibleTask>
             );

@@ -3,8 +3,8 @@
 
 .login-form-body {
     @extend .panel;
-    max-width: fit-content;
-    max-height: fit-content;
+    width: fit-content;
+    height: fit-content;
 }
 
 .login-form-grid {
@@ -14,17 +14,19 @@
 .login-form-item {
     color: $secondary;
     margin: 20px;
+    text-align: center;
+}
+
+button {
+    color: $primary !important;
+}
+
+label {
+    margin-top: 10px;
 }
 
 input[type="text"],
 input[type="password"] {
-    border-style: solid;
-    border-width: 4px;
-    border-color: $secondary;
-    border-radius: 8px !important;
-    background-color: $primary;
-    color: $secondary;
-    padding: 10px;
-    margin: 10px;
     width: 100%;
+    margin-left: 0px !important;
 }

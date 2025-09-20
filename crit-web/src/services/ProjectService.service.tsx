@@ -4,7 +4,8 @@ import { Project } from "../models/project.model";
 import { ProjectRequest } from "../models/requests/project-request.model";
 
 @Injectable()
-export class ProjectService {
+export class ProjectService
+{
 	private readonly projectUrl: string =
 		GetEnvValues()?.critApiUrl + "/Project";
 
@@ -12,12 +13,15 @@ export class ProjectService {
 
 	constructor() { }
 
-	public GetProjectIds(): string[] {
+	public GetProjectIds(): string[]
+	{
 		return this.projectIds;
 	}
 
-	public async GetAllProjects(): Promise<Project[]> {
-		return new Promise<Project[]>(async (resolve, reject) => {
+	public async GetAllProjects(): Promise<Project[]>
+	{
+		return new Promise<Project[]>(async (resolve, reject) =>
+		{
 			const response = await fetch(new URL(this.projectUrl), {
 				method: "GET",
 				mode: "cors",
@@ -26,18 +30,21 @@ export class ProjectService {
 					"Content-Type": "application/json",
 				},
 			});
-			if (!response.ok) {
+			if (!response.ok)
+			{
 				reject(new Error(await response.text()));
 				return;
 			}
 			const projects: Project[] = await response.json();
-			this.projectIds = projects.map((p) => p.id!);
+			this.projectIds = projects.map ? projects.map((p) => p.id!) : [];
 			resolve(projects);
 		});
 	}
 
-	public async GetProject(projectId: string): Promise<Project> {
-		return new Promise<Project>(async (resolve, reject) => {
+	public async GetProject(projectId: string): Promise<Project>
+	{
+		return new Promise<Project>(async (resolve, reject) =>
+		{
 			const response = await fetch(
 				new URL(`${this.projectUrl}/${projectId}`),
 				{
@@ -49,7 +56,8 @@ export class ProjectService {
 					},
 				}
 			);
-			if (!response.ok) {
+			if (!response.ok)
+			{
 				reject(new Error(await response.text()));
 				return;
 			}
@@ -58,8 +66,10 @@ export class ProjectService {
 		});
 	}
 
-	public async CreateNewProject(project: ProjectRequest): Promise<Project> {
-		return new Promise<Project>(async (resolve, reject) => {
+	public async CreateNewProject(project: ProjectRequest): Promise<Project>
+	{
+		return new Promise<Project>(async (resolve, reject) =>
+		{
 			const response = await fetch(new URL(this.projectUrl), {
 				method: "POST",
 				mode: "cors",
@@ -69,7 +79,8 @@ export class ProjectService {
 				},
 				body: JSON.stringify(project),
 			});
-			if (!response.ok) {
+			if (!response.ok)
+			{
 				reject(new Error(await response.text()));
 				return;
 			}
@@ -78,8 +89,10 @@ export class ProjectService {
 		});
 	}
 
-	public async UpdateProject(project: Project): Promise<void> {
-		return new Promise<void>(async (resolve, reject) => {
+	public async UpdateProject(project: Project): Promise<void>
+	{
+		return new Promise<void>(async (resolve, reject) =>
+		{
 			const response = await fetch(new URL(`${this.projectUrl}`), {
 				method: "PUT",
 				mode: "cors",
@@ -89,7 +102,8 @@ export class ProjectService {
 				},
 				body: JSON.stringify(project),
 			});
-			if (!response.ok) {
+			if (!response.ok)
+			{
 				reject(new Error(await response.text()));
 				return;
 			}
@@ -97,8 +111,10 @@ export class ProjectService {
 		});
 	}
 
-	public async DeleteProject(projectId: string): Promise<void> {
-		return new Promise<void>(async (resolve, reject) => {
+	public async DeleteProject(projectId: string): Promise<void>
+	{
+		return new Promise<void>(async (resolve, reject) =>
+		{
 			const response = await fetch(
 				new URL(`${this.projectUrl}/${projectId}`),
 				{
@@ -110,7 +126,8 @@ export class ProjectService {
 					},
 				}
 			);
-			if (!response.ok) {
+			if (!response.ok)
+			{
 				reject(new Error(await response.text()));
 				return;
 			}

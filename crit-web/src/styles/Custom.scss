@@ -22,7 +22,7 @@
     transition: margin-left 0.3s ease-in-out;
     margin-top: 88px;
     margin-bottom: 0px;
-    margin-left: 170px;
+    margin-left: 70px;
     margin-right: 0px;
 }
 
@@ -105,7 +105,8 @@ button:disabled:active {
     margin: 3pt;
 }
 
-input[type="text"] {
+input[type="text"],
+input[type="password"] {
     position: relative;
     font-size: 14pt;
     line-height: 14pt;

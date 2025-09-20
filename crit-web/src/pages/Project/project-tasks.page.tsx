@@ -5,7 +5,7 @@ import TaskTable from "../../components/Tasks/tasks-table.component";
 import { GetModuleContext } from "../../contexts/Module/module-context";
 import { ProjectService } from "../../services/ProjectService.service";
 import { UserService } from "../../services/UserService.service";
-import { User } from "../../models/user.model";
+import { User } from "../../models/requests/user.model";
 
 import "./projects.scss";
 import { ApiResult } from "../../models/responses/api-result.model";
@@ -36,8 +36,8 @@ function ProjectTasks(): JSX.Element {
                 setError(error.message);
             });
 
-        project?.projectUserIds?.forEach((userId) => {
-            userService.GetUserByUserId(userId).then((result) => {
+        project?.projectUsers?.forEach((user) => {
+            userService.GetUserByUserId(user.id!).then((result) => {
                 if (result && result.data) {
                     setUsers([...users, result.data]);
                 }
@@ -63,13 +63,14 @@ function ProjectTasks(): JSX.Element {
                         tasks={project?.tasks ?? []}
                         customFieldTypes={project?.customFieldTypes ?? []}
                         statuses={project?.statuses ?? []}
-                        hiddenCustomFieldTypeIds={project?.hiddenCustomFieldTypeIds}
+                        hiddenCustomFieldTypes={project?.hiddenCustomFieldTypes}
                         users={users}
                         priorities={project?.priorities} />)}
                 </div>
                 {showSidePanel ? (
                     <div className="scrollable-panel-right">
                         <Outlet />
+                        <button type="button" onClick={() => setShowSidePanel(false)}>Close Side Panel</button>
                     </div>
                 ) : (
                     <div className="scrollable-panel-right">

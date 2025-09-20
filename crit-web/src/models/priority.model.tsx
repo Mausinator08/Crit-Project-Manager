@@ -1,3 +1,6 @@
+import { Project } from "./project.model";
+import { Task } from "./task.model";
+
 export class Priority {
     constructor(name?: string, projectId?: string, priority?: any) {
         this.id = priority?.id ?? null;
@@ -7,6 +10,8 @@ export class Priority {
         this.color = priority?.color ?? null;
         this.projectId = priority?.projectId ?? projectId;
         this.taskId = priority?.taskId ?? null;
+        this.project = priority?.project ?? null;
+        this.tasks = priority?.tasks ?? null;
     }
 
     public id?: string;
@@ -16,4 +21,6 @@ export class Priority {
     public color?: string;
     public projectId: string;
     public taskId?: string;
+    public project?: Project;
+    public tasks?: Task[];
 }

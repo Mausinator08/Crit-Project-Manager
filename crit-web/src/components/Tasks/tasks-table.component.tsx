@@ -11,12 +11,12 @@ import { ListTasks } from "../../functions/Tasks/list-tasks";
 import { GetModuleContext } from "../../contexts/Module/module-context";
 import { AuthService } from "../../services/AuthService.service";
 import { Priority } from "../../models/priority.model";
-import { User } from "../../models/user.model";
+import { User } from "../../models/requests/user.model";
 
 export interface TasksProps {
     tasks: Task[];
     customFieldTypes: CustomFieldType[];
-    hiddenCustomFieldTypeIds: string[];
+    hiddenCustomFieldTypes: CustomFieldType[];
     users: User[];
     statuses: Status[];
     priorities: Priority[];
@@ -66,11 +66,11 @@ function TaskTable(props: TasksProps): JSX.Element {
                                 Due Date
                             </th>
                             {props.customFieldTypes.length > 0 &&
-                                props.customFieldTypes.filter(fieldType => !props.hiddenCustomFieldTypeIds.find(typeId => typeId === fieldType.id)).map<JSX.Element>(fieldType => listTaskListCustomColumn(fieldType))}
+                                props.customFieldTypes.filter(fieldType => !props.hiddenCustomFieldTypes.find(type => type.id === fieldType.id)).map<JSX.Element>(fieldType => listTaskListCustomColumn(fieldType))}
                         </tr>
                     </thead>
                     <tbody>
-                        {props.tasks && props.tasks.map(task => task && ListTasks(task, props.users, props.statuses, props.priorities, props.customFieldTypes, props.hiddenCustomFieldTypeIds))}
+                        {props.tasks && props.tasks.map(task => task && ListTasks(task, props.users, props.statuses, props.priorities, props.customFieldTypes, props.hiddenCustomFieldTypes))}
                     </tbody>
                 </Table>
                 {selectedTaskId && (<Outlet />)}
