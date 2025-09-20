@@ -1,0 +1,62 @@
+version: '3.8'
+services:
+  certgen:
+    user: "0:0"
+    build:
+      context: .
+      dockerfile: Dockerfile.certgen
+    container_name: crit_generate_self_signed_cert
+    volumes:
+      - crit_certs:/certs
+  postgres:
+    image: postgres:16-alpine
+    container_name: crit_postgres_db
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "127.0.0.1:5433:5432"
+    volumes:
+      - crit_postgres_data:/var/lib/postgresql/data
+      - crit_certs:/certs
+    command: >
+      postgres -c ssl=on
+               -c ssl_cert_file=/certs/server.crt
+               -c ssl_key_file=/certs/server.key
+    depends_on:
+      - certgen
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: crit_pgadmin
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+    ports:
+      - "8081:80"
+    depends_on:
+      - postgres
+    volumes:
+      - crit_pgadmin_data:/var/lib/pgadmin
+  backup:
+    build:
+      context: .
+      dockerfile: Dockerfile.backup
+    container_name: crit_postgres_backup
+    depends_on:
+      - postgres
+    volumes:
+      - ./postgres/backup:/backup
+    environment:
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+volumes:
+  crit_postgres_data:
+  crit_pgadmin_data:
+  crit_certs:

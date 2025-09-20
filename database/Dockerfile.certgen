@@ -1,0 +1,5 @@
+FROM alpine:latest
+RUN apk add --no-cache openssl
+COPY ./.postgres/postgres_certs.sh /postgres_certs.sh
+RUN chmod +x /postgres_certs.sh
+ENTRYPOINT [ "/postgres_certs.sh" ]
