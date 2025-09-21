@@ -197,9 +197,6 @@ function ProjectOptions(): JSX.Element {
 
     return (
         <>
-            <h2>{project?.name ?? '<no project name>'}</h2>
-            <h3>Options</h3>
-            <hr />
             {error && <p style={{ color: "red" }}>{error}</p>}
             {project && (
                 <div>

@@ -69,12 +69,15 @@ function ProjectTasks(): JSX.Element {
                 </div>
                 {showSidePanel ? (
                     <div className="scrollable-panel-right">
+                        <h2>Project Options</h2>
+                        <hr />
+                        <button className="float-right" type="button" onClick={() => setShowSidePanel(false)}>Close Project Options</button>
                         <Outlet />
-                        <button type="button" onClick={() => setShowSidePanel(false)}>Close Side Panel</button>
+                        <button className="float-right" type="button" onClick={() => setShowSidePanel(false)}>Close Project Options</button>
                     </div>
                 ) : (
                     <div className="scrollable-panel-right">
-                        <button onClick={() => setShowSidePanel(true)}>Show Side Panel</button>
+                        <button className="float-right" onClick={() => setShowSidePanel(true)}>Show Project Options</button>
                     </div>
                 )}
             </div>
