@@ -8,35 +8,39 @@ $INSTALLED_DISTROS = wsl --list --quiet  | Out-String -Stream
 $INSTALLED_DISTROS = $INSTALLED_DISTROS -replace "`0"
 
 if ([string]::IsNullOrWhiteSpace($DISTRO)) {
-    $DISTRO = "Ubuntu-24.04"
+	$DISTRO = "Ubuntu-24.04"
 	Write-Host $DISTRO
 	if (-not ($INSTALLED_DISTROS | Select-String -Pattern $DISTRO)) {
 		$INSTALL_LOC = Read-Host "Where do you want to install the distro? (Leave blank for default location which will be $INSTALL_LOC)"
 
 		Write-Host "Installing $DISTRO..."
 
-		$WSL_INSTALL = Start-Process -FilePath wsl.exe -ArgumentList "--install $DISTRO --no-launch" -Wait -PassThru
+		$WSL_INSTALL = Start-Process -FilePath wsl.exe -ArgumentList "--install -d $DISTRO --no-launch" -Wait -PassThru
 
 		if ($WSL_INSTALL.ExitCode -eq 0) {
 			Write-Host "$DISTRO installed successfully! Extracting distro..."
-			$INSTALL_TAR_GZ_FILE = Get-ChildItem -Recurse 'C:\Program Files\WindowsApps\' | Where-Object {$_.Name -eq 'install.tar.gz' }
+			$INSTALL_TAR_GZ_FILE = Get-ChildItem -Recurse 'C:\Program Files\WindowsApps\' | Where-Object { $_.Name -eq 'install.tar.gz' }
 
 			if ([string]::IsNullOrWhiteSpace($INSTALL_TAR_GZ_FILE)) {
 				Write-Host "Error locating distro!"
 				exit
-			} else {
+			}
+			else {
 				wsl --import $DISTRO "$INSTALL_LOC" "$INSTALL_TAR_GZ_FILE"
 			}
-		} else {
+		}
+		else {
 			Write-Host "$DISTRO installation failed!"
+			Write-Host $WSL_INSTALL.ExitCode
 			exit
 		}
-	} else {
+	}
+ else {
 		Write-Host "$DISTRO already installed!"
 	}
 }
 
-cd \\wsl$\$DISTRO
+Set-Location \\wsl$\$DISTRO
 
 $USERNAME = Read-Host "Type your distro OS's user name with elevated permissions."
 

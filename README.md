@@ -19,8 +19,9 @@ This repository contains the Crit web application written in React and Typescrip
   - [Installation](#installation)
   - [Usage](#usage)
   - [VSCode Launch and Task Examples](#vscode-launch-and-task-examples)
-    - [launch.json](#launchjson)
-    - [tasks.json](#tasksjson)
+    - [launch.json (API)](#launchjson-api)
+    - [tasks.json (API)](#tasksjson-api)
+    - [launch.json (web)](#launchjson-web)
 
 ## Prerequisites
 
@@ -28,7 +29,7 @@ This repository contains the Crit web application written in React and Typescrip
 
 - NodeJS >= v20.17.0 and NodeJS <= LTS
 - Npm >= 10.8.2
-- MongoDB v7.x Instance 
+- wsl2 (for hosting postgreSQL container)
 
 ### Optional
 
@@ -41,18 +42,24 @@ This repository contains the Crit web application written in React and Typescrip
 2. Open a terminal/command prompt/powershell instance at `./crit-web` for the React website.
 3. Run the following command to get the `node_modules`:
 
-```
+```Powershell
 npm install
 ```
 
-4. Install MongoDB v7.
-5. Set appsettings.Development.json variable for `MongoDB:ServerName` to your MongoDB server instance. (eg. localhost)
-6. Set appsettings.Development.json variable for `MongoDB:Database` to the database that will house Crit's collections. (eg. crit)
-7. Set an environment variable for `APP_CONTEXT_USER` to the user that will be used for authorizing SQL calls.
-8. Set an environment variable for `APP_CONTEXT_PASSWORD` to the password for the `APP_CONTEXT_USER`.
-9. Set appsettings.Development.json variable for `MongoDB:Port` to the port used for your server instance. (eg. default is `27017`)
-10. Set appsettings.Development.json variable for `MongoDB:UserName` to the `APP_CONTEXT_USER` environment variable name.
-11. Set appsettings.Development.json variable for `MongoDB:Password` to the `APP_CONTEXT_PASSWORD` environment variable name.
+4. Set the following environment variables:
+   1. POSTGRES_USER (admin)
+   2. POSTGRES_PASSWORD (admin)
+   3. POSTGRES_DB
+   4. POSTGRESQL_APP_CONTEXT_USER
+   5. POSTGRESQL_APP_CONTEXT_PASSWORD
+   6. PGADMIN_DEFAULT_EMAIL
+   7. PGADMIN_DEFAULT_PASSWORD
+5. Run the following powershell script as administrator: `./database/bootstrap-database-wsl.ps1` and follow the prompts.
+6. Set appsettings.Development.json variable for `PostgreSQL:ServerName` to your PostgreSQL server instance. (eg. localhost)
+7. Set appsettings.Development.json variable for `PostgreSQL:Database` to the database that will house Crit's tables. (eg. crit)
+8. Set appsettings.Development.json variable for `PostgreSQL:Port` to the port used for your server instance. (eg. default is `5433`)
+9. Set appsettings.Development.json variable for `PostgreSQL:UserName` to the `POSTGRESQL_APP_CONTEXT_USER` environment variable name.
+10. Set appsettings.Development.json variable for `PostgreSQL:Password` to the `POSTGRESQL_APP_CONTEXT_PASSWORD` environment variable name.
 
 ## Usage
 
@@ -69,42 +76,22 @@ npm run start
 
 ## VSCode Launch and Task Examples
 
-### launch.json
+### launch.json (API)
 
 ```json
 {
-    "version": "0.2.0",
-    "compounds": [
-        {
-            "name": "Build and Run Server/Client Debug",
-            "configurations": [
-                "Launch Crit Server",
-                ".NET Core Launch (CritApi) Debug"
-            ],
-            "stopAll": true
-        }
-    ],
     "configurations": [
-        {
-            "name": "Launch Crit Server",
-            "request": "launch",
-            "type": "node-terminal",
-            "command": "npm start",
-            "cwd": "${workspaceFolder}/crit-web"
-        },
         {
             "name": ".NET Core Launch (CritApi) Debug",
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "Build Crit Api Debug",
-            "program": "${workspaceFolder}/crit-api/CritApi/bin/Debug/net8.0/CritApi.dll",
+            "program": "${workspaceFolder}/CritApi/bin/Debug/net8.0/CritApi.dll",
             "args": [],
-            "cwd": "${workspaceFolder}/crit-api/CritApi",
+            "cwd": "${workspaceFolder}/CritApi",
             "stopAtEntry": false,
-            "serverReadyAction": {
-                "action": "openExternally",
-                "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
-            },
+            "launchSettingsFilePath": "${workspaceFolder}/CritApi/Properties/launchSettings.json",
+            "launchSettingsProfile": "https",
             "env": {
                 "ASPNETCORE_ENVIRONMENT": "Development"
             }
@@ -113,7 +100,7 @@ npm run start
 }
 ```
 
-### tasks.json
+### tasks.json (API)
 
 ```json
 {
@@ -125,7 +112,7 @@ npm run start
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/crit-api/CritApi.sln",
+                "${workspaceFolder}/CritApi.sln",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
@@ -140,7 +127,7 @@ npm run start
             "type": "process",
             "args": [
                 "publish",
-                "${workspaceFolder}/crit-api/CritApi.sln",
+                "${workspaceFolder}/CritApi.sln",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
@@ -157,7 +144,7 @@ npm run start
                 "watch",
                 "run",
                 "--project",
-                "${workspaceFolder}/crit-api/CritApi.sln"
+                "${workspaceFolder}/CritApi.sln"
             ],
             "problemMatcher": "$msCompile",
             "dependsOn": [
@@ -166,6 +153,22 @@ npm run start
             "presentation": {
                 "close": true
             }
+        }
+    ]
+}
+```
+
+### launch.json (web)
+
+```json
+{
+    "configurations": [
+        {
+            "name": "Launch Crit Server",
+            "request": "launch",
+            "type": "node-terminal",
+            "command": "npm start",
+            "cwd": "${workspaceFolder}"
         }
     ]
 }
