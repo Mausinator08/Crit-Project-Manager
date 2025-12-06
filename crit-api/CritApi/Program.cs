@@ -34,27 +34,27 @@ if (database == null)
 
 if (userNameEnvVar != null && passwordEnvVar != null)
 {
-    connectionString.Append(";Host=")
+    connectionString.Append("Host=")
     .Append(serverName)
     .Append(port.HasValue ? ";Port=" : "")
     .Append(port.HasValue ? port.Value.ToString() : "")
     .Append(";Database=")
     .Append(database)
     .Append(";Username=")
-    .Append(Environment.GetEnvironmentVariable(userNameEnvVar, EnvironmentVariableTarget.User))
+    .Append(Environment.GetEnvironmentVariable(userNameEnvVar))
     .Append(";Password=")
-    .Append(Environment.GetEnvironmentVariable(passwordEnvVar, EnvironmentVariableTarget.User));
+    .Append(Environment.GetEnvironmentVariable(passwordEnvVar));
 }
 else if (userNameEnvVar != null && passwordEnvVar == null)
 {
-    connectionString.Append(";Host=")
+    connectionString.Append("Host=")
     .Append(serverName)
     .Append(port.HasValue ? ";Port=" : "")
     .Append(port.HasValue ? port.Value.ToString() : "")
     .Append(";Database=")
     .Append(database)
     .Append(";Username=")
-    .Append(Environment.GetEnvironmentVariable(userNameEnvVar, EnvironmentVariableTarget.User));
+    .Append(Environment.GetEnvironmentVariable(userNameEnvVar));
 }
 else if (userNameEnvVar == null && passwordEnvVar != null)
 {
@@ -65,6 +65,8 @@ if (builder.Environment.IsDevelopment())
 {
     connectionString.Append(";Include Error Detail=true");
 }
+
+Console.WriteLine(connectionString.ToString());
 
 builder.Services.AddDbContext<CritDbContext>(options =>
 {

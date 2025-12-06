@@ -17,6 +17,9 @@
 		"scss.lint.validProperties": [
 			"composes"
 		],
-		"editor.trimAutoWhitespace": true
+		"editor.trimAutoWhitespace": true,
+		"omnisharp.autoStart": false,
+		"dotnet.server.internalOmniSharpOnlyRestoreEnabled": false,
+		"dotnet.projects.useProjectToolsServer": false
 	}
 }

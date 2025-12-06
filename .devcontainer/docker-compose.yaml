@@ -1,0 +1,82 @@
+services:
+  certgen:
+    user: "0:0"
+    build:
+      context: ../database
+      dockerfile: Dockerfile.certgen
+    volumes:
+      - ${localWorkspaceFolderBasename}_crit_certs:/certs
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "127.0.0.1:5433:5432"
+    volumes:
+      - ${localWorkspaceFolderBasename}_crit_postgres_data:/var/lib/postgresql/data
+      - ${localWorkspaceFolderBasename}_crit_certs:/certs
+    command: >
+      postgres -c ssl=on
+               -c ssl_cert_file=/certs/server.crt
+               -c ssl_key_file=/certs/server.key
+    depends_on:
+      - certgen
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    env_file:
+      - .env
+  pgadmin:
+    image: dpage/pgadmin4
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+    env_file:
+      - .env
+    ports:
+      - "8081:80"
+    depends_on:
+      - postgres
+    volumes:
+      - ${localWorkspaceFolderBasename}_crit_pgadmin_data:/var/lib/pgadmin
+  backup:
+    build:
+      context: ../database
+      dockerfile: Dockerfile.backup
+    depends_on:
+      - postgres
+    volumes:
+      - ../database/.postgres/backup:/backup
+    environment:
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+    env_file:
+      - .env
+  dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ..:/workspace
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: sleep infinity
+    depends_on:
+      - certgen
+      - postgres
+    ports:
+      - "${API_HTTP_PORT}:${API_HTTP_PORT}"
+      - "${API_HTTPS_PORT}:${API_HTTPS_PORT}"
+      - "${CRIT_WEB_HTTP_PORT}:${CRIT_WEB_HTTP_PORT}"
+    env_file:
+      - .env
+    environment:
+      DOCKER_HOST: unix:///var/run/docker.sock
+volumes:
+  ${localWorkspaceFolderBasename}_crit_postgres_data:
+  ${localWorkspaceFolderBasename}_crit_pgadmin_data:
+  ${localWorkspaceFolderBasename}_crit_certs:

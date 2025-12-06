@@ -1,0 +1,49 @@
+{
+	"name": "Crit DevContainer",
+	"dockerComposeFile": "docker-compose.yaml",
+	"service": "dev",
+	"workspaceFolder": "/workspace",
+	"remoteUser": "root",
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"ms-dotnettools.vscode-dotnet-runtime",
+				"ms-azuretools.vscode-containers",
+				"ms-dotnettools.csharp",
+				"ms-vscode.vscode-typescript-next",
+				"ms-azuretools.vscode-docker",
+				"GitHub.copilot-chat",
+				"msjsdiag.vscode-react-native",
+				"SyncfusionInc.Web-VSCode-Extensions",
+				"ms-azuretools.vscode-containers",
+				"ms-dotnettools.csdevkit",
+				"fernandoescolar.vscode-solution-explorer"
+			],
+			"settings": {
+				"dotnet.server.runtimeConfig": ".vscode/csharp.runtimeconfig.json",
+				"dotnet.server.autoLoadWorkspace": false,
+				"razor.disabled": true,
+				"dotnetAcquisitionExtension.enableWorkloads": false,
+				"dotnet.server.useOmnisharp": false,
+				"dotnet.server.runtimePath": "/usr/share/dotnet/dotnet",
+				"dotnetAcquisitionExtension.enableTelemetry": false,
+				"dotnetAcquisitionExtension.installRuntime": false,
+				"dotnetAcquisitionExtension.installSdk": false,
+				"dotnetAcquisitionExtension.allowPrerelease": false,
+				"dotnetAcquisitionExtension.existingDotnetInstallPath": "/usr/share/dotnet",
+				"omnisharp.enableEditorConfigSupport": false,
+				"dotnet.server.enableRuntimeDotnet": false,
+				"dotnet.server.sdkPath": "/usr/share/dotnet/sdk",
+				"dotnet.server.internalOmniSharpOnlyRestoreEnabled": false,
+				"dotnet.projects.useProjectToolsServer": false
+			}
+		}
+	},
+	"postCreateCommand": "bash .devcontainer/setup.sh",
+	"shutdownAction": "stopCompose",
+	"containerEnv": {
+		"NUGET_FALLBACK_PACKAGES": "",
+		"NUGET_PACKAGES": "/home/vscode/.nuget/packages",
+		"DOCKER_HOST": "unix:///var/run/docker.sock"
+	}
+}
