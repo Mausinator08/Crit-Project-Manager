@@ -136,3 +136,48 @@
 * Added priority controller and repository.
 * Added Status and Priority services and implemented status and priority selection in project options.
 * Added custom field type controller and repository.
+
+## 2025/09/09 23:49 CST
+
+### Fixes
+
+* Applied fixes project-options.page.tsx.
+
+### Enhancements
+
+* Cleaned up scss for projects and custom. 
+* Applied enhancements to project-options.page.tsx.
+
+## 2025/09/19 20:51 CST
+
+### Enhancements
+
+* Containerized postgreSQL database, and stopped using Mongo DB.
+* Stopped using Mongo DB in favor of postgreSQL due to the nature of entity framework core, and adapted API to it.
+* Updated models and their usages throughout to accommodate the API after switching to PostgreSQL.
+
+## 2025/09/20 21:01 CST
+
+### Fixes
+
+* Slightly modified the project options panel and added ability to close it again.
+
+### Enhancements
+
+* Shrunk the borders of panels for visual appeal.
+
+## 2025/11/27 14:24 CST
+
+### Fixes
+
+* Fixed a bug in boostrap-database-wsl.ps1
+
+### Enhancements
+
+* Updated readme.md.
+
+## 2025/12/05 23:50 CST
+
+### Enhancements
+
+* Completely did away with custom scripts for bootstrapping in lue of devcontainers.

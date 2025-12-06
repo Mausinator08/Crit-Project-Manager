@@ -16,19 +16,20 @@ This repository contains the Crit web application written in React and Typescrip
   - [Prerequisites](#prerequisites)
     - [Required](#required)
     - [Optional](#optional)
-  - [Installation](#installation)
+  - [Installation (VSCode approach heavily recommended for devcontainers.)](#installation-vscode-approach-heavily-recommended-for-devcontainers)
   - [Usage](#usage)
-  - [VSCode Launch and Task Examples](#vscode-launch-and-task-examples)
-    - [launch.json (API)](#launchjson-api)
-    - [tasks.json (API)](#tasksjson-api)
-    - [launch.json (web)](#launchjson-web)
+  - [VSCode .vscode directory and files](#vscode-vscode-directory-and-files)
+    - [csharp.runtimeconfig.json](#csharpruntimeconfigjson)
+    - [launch.json](#launchjson)
+    - [settings.json](#settingsjson)
+  - [VSCode .devcontainer](#vscode-devcontainer)
+    - [.env](#env)
 
 ## Prerequisites
 
 ### Required
 
-- NodeJS >= v20.17.0 and NodeJS <= LTS
-- Npm >= 10.8.2
+- NodeJS >= v20.17.0 and NodeJS <= LTS (devcontainer comes with NodeJS 20 and NPM is downgraded to 9 for compatibility with react-scripts)
 - wsl2 (for hosting postgreSQL container)
 
 ### Optional
@@ -36,140 +37,129 @@ This repository contains the Crit web application written in React and Typescrip
 - Chrome Extension: [React Dev Tools](https://chromewebstore.google.com/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi?hl=en)
   - Other browsers and device instructions such as mobile device can be found [here](https://react.dev/learn/react-developer-tools).
 
-## Installation
+## Installation (VSCode approach heavily recommended for devcontainers.)
 
-1. Open the cloned repository in VS Code or your favorite IDE (such as Visual Studio 2022/Rider) or text editor.
-2. Open a terminal/command prompt/powershell instance at `./crit-web` for the React website.
-3. Run the following command to get the `node_modules`:
-
-```Powershell
-npm install
-```
-
-4. Set the following environment variables:
-   1. POSTGRES_USER (admin)
-   2. POSTGRES_PASSWORD (admin)
-   3. POSTGRES_DB
-   4. POSTGRESQL_APP_CONTEXT_USER
-   5. POSTGRESQL_APP_CONTEXT_PASSWORD
-   6. PGADMIN_DEFAULT_EMAIL
-   7. PGADMIN_DEFAULT_PASSWORD
-5. Run the following powershell script as administrator: `./database/bootstrap-database-wsl.ps1` and follow the prompts.
-6. Set appsettings.Development.json variable for `PostgreSQL:ServerName` to your PostgreSQL server instance. (eg. localhost)
-7. Set appsettings.Development.json variable for `PostgreSQL:Database` to the database that will house Crit's tables. (eg. crit)
-8. Set appsettings.Development.json variable for `PostgreSQL:Port` to the port used for your server instance. (eg. default is `5433`)
-9. Set appsettings.Development.json variable for `PostgreSQL:UserName` to the `POSTGRESQL_APP_CONTEXT_USER` environment variable name.
-10. Set appsettings.Development.json variable for `PostgreSQL:Password` to the `POSTGRESQL_APP_CONTEXT_PASSWORD` environment variable name.
+1. Open the cloned repository in VS Code.
+2. Create the .vscode directory and its files. (See [VSCode .vscode directory and files](#vscode-vscode-directory-and-files))
+3. Create the `.env` file. (described [VSCode .devcontainer](#vscode-devcontainer))
+4. Type `CTRL` + `SHIFT` + `P` to open the Command Palette.
+5. Type `Dev Containers: Rebuild and Reopen in Container` and press `ENTER`.
+6. The VSCode window will reload and take quite some time to create the devcontainer and setup the PostgreSQL DB.
 
 ## Usage
 
-1. In VS Code, just press `F5` to run the server on your local machine. (ensure the correct launch configuration has been created and is selected in VS Code. The `/.vscode` folder is not included in the git repository since every system's environment is different.)
-   1. If in another IDE, refer to your IDE documentation to setup a launch or debug configuration.
-   2. Remember to run the `CritApi` project in `./crit-api/CritApi` first and to configure it's port in the React project's `.env.development.local` file. (or which ever environment you intend to run this.) This can all be done in your own `/.vscode/launch.json` file if using VS Code. See example at [vscode launch and task examples](#vscode-launch-and-task-examples). I have a `compounds` configuration in `launch.json` example that does this for you.
-   3. If in a text editor without launch or debug configurations, simply run the following command in `./crit-web` and then launch a web browser at `http://localhost:3000/`. (replace the `3000` port with whatever port you configure in the `.env` files):
+1. Once done, the project is ready to debug. Go to the debug menu, and select `Build and Run Server/Client Debug`.
+2. Press `F5` to start both the API and the Crit Web application.
+3. Open a browser to `http://localhost:3000/` and click Register to test creating a user/organization.
+4. Then login with that username and password, and the app can be tested.
 
-```
-npm run start
-```
+## VSCode .vscode directory and files
 
-2. Navigate the web app/site.
-
-## VSCode Launch and Task Examples
-
-### launch.json (API)
+### csharp.runtimeconfig.json
 
 ```json
 {
-    "configurations": [
-        {
-            "name": ".NET Core Launch (CritApi) Debug",
-            "type": "coreclr",
-            "request": "launch",
-            "preLaunchTask": "Build Crit Api Debug",
-            "program": "${workspaceFolder}/CritApi/bin/Debug/net8.0/CritApi.dll",
-            "args": [],
-            "cwd": "${workspaceFolder}/CritApi",
-            "stopAtEntry": false,
-            "launchSettingsFilePath": "${workspaceFolder}/CritApi/Properties/launchSettings.json",
-            "launchSettingsProfile": "https",
-            "env": {
-                "ASPNETCORE_ENVIRONMENT": "Development"
-            }
-        }
-    ]
+	"runtimeOptions": {
+		"tfm": "net8.0",
+		"framework": {
+			"name": "Microsoft.NETCore.App",
+			"version": "8.0.0"
+		}
+	}
 }
 ```
 
-### tasks.json (API)
+### launch.json
 
 ```json
 {
-    "version": "2.0.0",
-    "tasks": [
+    "version": "0.2.0",
+    "compounds": [
         {
-            "label": "Build Crit Api Debug",
-            "command": "dotnet",
-            "type": "process",
-            "args": [
-                "build",
-                "${workspaceFolder}/CritApi.sln",
-                "/property:GenerateFullPaths=true",
-                "/consoleloggerparameters:NoSummary"
+            "name": "Build and Run Server/Client Debug",
+            "configurations": [
+                ".NET Core (CritApi) Debug with Watch",
+                "Launch Crit Web",
             ],
-            "problemMatcher": "$msCompile",
-            "presentation": {
-                "close": true
-            }
+            "stopAll": true
+        }
+    ],
+    "configurations": [
+        {
+            "name": "Launch Crit Web",
+            "request": "launch",
+            "type": "node-terminal",
+            "command": "npm run start",
+            "cwd": "/workspace/crit-web/"
         },
         {
-            "label": "Publish Crit Api Debug",
-            "command": "dotnet",
-            "type": "process",
-            "args": [
-                "publish",
-                "${workspaceFolder}/CritApi.sln",
-                "/property:GenerateFullPaths=true",
-                "/consoleloggerparameters:NoSummary"
-            ],
-            "problemMatcher": "$msCompile",
-            "presentation": {
-                "close": true
-            }
-        },
-        {
-            "label": "Watch Crit Api Debug",
-            "command": "dotnet",
-            "type": "process",
+            "name": ".NET Core (CritApi) Debug with Watch",
+            "type": "coreclr",
+            "request": "launch",
+            "program": "dotnet",
             "args": [
                 "watch",
                 "run",
+                "--launch-profile",
+                "Http Debug",
                 "--project",
-                "${workspaceFolder}/CritApi.sln"
+                "/workspace/crit-api/CritApi/CritApi.csproj"
             ],
-            "problemMatcher": "$msCompile",
-            "dependsOn": [
-                "Build Crit Api Debug"
-            ],
-            "presentation": {
-                "close": true
+            "cwd": "/workspace/crit-api/CritApi",
+            "stopAtEntry": false,
+            "justMyCode": false,
+            "console": "integratedTerminal",
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            },
+            "sourceFileMap": {
+                "/workspace": "${workspaceFolder}"
             }
         }
     ]
 }
 ```
 
-### launch.json (web)
+### settings.json
 
 ```json
 {
-    "configurations": [
-        {
-            "name": "Launch Crit Server",
-            "request": "launch",
-            "type": "node-terminal",
-            "command": "npm start",
-            "cwd": "${workspaceFolder}"
-        }
-    ]
+	"dotnetServer.buildsEnabled": false,
+	"files.exclude": {
+		"**/bin": true,
+		"**/obj": true
+	},
+	"csharp.referencesCodeLens.enabled": true,
+	"csharp.testsCodeLens.enabled": true,
+	"editor.formatOnSave": true,
+	"editor.defaultFormatter": "ms-dotnettools.csharp",
+	"dotnet.server.internalOmniSharpOnlyRestoreEnabled": false,
+	"dotnet.projects.useProjectToolsServer": false
 }
+```
+
+
+## VSCode .devcontainer
+
+### .env
+
+```env
+POSTGRES_USER=admin
+POSTGRES_PASSWORD=<admin password>
+POSTGRES_DB=crit
+
+PGADMIN_DEFAULT_EMAIL=<your email>
+PGADMIN_DEFAULT_PASSWORD=<password to access pgadmin>
+
+POSTGRES_APP_CONTEXT_USER=crit_context
+POSTGRES_APP_CONTEXT_PASSWORD=<crit_context password>
+
+API_HTTP_PORT=5139
+API_HTTPS_PORT=7295
+API_IIS_HTTP_PORT=20171
+API_IIS_HTTPS_PORT=44314
+
+CRIT_WEB_HTTP_PORT=3000
+REACT_APP_CRIT_API_URL=http://localhost:5139/api
+DISABLE_ESLINT_PLUGIN=true
 ```
