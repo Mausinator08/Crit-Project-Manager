@@ -45,5 +45,6 @@
 		"NUGET_FALLBACK_PACKAGES": "",
 		"NUGET_PACKAGES": "/home/vscode/.nuget/packages",
 		"DOCKER_HOST": "unix:///var/run/docker.sock"
-	}
+	},
+	"overrideCommand": false
 }

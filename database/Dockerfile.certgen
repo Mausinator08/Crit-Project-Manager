@@ -1,5 +1,7 @@
 FROM alpine:latest
-RUN apk add --no-cache openssl
-COPY ./.postgres/postgres_certs.sh /postgres_certs.sh
+RUN apk add --no-cache openssl dos2unix
+RUN mkdir -p /certs && chmod 755 /certs
+COPY .postgres/postgres_certs.sh /postgres_certs.sh
+RUN dos2unix /postgres_certs.sh
 RUN chmod +x /postgres_certs.sh
 ENTRYPOINT [ "/postgres_certs.sh" ]

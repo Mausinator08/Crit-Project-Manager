@@ -1,3 +1,4 @@
+name: crit
 services:
   certgen:
     user: "0:0"
@@ -5,7 +6,7 @@ services:
       context: ../database
       dockerfile: Dockerfile.certgen
     volumes:
-      - ${localWorkspaceFolderBasename}_crit_certs:/certs
+      - crit_certs:/certs
   postgres:
     image: postgres:16-alpine
     restart: unless-stopped
@@ -16,8 +17,8 @@ services:
     ports:
       - "127.0.0.1:5433:5432"
     volumes:
-      - ${localWorkspaceFolderBasename}_crit_postgres_data:/var/lib/postgresql/data
-      - ${localWorkspaceFolderBasename}_crit_certs:/certs
+      - crit_postgres_data:/var/lib/postgresql/data
+      - crit_certs:/certs
     command: >
       postgres -c ssl=on
                -c ssl_cert_file=/certs/server.crt
@@ -25,7 +26,7 @@ services:
     depends_on:
       - certgen
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -44,7 +45,7 @@ services:
     depends_on:
       - postgres
     volumes:
-      - ${localWorkspaceFolderBasename}_crit_pgadmin_data:/var/lib/pgadmin
+      - crit_pgadmin_data:/var/lib/pgadmin
   backup:
     build:
       context: ../database
@@ -77,6 +78,9 @@ services:
     environment:
       DOCKER_HOST: unix:///var/run/docker.sock
 volumes:
-  ${localWorkspaceFolderBasename}_crit_postgres_data:
-  ${localWorkspaceFolderBasename}_crit_pgadmin_data:
-  ${localWorkspaceFolderBasename}_crit_certs:
+  crit_postgres_data:
+    name: crit_postgres_data
+  crit_pgadmin_data:
+    name: crit_pgadmin_data
+  crit_certs:
+    name: crit_certs
