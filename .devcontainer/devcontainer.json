@@ -20,6 +20,7 @@
 				"fernandoescolar.vscode-solution-explorer"
 			],
 			"settings": {
+				"dotnet.defaultSolution": "/workspace/crit-api/CritApi.sln",
 				"dotnet.server.runtimeConfig": ".vscode/csharp.runtimeconfig.json",
 				"dotnet.server.autoLoadWorkspace": false,
 				"razor.disabled": true,

@@ -21,32 +21,32 @@ else
   echo "➡️ Ensuring PostgreSQL user \"$POSTGRES_APP_CONTEXT_USER\" exists..."
 
   docker exec -i $CONTAINER_NAME psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" <<EOF
-  DO \$\$
-  DECLARE
-    user_name CONSTANT text := '${POSTGRES_APP_CONTEXT_USER}';
-  BEGIN
-      IF NOT EXISTS (
-          SELECT FROM pg_catalog.pg_roles WHERE rolname = '${POSTGRES_APP_CONTEXT_USER}'
-      ) THEN
-          CREATE USER ${POSTGRES_APP_CONTEXT_USER} WITH PASSWORD '${POSTGRES_APP_CONTEXT_PASSWORD}';
-          GRANT ALL PRIVILEGES ON DATABASE ${POSTGRES_DB} TO ${POSTGRES_APP_CONTEXT_USER};
-      END IF;
-      -- Allow creation of tables, sequences, etc.
-      EXECUTE format('GRANT ALL PRIVILEGES ON SCHEMA public TO %I', user_name);
+DO \$\$
+DECLARE
+  user_name CONSTANT text := '${POSTGRES_APP_CONTEXT_USER}';
+BEGIN
+    IF NOT EXISTS (
+        SELECT FROM pg_catalog.pg_roles WHERE rolname = '${POSTGRES_APP_CONTEXT_USER}'
+    ) THEN
+        CREATE USER ${POSTGRES_APP_CONTEXT_USER} WITH PASSWORD '${POSTGRES_APP_CONTEXT_PASSWORD}';
+        GRANT ALL PRIVILEGES ON DATABASE ${POSTGRES_DB} TO ${POSTGRES_APP_CONTEXT_USER};
+    END IF;
+    -- Allow creation of tables, sequences, etc.
+    EXECUTE format('GRANT ALL PRIVILEGES ON SCHEMA public TO %I', user_name);
 
-      -- Give full rights on all existing objects
-      EXECUTE format('GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO %I', user_name);
-      EXECUTE format('GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO %I', user_name);
-      EXECUTE format('GRANT ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA public TO %I', user_name);
+    -- Give full rights on all existing objects
+    EXECUTE format('GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO %I', user_name);
+    EXECUTE format('GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO %I', user_name);
+    EXECUTE format('GRANT ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA public TO %I', user_name);
 
-      -- Ensure new objects created in the future are accessible
-      EXECUTE format('ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL PRIVILEGES ON TABLES TO %I', user_name);
-      EXECUTE format('ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL PRIVILEGES ON SEQUENCES TO %I', user_name);
-  END
-  \$\$ LANGUAGE plpgsql;
+    -- Ensure new objects created in the future are accessible
+    EXECUTE format('ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL PRIVILEGES ON TABLES TO %I', user_name);
+    EXECUTE format('ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL PRIVILEGES ON SEQUENCES TO %I', user_name);
+END
+\$\$ LANGUAGE plpgsql;
 EOF
 
-  echo "✅ User ensured: $POSTGRESQL_APP_CONTEXT_USER"
+  echo "✅ User ensured: $POSTGRES_APP_CONTEXT_USER"
 fi
 
 echo "Fixing line endings for .env..."
