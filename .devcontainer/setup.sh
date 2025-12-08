@@ -3,6 +3,11 @@ set -e
 
 echo "Running initial project setup..."
 
+echo "Fixing line endings for .env..."
+if [ -f /workspace/.env ]; then
+    dos2unix /workspace/.env
+fi
+
 # Load env vars from .env inside workspace, if needed
 if [ -f /workspace/.env ]; then
   export $(grep -v '^#' /workspace/.env | xargs)
@@ -47,11 +52,6 @@ END
 EOF
 
   echo "✅ User ensured: $POSTGRES_APP_CONTEXT_USER"
-fi
-
-echo "Fixing line endings for .env..."
-if [ -f /workspace/.env ]; then
-    dos2unix /workspace/.env
 fi
 
 echo "Downgrade NPM to version 9 so that react-scripts behaves on Linux."

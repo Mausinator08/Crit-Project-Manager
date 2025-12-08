@@ -12,6 +12,10 @@ RUN wget https://dotnetcli.azureedge.net/dotnet/Sdk/8.0.416/dotnet-sdk-8.0.416-l
 ENV DOTNET_ROOT=/usr/share/dotnet
 ENV PATH="$PATH:/usr/share/dotnet"
 
+# Install dotnet-ef tool globally
+RUN dotnet tool install -g dotnet-ef
+ENV PATH="${PATH}:/root/.dotnet/tools"
+
 # Install OS packages + Node in one clean apt run
 RUN apt-get update && \
     apt-get install -y \

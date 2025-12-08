@@ -123,10 +123,11 @@ public class CritDbContext : IdentityDbContext<ApplicationUser, ApplicationRole,
             entity.Property(table => table.Id).HasColumnName("Id").IsRequired(true)
             .HasValueGenerator<GuidValueGenerator>()
             .ValueGeneratedOnAdd();
-            entity.Property(table => table.CountryCode).HasColumnName("countryCode").IsRequired(true);
-            entity.Property(table => table.Number).HasColumnName("number").IsRequired(true);
-            entity.Property(table => table.Extension).HasColumnName("extension").IsRequired(false);
-            entity.Property(table => table.Type).HasColumnName("type").IsRequired(true);
+            entity.Property(table => table.CountryCode).HasColumnName("CountryCode").IsRequired(true);
+            entity.Property(table => table.Number).HasColumnName("Number").IsRequired(true);
+            entity.Property(table => table.Extension).HasColumnName("Extension").IsRequired(false);
+            entity.Property(table => table.Type).HasColumnName("Type").IsRequired(true);
+            entity.Property(table => table.UserId).HasColumnName("UserId").IsRequired(false);
         });
 
         modelBuilder.Entity<PhoneNumber>()
@@ -587,7 +588,12 @@ public class CritDbContext : IdentityDbContext<ApplicationUser, ApplicationRole,
     {
         Configure(db =>
         {
-            db.Migrate();
+            var isDesignTime = Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_MIGRATION") == "true";
+
+            if (!isDesignTime)
+            {
+                db.Migrate();
+            }
         });
     }
 }

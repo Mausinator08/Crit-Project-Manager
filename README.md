@@ -18,6 +18,8 @@ This repository contains the Crit web application written in React and Typescrip
     - [Optional](#optional)
   - [Installation (VSCode approach heavily recommended for devcontainers.)](#installation-vscode-approach-heavily-recommended-for-devcontainers)
   - [Usage](#usage)
+    - [Building and Running](#building-and-running)
+    - [DB Changes and Migrations](#db-changes-and-migrations)
   - [VSCode .vscode directory and files](#vscode-vscode-directory-and-files)
     - [csharp.runtimeconfig.json](#csharpruntimeconfigjson)
     - [launch.json](#launchjson)
@@ -48,10 +50,20 @@ This repository contains the Crit web application written in React and Typescrip
 
 ## Usage
 
+### Building and Running
+
 1. Once done, the project is ready to debug. Go to the debug menu, and select `Build and Run Server/Client Debug`.
 2. Press `F5` to start both the API and the Crit Web application.
 3. Open a browser to `http://localhost:3000/` and click Register to test creating a user/organization.
 4. Then login with that username and password, and the app can be tested.
+
+### DB Changes and Migrations
+
+If the CritDBContext changes, models change, columns even change, and etc... please run the following:
+
+1. To add a migration run `dotnet ef migrations add <migration-name> --project CritBusinessLogic --startup-project CritApi`.
+2. To remove (undo) the last migration run `dotnet ef migrations remove --project CritBusinessLogic --startup-project CritApi`.
+3. Running the API will automatically apply the migrations to the target database.
 
 ## VSCode .vscode directory and files
 
