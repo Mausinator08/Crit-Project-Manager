@@ -61,41 +61,18 @@ This repository contains the Crit web application written in React and Typescrip
 
 If the CritDBContext changes, models change, columns even change, and etc... please run the following:
 
-1. To add a migration run `dotnet ef migrations add <migration-name> --project CritBusinessLogic --startup-project CritApi`.
-2. To remove (undo) the last migration run `dotnet ef migrations remove --project CritBusinessLogic --startup-project CritApi`.
-3. Running the API will automatically apply the migrations to the target database.
+1. Install dotnet-ef with `dotnet tool install -g dotnet-ef --version 8.0.20` after starting the devcontainer.
+2. To add a migration run `dotnet ef migrations add <migration-name> --project CritDataAccess --startup-project CritApi`.
+3. To remove (undo) the last migration run `dotnet ef migrations remove --project CritDataAccess --startup-project CritApi`.
+4. Running the API will automatically apply the migrations to the target database.
 
 ## VSCode .vscode directory and files
-
-### csharp.runtimeconfig.json
-
-```json
-{
-	"runtimeOptions": {
-		"tfm": "net8.0",
-		"framework": {
-			"name": "Microsoft.NETCore.App",
-			"version": "8.0.0"
-		}
-	}
-}
-```
 
 ### launch.json
 
 ```json
 {
     "version": "0.2.0",
-    "compounds": [
-        {
-            "name": "Build and Run Server/Client Debug",
-            "configurations": [
-                ".NET Core (CritApi) Debug with Watch",
-                "Launch Crit Web",
-            ],
-            "stopAll": true
-        }
-    ],
     "configurations": [
         {
             "name": "Launch Crit Web",
@@ -105,30 +82,54 @@ If the CritDBContext changes, models change, columns even change, and etc... ple
             "cwd": "/workspace/crit-web/"
         },
         {
-            "name": ".NET Core (CritApi) Debug with Watch",
+            "name": ".NET Core (CritApi) Debug",
             "type": "coreclr",
             "request": "launch",
-            "program": "dotnet",
-            "args": [
-                "watch",
-                "run",
-                "--launch-profile",
-                "Http Debug",
-                "--project",
-                "/workspace/crit-api/CritApi/CritApi.csproj"
-            ],
+            "program": "/workspace/crit-api/CritApi/bin/Debug/net8.0/CritApi.dll",
             "cwd": "/workspace/crit-api/CritApi",
             "stopAtEntry": false,
             "justMyCode": false,
             "console": "integratedTerminal",
             "env": {
-                "ASPNETCORE_ENVIRONMENT": "Development"
+                "ASPNETCORE_ENVIRONMENT": "Development",
+                "ASPNETCORE_URLS": "http://0.0.0.0:5139"
             },
-            "sourceFileMap": {
-                "/workspace": "${workspaceFolder}"
-            }
+            "preLaunchTask": "build-api"
         }
-    ]
+    ],
+    "compounds": [
+        {
+            "name": "Build and Run Server/Client Debug",
+            "configurations": [
+                ".NET Core (CritApi) Debug",
+                "Launch Crit Web",
+            ],
+            "stopAll": true
+        }
+    ],
+}
+```
+
+### tasks.json
+
+```json
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "build-api",
+			"type": "process",
+			"command": "dotnet",
+			"args": [
+				"build",
+				"/workspace/crit-api/CritApi.sln",
+				"-c",
+				"Debug"
+			],
+			"problemMatcher": "$msCompile",
+			"group": "build"
+		}
+	]
 }
 ```
 
