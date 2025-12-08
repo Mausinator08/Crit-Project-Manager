@@ -3,6 +3,7 @@ using System;
 using CritDataAccess.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CritDataAccess.Migrations
 {
     [DbContext(typeof(CritDbContext))]
-    partial class CritDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251208064129_CorrectPhoneNumberCasing")]
+    partial class CorrectPhoneNumberCasing
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
