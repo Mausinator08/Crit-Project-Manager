@@ -25,7 +25,8 @@ public class PhoneNumberRepository : IPhoneNumberRepository
                 Extension = phoneNumber.Extension,
                 CountryCode = phoneNumber.CountryCode,
                 Type = phoneNumber.Type,
-                Organization = phoneNumber.Organization
+                Organization = phoneNumber.Organization,
+                UserId = phoneNumber.UserId
             };
 
             _critDbContext.PhoneNumbers.Add(newPhoneNumber);
