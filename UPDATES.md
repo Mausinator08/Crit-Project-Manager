@@ -181,3 +181,19 @@
 ### Enhancements
 
 * Completely did away with custom scripts for bootstrapping in lue of devcontainers.
+
+## 2025/12/07 19:01 CST
+
+### Fixes
+
+* Normalized line endings and fixed settings in dev container for vs solutions.
+
+## 2025/12/08 01:10 CST
+
+### Fixes
+
+* Fixed dev containers, updated README.md
+* Updated tsconfig.json for moduleResolution to use bundler instead of node for newer typescript.
+* Removed unnecessary global.json file.
+* Fixed column names and created a migration for it.
+* Fixed phone numbers to save the UserId associated with it.
