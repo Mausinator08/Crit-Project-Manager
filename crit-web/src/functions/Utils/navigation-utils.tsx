@@ -1,4 +1,4 @@
-import { useNavigate, NavigateFunction } from 'react-router-dom';
+import { NavigateFunction } from 'react-router-dom';
 
 let navigateFn: NavigateFunction;
 

@@ -15,7 +15,7 @@ function CustomFieldSelect(props: CustomFieldSelectProps): JSX.Element {
     return (
         <Dropdown key={props.taskId + '-customField'} onSelect={props.onCustomFieldSelect}>
             <Dropdown.Toggle id="customField">
-                {props.customFields.find(s => s.id === props.customField && s.customFieldTypeId == props.customFieldType.id)?.value ?? `${props.customFieldType.name} Not Set`}
+                {props.customFields.find(s => s.id === props.customField && s.customFieldTypeId === props.customFieldType.id)?.value ?? `${props.customFieldType.name} Not Set`}
             </Dropdown.Toggle>
             <Dropdown.Menu>
                 <Dropdown.Item>{props.customFieldType.name} Not Set</Dropdown.Item>

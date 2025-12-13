@@ -25,24 +25,32 @@ async function getTask(taskId: string | undefined): Promise<Task | null> {
 
 function TaskDetails(): JSX.Element {
     const { taskId } = useParams();
-    const [task, setTask] = useState<Task | null>(null);
-    const [hasFetched, setHasFetched] = useState<boolean>(false);
+    const [taskDetailsStates, setTaskDetailsStates] = useState<{
+        task: Task | null;
+        hasFetched: boolean;
+    }>({
+        task: null,
+        hasFetched: false,
+    });
 
     useEffect(() => {
-        if (hasFetched) {
+        if (taskDetailsStates.hasFetched) {
             return;
         }
 
-        setHasFetched(true);
+        setTaskDetailsStates((prevState) => ({ ...prevState, hasFetched: true }));
 
         getTask(taskId).then(value => {
-            setTask(value);
+            setTaskDetailsStates((prevState) => ({ ...prevState, task: value }));
         });
-    }, [taskId]);
+    }, [
+        taskId,
+        taskDetailsStates.hasFetched
+    ]);
 
     return (
         <div>
-            <h2>Task Details for: {task?.title ?? '<new task>'}</h2>
+            <h2>Task Details for: {taskDetailsStates.task?.title ?? '<new task>'}</h2>
             <hr />
         </div>
     );

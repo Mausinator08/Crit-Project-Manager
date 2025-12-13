@@ -1,5 +1,5 @@
-import { JSX, useContext, useRef } from "react";
-import { GetModuleContext } from "../../contexts/Module/module-context";
+import { JSX } from "react";
+import { UseService } from "../../contexts/Module/module-context";
 import { ProjectService } from "../../services/ProjectService.service";
 import { Project } from "../../models/project.model";
 import "./projects.scss";
@@ -21,9 +21,7 @@ function ProjectActions({
 	isLockedProjectsEnabled,
 	setError,
 }: ProjectActionsProps): JSX.Element {
-	const moduleContext = useRef(GetModuleContext("app"));
-	const { getService } = useContext(moduleContext.current.context);
-	const projectService: ProjectService = getService(ProjectService);
+	const projectService: ProjectService = UseService('app', ProjectService);
 
 	return (
 		<div className="actions-panel">

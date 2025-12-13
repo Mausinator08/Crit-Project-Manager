@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMinus, faBars } from "@fortawesome/free-solid-svg-icons";
-import { JSX, useState, useEffect, useContext, useRef } from "react";
+import { JSX, useState, useEffect } from "react";
 
 import {
 	GetLinks,
@@ -9,7 +9,7 @@ import {
 } from "../../constants/nav-bar-links";
 import styles from "./nav-bar.module.scss";
 import { CreateLinks } from "../../functions/Links/create-links";
-import { GetModuleContext } from "../../contexts/Module/module-context";
+import { UseService } from "../../contexts/Module/module-context";
 import { AuthService } from "../../services/AuthService.service";
 import { ProjectService } from "../../services/ProjectService.service";
 
@@ -19,81 +19,90 @@ type Props = {
 };
 
 function NavBar(props: Props): JSX.Element {
-	const moduleContext = useRef(GetModuleContext("app"));
-	const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-	const [links, setLinks] = useState<Link[]>([]);
-	const { getService } = useContext(moduleContext.current.context);
-	const authService: AuthService = getService(AuthService);
-	const projectService: ProjectService = getService(ProjectService);
-	const [isAutoRefreshEnabled, setIsAutoRefreshEnabled] = useState<boolean>(
-		localStorage.getItem("isAutoRefreshEnabled") === "true"
-	);
-	const [autoRefreshInterval, setAutoRefreshInterval] = useState<number>(
-		parseInt(localStorage.getItem("autoRefreshInterval") || "1", 10)
-	);
-	const [autoRefreshIntervalInstance, setAutoRefreshIntervalInstance] =
-		useState<NodeJS.Timeout | null>(null);
-	const [authIntervalInstance, setAuthIntervalInstance] =
-		useState<NodeJS.Timeout | null>(null);
-	const [hasFetched, setHasFetched] = useState<boolean>(false);
-	const [projectIds, setProjectIds] = useState<string[]>([]);
+	const authService: AuthService = UseService('app', AuthService);
+	const projectService: ProjectService = UseService('app', ProjectService);
+	const [navBarStates, setNavBarStates] = useState<{
+		isAuthenticated: boolean;
+		links: Link[];
+		isAutoRefreshEnabled: boolean;
+		autoRefreshInterval: number;
+		autoRefreshIntervalInstance: NodeJS.Timeout | null;
+		authIntervalInstance: NodeJS.Timeout | null;
+		hasFetched: boolean;
+		projectIds: string[];
+	}>({
+		isAuthenticated: false,
+		links: [],
+		isAutoRefreshEnabled: localStorage.getItem("isAutoRefreshEnabled") === "true",
+		autoRefreshInterval: parseInt(localStorage.getItem("autoRefreshInterval") || "1", 10),
+		autoRefreshIntervalInstance: null,
+		authIntervalInstance: null,
+		hasFetched: false,
+		projectIds: [],
+	});
 
 	useEffect(() => {
-		if (hasFetched) {
+		if (navBarStates.hasFetched) {
 			return;
 		}
 
-		setHasFetched(true);
+		setNavBarStates(prevState => ({ ...prevState, hasFetched: true }));
 
-		if (authIntervalInstance) {
-			clearInterval(authIntervalInstance);
+		if (navBarStates.authIntervalInstance) {
+			clearInterval(navBarStates.authIntervalInstance);
 		}
 
-		setAuthIntervalInstance(
-			setInterval(() => {
-				if (authService) {
-					setIsAuthenticated(authService.IsAuthenticated());
-				}
+		const intervalId = setInterval(() => {
+			if (authService) {
+				setNavBarStates(prevState => ({ ...prevState, isAuthenticated: authService.IsAuthenticated() }));
+			}
 
-				setProjectIds(projectService.GetProjectIds());
-			}, 1000)
-		);
-	}, []);
+			setNavBarStates(prevState => ({ ...prevState, projectIds: projectService.GetProjectIds() }));
+		}, 1000);
+
+		setNavBarStates(prevState => ({ ...prevState, authIntervalInstance: intervalId }));
+	}, [navBarStates.hasFetched, navBarStates.authIntervalInstance, authService, projectService]);
 
 	useEffect(() => {
-		if (isAuthenticated) {
-			GetLinks().then((links) => setLinks(links));
+		if (navBarStates.isAuthenticated) {
+			GetLinks().then((links) => setNavBarStates(prevState => ({ ...prevState, links })));
 		} else {
-			GetLoggedOutLinks().then((links) => setLinks(links));
+			GetLoggedOutLinks().then((links) => setNavBarStates(prevState => ({ ...prevState, links })));
 		}
-	}, [isAuthenticated, projectIds]);
+	}, [navBarStates.isAuthenticated, navBarStates.projectIds]);
 
 	useEffect(() => {
 		localStorage.setItem(
 			"isAutoRefreshEnabled",
-			isAutoRefreshEnabled.toString()
+			navBarStates.isAutoRefreshEnabled.toString()
 		);
 		localStorage.setItem(
 			"autoRefreshInterval",
-			autoRefreshInterval.toString()
+			navBarStates.autoRefreshInterval.toString()
 		);
 
-		if (autoRefreshIntervalInstance) {
-			clearInterval(autoRefreshIntervalInstance);
+		if (navBarStates.autoRefreshIntervalInstance) {
+			clearInterval(navBarStates.autoRefreshIntervalInstance);
 		}
 
-		if (!isAutoRefreshEnabled) return;
+		if (!navBarStates.isAutoRefreshEnabled) return;
 
-		setAutoRefreshIntervalInstance(
-			setInterval(() => {
-				if (isAuthenticated) {
-					GetLinks().then((links) => setLinks(links));
-				} else {
-					GetLoggedOutLinks().then((links) => setLinks(links));
-				}
-			}, autoRefreshInterval * 60000)
-		); // Convert minutes to milliseconds
-	}, [isAutoRefreshEnabled, autoRefreshInterval, isAuthenticated]);
+		const intervalId = setInterval(() => {
+			if (navBarStates.isAuthenticated) {
+				GetLinks().then((links) => setNavBarStates(prevState => ({ ...prevState, links })));
+			} else {
+				GetLoggedOutLinks().then((links) => setNavBarStates(prevState => ({ ...prevState, links })));
+			}
+		}, navBarStates.autoRefreshInterval * 60000);
+
+		setNavBarStates(prevState => ({ ...prevState, autoRefreshIntervalInstance: intervalId }));
+		// Convert minutes to milliseconds
+	}, [
+		navBarStates.isAutoRefreshEnabled,
+		navBarStates.autoRefreshInterval,
+		navBarStates.isAuthenticated,
+		navBarStates.autoRefreshIntervalInstance,
+	]);
 
 	return (
 		<nav
@@ -108,7 +117,7 @@ function NavBar(props: Props): JSX.Element {
 				onClick={props.onToggleOpen}
 			/>
 			<div>
-				{links.map<JSX.Element | undefined>((link) => {
+				{navBarStates.links.map<JSX.Element | undefined>((link) => {
 					return CreateLinks(link, props.open);
 				})}
 			</div>

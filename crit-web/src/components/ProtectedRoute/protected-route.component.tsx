@@ -1,6 +1,6 @@
-import { JSX, useState, useContext, useRef } from 'react';
+import { JSX, useState } from 'react';
 
-import { GetModuleContext } from '../../contexts/Module/module-context';
+import { UseService } from '../../contexts/Module/module-context';
 import { AuthService } from '../../services/AuthService.service';
 
 type ProtectedRouteProps = {
@@ -8,10 +8,8 @@ type ProtectedRouteProps = {
 };
 
 function ProtectedRoute(props: ProtectedRouteProps): JSX.Element {
-    const moduleContext = useRef(GetModuleContext('app'));
     const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const { getService } = useContext(moduleContext.current.context);
-    const authService: AuthService = getService(AuthService);
+    const authService: AuthService = UseService('app', AuthService);
 
     setInterval(() => {
         if (authService) {

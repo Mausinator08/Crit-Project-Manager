@@ -1,5 +1,3 @@
-import { Organization } from "../models/organization.model";
-
 export const USER_ROLES = {
     User: { value: 'User', display: 'User' },
     ProjectAdmin: { value: 'ProjectAdmin', display: 'Project Admin' },

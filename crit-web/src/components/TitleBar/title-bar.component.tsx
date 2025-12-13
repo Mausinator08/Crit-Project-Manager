@@ -4,8 +4,6 @@ import { JSX } from "react";
 
 import NavBar from "../NavBar/nav-bar.component";
 import "./title-bar.scss";
-import ModuleProvider from "../../contexts/Module/module-context";
-import { ProjectService } from "../../services/ProjectService.service";
 
 type Props = {
 	onToggleTheme: () => void;

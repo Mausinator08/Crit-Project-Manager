@@ -1,5 +1,5 @@
 import { Table } from "react-bootstrap";
-import { JSX, useContext, useEffect, useRef, useState } from "react";
+import { JSX, useContext } from "react";
 import { Outlet, useParams } from "react-router-dom";
 
 import { Task } from "../../models/task.model";
@@ -8,8 +8,6 @@ import styles from "./tasks.module.scss";
 import { CustomFieldType } from '../../models/custom-field-type.model';
 import { Status } from "../../models/status.model";
 import { ListTasks } from "../../functions/Tasks/list-tasks";
-import { GetModuleContext } from "../../contexts/Module/module-context";
-import { AuthService } from "../../services/AuthService.service";
 import { Priority } from "../../models/priority.model";
 import { User } from "../../models/requests/user.model";
 
@@ -34,10 +32,6 @@ function listTaskListCustomColumn(fieldType: CustomFieldType): JSX.Element {
 function TaskTable(props: TasksProps): JSX.Element {
     const { selectedTaskId } = useParams();
     const { theme } = useContext(ThemeContext);
-    const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-    const moduleContext = useRef(GetModuleContext('app'));
-    const { getService } = useContext(moduleContext.current.context);
-    const authService: AuthService = getService(AuthService);
 
     return (
         <div>

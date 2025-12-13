@@ -1,9 +1,9 @@
-import { JSX, useContext, useRef, useState } from "react";
+import { JSX, useContext, useState } from "react";
 import { Project } from "../../models/project.model";
 import { NavLink } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPencil, faTrash } from "@fortawesome/free-solid-svg-icons";
-import { GetModuleContext } from "../../contexts/Module/module-context";
+import { UseService } from "../../contexts/Module/module-context";
 import { ProjectService } from "../../services/ProjectService.service";
 import './projects.scss';
 import { ThemeContext } from "../../contexts/Theme/theme-context";
@@ -24,12 +24,15 @@ function ProjectsTable({ projects,
     setSelectedProjects,
     isLockedProjectsEnabled,
     setError }: ProjectTableProps): JSX.Element {
-    const moduleContext = useRef(GetModuleContext("app"));
     const { theme } = useContext(ThemeContext);
-    const { getService } = useContext(moduleContext.current.context);
-    const projectService: ProjectService = getService(ProjectService);
-    const [editingProjectName, setEditingProjectName] = useState<string | null>(null);
-    const [editingProjectDescription, setEditingProjectDescription] = useState<string | null>(null);
+    const projectService: ProjectService = UseService('app', ProjectService);
+    const [projectsTableStates, setProjectsTableStates] = useState<{
+        editingProjectName: string | null;
+        editingProjectDescription: string | null;
+    }>({
+        editingProjectName: null,
+        editingProjectDescription: null,
+    });
 
     return (
         <Table responsive striped bordered hover variant={theme} width="100%">
@@ -67,8 +70,8 @@ function ProjectsTable({ projects,
                                 </NavLink>
                             </td>
                             <td>
-                                <h5 onClick={() => setEditingProjectName(project.id!)}>
-                                    {editingProjectName === project.id ? (<input
+                                <h5 onClick={() => setProjectsTableStates(prevState => ({ ...prevState, editingProjectName: project.id! }))}>
+                                    {projectsTableStates.editingProjectName === project.id ? (<input
                                         type="text"
                                         id={`project_name_for_${project.id}`}
                                         defaultValue={project.name}
@@ -97,13 +100,13 @@ function ProjectsTable({ projects,
                                                     console.error(error);
                                                     setError(error.message);
                                                 });
-                                            setEditingProjectName(null);
+                                            setProjectsTableStates(prevState => ({ ...prevState, editingProjectName: null }));
                                         }}
                                     />) : project.name}
                                 </h5>
                             </td>
                             <td>
-                                <h5 onClick={() => setEditingProjectDescription(project.description ?? null)}>{editingProjectDescription === project.description ? (<input
+                                <h5 onClick={() => setProjectsTableStates(prevState => ({ ...prevState, editingProjectDescription: project.description ?? null }))}>{projectsTableStates.editingProjectDescription === project.description ? (<input
                                     type="text"
                                     id={`project_description_for_${project.id}`}
                                     defaultValue={project.description}
@@ -132,7 +135,7 @@ function ProjectsTable({ projects,
                                                 console.error(error);
                                                 setError(error.message);
                                             });
-                                        setEditingProjectDescription(null);
+                                        setProjectsTableStates(prevState => ({ ...prevState, editingProjectDescription: null }));
                                     }}
                                 />) : project.description}
                                 </h5>

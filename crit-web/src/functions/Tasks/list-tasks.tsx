@@ -25,69 +25,78 @@ export function ListTasks(
     hiddenCustomFieldTypes: CustomFieldType[],
     isSubtask?: boolean,
 ): JSX.Element {
-    const [assignedUser, setAssignedUser] = useState<string | undefined>(undefined);
-    const [status, setStatus] = useState<string | undefined>(undefined)
-    const [priority, setPriority] = useState<string | undefined>(undefined);
-    const [complexity, setComplexity] = useState<number | undefined>(undefined);
-    const [dueDate, setDueDate] = useState<Date | undefined>(undefined);
-    const [customFields, setCustomFields] = useState<(string | undefined)[]>([]);
+    const [listTasksStates, setListTasksStates] = useState<{
+        assignedUser: string | undefined;
+        status: string | undefined;
+        priority: string | undefined;
+        complexity: number | undefined;
+        dueDate: Date | undefined;
+        customFields: (string | undefined)[];
+    }>({
+        assignedUser: undefined,
+        status: undefined,
+        priority: undefined,
+        complexity: undefined,
+        dueDate: undefined,
+        customFields: [],
+    });
 
     function onAssignedUserSelect(value: string | undefined | null): void {
         if (value) {
-            setAssignedUser(value);
+            setListTasksStates(prevState => ({ ...prevState, assignedUser: value }));
             const user = users.find(u => u.id === value);
             if (user) {
                 task.assignedUserId = user.id;
             }
         } else {
-            setAssignedUser(undefined);
+            setListTasksStates(prevState => ({ ...prevState, assignedUser: undefined }));
             task.assignedUserId = undefined;
         }
     }
 
     function onStatusSelect(value: string | undefined | null): void {
         if (value) {
-            setStatus(value);
+            setListTasksStates(prevState => ({ ...prevState, status: value }));
             const status = statuses.find(s => s.id === value);
             if (status) {
                 task.statusId = status.id;
             }
         } else {
-            setStatus(undefined);
+            setListTasksStates(prevState => ({ ...prevState, status: undefined }));
             task.statusId = undefined;
         }
     }
 
     function onPrioritySelect(value: string | undefined | null): void {
         if (value) {
-            setPriority(value);
+            setListTasksStates(prevState => ({ ...prevState, priority: value }));
             const priority = priorities.find(s => s.id === value);
             if (priority) {
                 task.priorityId = priority.id;
             }
         } else {
-            setPriority(undefined);
+            setListTasksStates(prevState => ({ ...prevState, priority: undefined }));
             task.priorityId = undefined;
         }
     }
 
     function onComplexitySelect(value: number | undefined | null): void {
         if (value) {
-            setComplexity(value);
+            setListTasksStates(prevState => ({ ...prevState, complexity: value }));
             task.complexity = value;
         } else {
-            setComplexity(undefined);
+            setListTasksStates(prevState => ({ ...prevState, complexity: undefined }));
             task.complexity = undefined;
         }
     }
 
     function onDueDateSelect(value: Date | undefined | null): void {
         if (value) {
-            setDueDate(value);
+            setListTasksStates(prevState => ({ ...prevState, dueDate: value }));
             task.dueDate = value;
         }
         else {
-            setDueDate(undefined);
+            setListTasksStates(prevState => ({ ...prevState, dueDate: undefined }));
             task.dueDate = undefined;
         }
     }
@@ -100,7 +109,7 @@ export function ListTasks(
                 }
                 return cf;
             });
-            setCustomFields(task.customFields.map(cf => cf.id));
+            setListTasksStates(prevState => ({ ...prevState, customFields: task.customFields.map(cf => cf.id) }));
         } else {
             task.customFields = task.customFields.map(cf => {
                 if (cf.id === value) {
@@ -108,46 +117,55 @@ export function ListTasks(
                 }
                 return cf;
             });
-            setCustomFields(task.customFields.map(cf => cf.id));
+            setListTasksStates(prevState => ({ ...prevState, customFields: task.customFields.map(cf => cf.id) }));
         }
     }
 
     useEffect(() => {
+        const updates: Partial<typeof listTasksStates> = {};
+
         if (task.assignedUserId) {
             const user = users.find(u => u.id === task.assignedUserId);
-            setAssignedUser(user?.id);
+            updates.assignedUser = user?.id;
         } else {
-            setAssignedUser(undefined);
+            updates.assignedUser = undefined;
         }
 
         if (task.statusId) {
             const status = statuses.find(s => s.id === task.statusId);
-            setStatus(status?.id);
+            updates.status = status?.id;
         } else {
-            setStatus(undefined);
+            updates.status = undefined;
         }
 
         if (task.priorityId) {
             const priority = priorities.find(s => s.id === task.priorityId);
-            setStatus(priority?.id);
+            updates.priority = priority?.id;
         } else {
-            setStatus(undefined);
+            updates.priority = undefined;
         }
 
         if (task.complexity) {
-            setComplexity(task.complexity);
+            updates.complexity = task.complexity;
         } else {
-            setComplexity(undefined);
+            updates.complexity = undefined;
         }
 
         if (task.dueDate) {
-            setDueDate(task.dueDate);
+            updates.dueDate = task.dueDate;
         } else {
-            setDueDate(undefined);
+            updates.dueDate = undefined;
         }
 
-        setCustomFields(task.customFields.map(cf => cf.id));
-    }, []);
+        updates.customFields = task.customFields.map(cf => cf.id);
+
+        setListTasksStates(prevState => ({ ...prevState, ...updates }));
+    }, [
+        task,
+        users,
+        statuses,
+        priorities,
+    ]);
 
     function TaskTableRow(): JSX.Element {
         return (
@@ -156,19 +174,19 @@ export function ListTasks(
                     {task.title}
                 </td>
                 <td>
-                    <UserSelect users={users} assignedUser={assignedUser} onAssignedUserSelect={onAssignedUserSelect} taskId={task.id!} />
+                    <UserSelect users={users} assignedUser={listTasksStates.assignedUser} onAssignedUserSelect={onAssignedUserSelect} taskId={task.id!} />
                 </td>
                 <td>
-                    <StatusSelect statuses={statuses} onStatusSelect={onStatusSelect} taskId={task.id!} status={status} />
+                    <StatusSelect statuses={statuses} onStatusSelect={onStatusSelect} taskId={task.id!} status={listTasksStates.status} />
                 </td>
                 <td>
-                    <PrioritySelect priorities={priorities} onPrioritySelect={onPrioritySelect} taskId={task.id!} priority={priority} />
+                    <PrioritySelect priorities={priorities} onPrioritySelect={onPrioritySelect} taskId={task.id!} priority={listTasksStates.priority} />
                 </td>
                 <td>
-                    <ComplexitySelect taskId={task.id!} onComplexitySelect={onComplexitySelect} complexity={complexity} />
+                    <ComplexitySelect taskId={task.id!} onComplexitySelect={onComplexitySelect} complexity={listTasksStates.complexity} />
                 </td>
                 <td>
-                    <DueDateSelect taskId={task.id!} dueDate={dueDate} onDueDateSelect={onDueDateSelect} />
+                    <DueDateSelect taskId={task.id!} dueDate={listTasksStates.dueDate} onDueDateSelect={onDueDateSelect} />
                 </td>
                 <td>
                     {customFieldTypes.length > 0 &&
@@ -179,7 +197,7 @@ export function ListTasks(
                                     customFields={task.customFields}
                                     customFieldType={fieldType}
                                     onCustomFieldSelect={onCustomFieldSelect}
-                                    customField={customFields.find(cf => cf === fieldType.id)} />
+                                    customField={listTasksStates.customFields.find(cf => cf === fieldType.id)} />
                             </>
                         )
                     }
