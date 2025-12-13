@@ -1,9 +1,9 @@
-import { JSX, useContext, useState } from "react";
+import { JSX, useContext, useRef, useState } from "react";
 import { Project } from "../../models/project.model";
 import { NavLink } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPencil, faTrash } from "@fortawesome/free-solid-svg-icons";
-import { UseService } from "../../contexts/Module/module-context";
+import { GetModuleContext } from "../../contexts/Module/module-context";
 import { ProjectService } from "../../services/ProjectService.service";
 import './projects.scss';
 import { ThemeContext } from "../../contexts/Theme/theme-context";
@@ -25,7 +25,9 @@ function ProjectsTable({ projects,
     isLockedProjectsEnabled,
     setError }: ProjectTableProps): JSX.Element {
     const { theme } = useContext(ThemeContext);
-    const projectService: ProjectService = UseService('app', ProjectService);
+    const moduleContext = useRef(GetModuleContext('app'));
+    const { getService } = useContext(moduleContext.current.context);
+    const projectService: ProjectService = getService(ProjectService);
     const [projectsTableStates, setProjectsTableStates] = useState<{
         editingProjectName: string | null;
         editingProjectDescription: string | null;

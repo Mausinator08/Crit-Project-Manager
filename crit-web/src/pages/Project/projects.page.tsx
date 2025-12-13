@@ -1,9 +1,9 @@
-import { JSX, useEffect, useState } from "react";
+import { JSX, useContext, useEffect, useRef, useState } from "react";
 import { Outlet, useParams } from "react-router-dom";
 
 import { Project } from "../../models/project.model";
 import { ProjectService } from "../../services/ProjectService.service";
-import { UseService } from "../../contexts/Module/module-context";
+import { GetModuleContext } from "../../contexts/Module/module-context";
 import "./projects.scss";
 import ProjectsTable from "../../components/Projects/projects-table.component";
 import ProjectSettings from "../../components/Projects/project-settings.component";
@@ -12,7 +12,9 @@ import ProjectCreation from "../../components/Projects/project-creation.componen
 
 function Projects(): JSX.Element {
 	const { projectId } = useParams();
-	const projectService: ProjectService = UseService("app", ProjectService);
+	const moduleContext = useRef(GetModuleContext('app'));
+	const { getService } = useContext(moduleContext.current.context);
+	const projectService: ProjectService = getService(ProjectService);
 	const [projectsStates, setProjectStates] = useState<{
 		projects: Project[];
 		error: string | null;
@@ -63,7 +65,6 @@ function Projects(): JSX.Element {
 		setProjectStates(prevState => ({ ...prevState, autoRefreshInterval: refreshInterval }));
 	}, [
 		projectsStates.hasFetched,
-		projectService,
 	]);
 
 	useEffect(() => {
@@ -100,7 +101,6 @@ function Projects(): JSX.Element {
 		projectsStates.isAutoRefreshEnabled,
 		projectsStates.autoRefreshInterval,
 		projectsStates.autoRefreshIntervalInstance,
-		projectService,
 	]);
 
 	return (

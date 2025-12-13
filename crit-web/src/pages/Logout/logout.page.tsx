@@ -1,12 +1,14 @@
 
-import { JSX, useEffect } from "react";
+import { JSX, useContext, useEffect, useRef } from "react";
 import { navigate } from "../../functions/Utils/navigation-utils";
 import { GetEnvValues } from "../../constants/environment";
-import { UseService } from "../../contexts/Module/module-context";
+import { GetModuleContext } from "../../contexts/Module/module-context";
 import { AuthService } from "../../services/AuthService.service";
 
 function Logout(): JSX.Element {
-    const authService: AuthService = UseService('app', AuthService);
+    const moduleContext = useRef(GetModuleContext('app'));
+    const { getService } = useContext(moduleContext.current.context);
+    const authService: AuthService = getService(AuthService);
 
     useEffect(() => {
         fetch(new URL(`${GetEnvValues()?.critApiUrl}/Logout`), {
@@ -24,7 +26,7 @@ function Logout(): JSX.Element {
                 alert(await response.text());
             }
         });
-    }, [authService]);
+    }, []);
 
     return (
         <p>Logout</p>

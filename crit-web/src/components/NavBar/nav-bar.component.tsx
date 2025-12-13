@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMinus, faBars } from "@fortawesome/free-solid-svg-icons";
-import { JSX, useState, useEffect } from "react";
+import { JSX, useState, useEffect, useRef, useContext } from "react";
 
 import {
 	GetLinks,
@@ -9,7 +9,7 @@ import {
 } from "../../constants/nav-bar-links";
 import styles from "./nav-bar.module.scss";
 import { CreateLinks } from "../../functions/Links/create-links";
-import { UseService } from "../../contexts/Module/module-context";
+import { GetModuleContext } from "../../contexts/Module/module-context";
 import { AuthService } from "../../services/AuthService.service";
 import { ProjectService } from "../../services/ProjectService.service";
 
@@ -19,8 +19,10 @@ type Props = {
 };
 
 function NavBar(props: Props): JSX.Element {
-	const authService: AuthService = UseService('app', AuthService);
-	const projectService: ProjectService = UseService('app', ProjectService);
+	const moduleContext = useRef(GetModuleContext('app'));
+	const { getService } = useContext(moduleContext.current.context);
+	const authService: AuthService = getService(AuthService);
+	const projectService: ProjectService = getService(ProjectService);
 	const [navBarStates, setNavBarStates] = useState<{
 		isAuthenticated: boolean;
 		links: Link[];
@@ -61,7 +63,7 @@ function NavBar(props: Props): JSX.Element {
 		}, 1000);
 
 		setNavBarStates(prevState => ({ ...prevState, authIntervalInstance: intervalId }));
-	}, [navBarStates.hasFetched, navBarStates.authIntervalInstance, authService, projectService]);
+	}, [navBarStates.hasFetched, navBarStates.authIntervalInstance]);
 
 	useEffect(() => {
 		if (navBarStates.isAuthenticated) {
@@ -101,7 +103,6 @@ function NavBar(props: Props): JSX.Element {
 		navBarStates.isAutoRefreshEnabled,
 		navBarStates.autoRefreshInterval,
 		navBarStates.isAuthenticated,
-		navBarStates.autoRefreshIntervalInstance,
 	]);
 
 	return (

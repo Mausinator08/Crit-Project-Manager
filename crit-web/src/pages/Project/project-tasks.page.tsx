@@ -1,8 +1,8 @@
 import { Outlet, useParams } from "react-router-dom";
-import { JSX, useEffect, useState } from "react";
+import { JSX, useContext, useEffect, useRef, useState } from "react";
 import { Project } from '../../models/project.model';
 import TaskTable from "../../components/Tasks/tasks-table.component";
-import { UseService } from "../../contexts/Module/module-context";
+import { GetModuleContext } from "../../contexts/Module/module-context";
 import { ProjectService } from "../../services/ProjectService.service";
 import { UserService } from "../../services/UserService.service";
 import { User } from "../../models/requests/user.model";
@@ -25,8 +25,10 @@ function ProjectTasks(): JSX.Element {
         showSidePanel: false,
         users: [],
     });
-    const projectService: ProjectService = UseService("app", ProjectService);
-    const userService: UserService = UseService("app", UserService);
+    const moduleContext = useRef(GetModuleContext('app'));
+    const { getService } = useContext(moduleContext.current.context);
+    const projectService: ProjectService = getService(ProjectService);
+    const userService: UserService = getService(UserService);
 
     useEffect(() => {
         if (!projectId) {
@@ -58,8 +60,6 @@ function ProjectTasks(): JSX.Element {
     }, [
         projectId,
         projectTasksStates.project?.projectUsers,
-        projectService,
-        userService,
     ]);
 
     return (

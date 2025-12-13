@@ -1,4 +1,4 @@
-import React, { Context, createContext, useCallback, useContext, useRef, useState } from "react";
+import React, { Context, createContext, useCallback, useRef, useState } from "react";
 import { Container } from "../../dependencies/container";
 import ErrorPage from "../../pages/Error/error.page";
 import { NavLink } from "react-router-dom";
@@ -122,11 +122,5 @@ const ModuleProvider: React.FC<Props> = ({ services, children, id }) => {
         </ModuleContext>
     );
 };
-
-export function UseService(context: string, service: any): any {
-    const moduleContext = useRef(GetModuleContext(context));
-    const { getService } = useContext(moduleContext.current.context);
-    return getService(service);
-}
 
 export default ModuleProvider;

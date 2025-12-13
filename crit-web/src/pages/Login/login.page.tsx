@@ -1,14 +1,16 @@
-import { JSX } from "react";
+import { JSX, useContext, useRef } from "react";
 import { GetEnvValues } from "../../constants/environment";
 import { navigate } from "../../functions/Utils/navigation-utils";
 import { User } from "../../models/requests/user.model";
 import "./login.scss";
 import { NavLink } from "react-router-dom";
-import { UseService } from "../../contexts/Module/module-context";
+import { GetModuleContext } from "../../contexts/Module/module-context";
 import { AuthService } from "../../services/AuthService.service";
 
 function Login(): JSX.Element {
-    const authService: AuthService = UseService('app', AuthService);
+    const moduleContext = useRef(GetModuleContext('app'));
+    const { getService } = useContext(moduleContext.current.context);
+    const authService: AuthService = getService(AuthService);
 
     const submitLogin = (userName: string, password: string, useCookies: string): Promise<void> => {
         return new Promise<void>((resolve, reject) => {

@@ -1,9 +1,9 @@
-import { JSX, useState } from "react";
+import { JSX, useContext, useRef, useState } from "react";
 import { ProjectRequest } from "../../models/requests/project-request.model";
 import { Project } from "../../models/project.model";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
-import { UseService } from "../../contexts/Module/module-context";
+import { GetModuleContext } from "../../contexts/Module/module-context";
 import { ProjectService } from "../../services/ProjectService.service";
 
 import "./projects.scss";
@@ -17,7 +17,9 @@ function ProjectCreation({
 	setProjects,
 	setError,
 }: ProjectCreationProps): JSX.Element {
-	const projectService: ProjectService = UseService('app', ProjectService);
+	const moduleContext = useRef(GetModuleContext('app'));
+	const { getService } = useContext(moduleContext.current.context);
+	const projectService: ProjectService = getService(ProjectService);
 	const [projectCreationStates, setProjectCreationStates] = useState<{
 		newProjectName: string;
 		newProjectDescription: string;

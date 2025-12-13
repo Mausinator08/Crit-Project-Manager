@@ -1,9 +1,9 @@
-import { JSX, useEffect, useState } from "react";
+import { JSX, useContext, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Project } from "../../models/project.model";
 
 import "./projects.scss";
-import { UseService } from "../../contexts/Module/module-context";
+import { GetModuleContext } from "../../contexts/Module/module-context";
 import { UserService } from "../../services/UserService.service";
 import { ProjectService } from "../../services/ProjectService.service";
 import { ApiResult } from "../../models/responses/api-result.model";
@@ -25,12 +25,14 @@ import { ProjectUser } from "../../models/project-user.model";
 
 function ProjectOptions(): JSX.Element {
     const { projectId } = useParams();
-    const projectService: ProjectService = UseService("app", ProjectService);
-    const userService: UserService = UseService("app", UserService);
-    const organizationService: OrganizationService = UseService("app", OrganizationService);
-    const statusService: StatusService = UseService("app", StatusService);
-    const priorityService: PriorityService = UseService("app", PriorityService);
-    const customFieldTypeService: CustomFieldTypeService = UseService("app", CustomFieldTypeService);
+    const moduleContext = useRef(GetModuleContext('app'));
+    const { getService } = useContext(moduleContext.current.context);
+    const projectService: ProjectService = getService(ProjectService);
+    const userService: UserService = getService(UserService);
+    const organizationService: OrganizationService = getService(OrganizationService);
+    const statusService: StatusService = getService(StatusService);
+    const priorityService: PriorityService = getService(PriorityService);
+    const customFieldTypeService: CustomFieldTypeService = getService(CustomFieldTypeService);
     const [projectOptionsStates, setProjectOptionsStates] = useState<{
         project: Project | null;
         hasFetched: boolean;
@@ -136,11 +138,6 @@ function ProjectOptions(): JSX.Element {
     }, [
         projectId,
         projectOptionsStates.hasFetched,
-        customFieldTypeService,
-        priorityService,
-        projectService,
-        statusService,
-        userService,
     ]);
 
     useEffect(() => {
@@ -177,8 +174,6 @@ function ProjectOptions(): JSX.Element {
             });
     }, [
         projectOptionsStates.userId,
-        organizationService,
-        userService,
     ]);
 
     useEffect(() => {
@@ -222,8 +217,6 @@ function ProjectOptions(): JSX.Element {
             });
     }, [
         projectOptionsStates.project?.owningOrganizationId,
-        organizationService,
-        userService,
     ]);
 
     return (
