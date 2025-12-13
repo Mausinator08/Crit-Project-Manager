@@ -16,7 +16,10 @@
 				"msjsdiag.vscode-react-native",
 				"ms-azuretools.vscode-containers",
 				"ms-dotnettools.csdevkit",
-				"fernandoescolar.vscode-solution-explorer"
+				"fernandoescolar.vscode-solution-explorer",
+				"yzhang.markdown-all-in-one",
+				"bierner.markdown-emoji",
+				"bierner.markdown-checkbox"
 			],
 			"settings": {
 				"dotnet.defaultSolution": "/workspace/crit-api/CritApi.sln",
