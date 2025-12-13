@@ -59,7 +59,6 @@ function ProjectTasks(): JSX.Element {
         });
     }, [
         projectId,
-        projectTasksStates.project?.projectUsers,
     ]);
 
     return (

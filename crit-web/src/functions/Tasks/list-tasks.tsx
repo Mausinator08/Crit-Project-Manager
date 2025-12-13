@@ -160,12 +160,7 @@ export function ListTasks(
         updates.customFields = task.customFields.map(cf => cf.id);
 
         setListTasksStates(prevState => ({ ...prevState, ...updates }));
-    }, [
-        task,
-        users,
-        statuses,
-        priorities,
-    ]);
+    }, []);
 
     function TaskTableRow(): JSX.Element {
         return (

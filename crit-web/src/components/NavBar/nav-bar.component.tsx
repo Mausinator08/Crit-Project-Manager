@@ -63,7 +63,7 @@ function NavBar(props: Props): JSX.Element {
 		}, 1000);
 
 		setNavBarStates(prevState => ({ ...prevState, authIntervalInstance: intervalId }));
-	}, [navBarStates.hasFetched, navBarStates.authIntervalInstance]);
+	}, []);
 
 	useEffect(() => {
 		if (navBarStates.isAuthenticated) {

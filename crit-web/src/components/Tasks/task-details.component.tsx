@@ -45,7 +45,6 @@ function TaskDetails(): JSX.Element {
         });
     }, [
         taskId,
-        taskDetailsStates.hasFetched
     ]);
 
     return (

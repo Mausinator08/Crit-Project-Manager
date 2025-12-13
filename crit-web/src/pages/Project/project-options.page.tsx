@@ -137,7 +137,6 @@ function ProjectOptions(): JSX.Element {
             });
     }, [
         projectId,
-        projectOptionsStates.hasFetched,
     ]);
 
     useEffect(() => {

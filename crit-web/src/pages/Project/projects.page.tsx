@@ -63,9 +63,7 @@ function Projects(): JSX.Element {
 		}
 
 		setProjectStates(prevState => ({ ...prevState, autoRefreshInterval: refreshInterval }));
-	}, [
-		projectsStates.hasFetched,
-	]);
+	}, []);
 
 	useEffect(() => {
 		localStorage.setItem(
@@ -100,7 +98,6 @@ function Projects(): JSX.Element {
 	}, [
 		projectsStates.isAutoRefreshEnabled,
 		projectsStates.autoRefreshInterval,
-		projectsStates.autoRefreshIntervalInstance,
 	]);
 
 	return (

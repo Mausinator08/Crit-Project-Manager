@@ -5,6 +5,6 @@ interface EffectProps {
 };
 
 export function Effect(props: EffectProps) {
-    useEffect(() => props.callback?.(), [props]);
+    useEffect(() => props.callback?.(), []);
     return null;
 }
