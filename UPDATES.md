@@ -197,3 +197,16 @@
 * Removed unnecessary global.json file.
 * Fixed column names and created a migration for it.
 * Fixed phone numbers to save the UserId associated with it.
+
+## 2025/12/13 15:45 CST
+
+### Fixes
+
+* Declared css and css modules so that importing them does not show errors.
+* Fixed warnings for useEffect hooks missing dependencies.
+
+### Enhancements
+
+* Added a UseService() function to make getting context services easier and less verbose.
+* Changed all pages, components, etc... to use UseService() function for getting services.
+* Consolidated useState hooks into one hook for all pages, components, etc...
