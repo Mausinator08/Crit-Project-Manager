@@ -22,6 +22,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { ProjectAdmin } from "../../models/project-admin.model";
 import { ProjectUser } from "../../models/project-user.model";
+import MultiSelect from "../../components/MultiSelect/multi-select.component";
 
 function ProjectOptions(): JSX.Element {
     const { projectId } = useParams();
@@ -43,11 +44,15 @@ function ProjectOptions(): JSX.Element {
         organizationUsers: User[];
         isViewOnly: boolean;
         statuses: Status[];
+        deletedStatuses: string[];
+        newStatuses: Status[];
         statusColor: string;
         statusBackgroundColor: string;
         priorityColor: string;
         priorityBackgroundColor: string;
         priorities: Priority[];
+        deletedPriorities: string[];
+        newPriorities: Priority[];
         customFieldTypes: CustomFieldType[];
         hiddenCustomFieldTypes: CustomFieldType[];
     }>({
@@ -60,11 +65,15 @@ function ProjectOptions(): JSX.Element {
         organizationUsers: [],
         isViewOnly: false,
         statuses: [],
+        deletedStatuses: [],
+        newStatuses: [],
         statusColor: "#FFFFFF",
         statusBackgroundColor: "#000000",
         priorityColor: "#FFFFFF",
         priorityBackgroundColor: "#000000",
         priorities: [],
+        deletedPriorities: [],
+        newPriorities: [],
         customFieldTypes: [],
         hiddenCustomFieldTypes: [],
     });
@@ -315,37 +324,28 @@ function ProjectOptions(): JSX.Element {
                     </div>
                     <div>
                         <Form.Group as={Col}>
-                            <Form.Label>Statuses</Form.Label>
-                            <Form.Control as="select" multiple disabled={projectOptionsStates.isViewOnly} onChange={(e) => {
-                                const selectedOptions = Array.from((e.target as unknown as HTMLSelectElement).selectedOptions).map((option) => option.value);
-                                projectOptionsStates.statuses.filter((status) => selectedOptions.includes(status.id!)).forEach((status) => {
-                                    statusService.DeleteStatus(status.id!)
-                                        .then(() => {
-                                            setProjectOptionsStates(prevState => ({ ...prevState, statuses: prevState.statuses.filter((s) => s.id !== status.id) }));
-                                            projectOptionsStates.project!.statuses = projectOptionsStates.statuses;
-                                        })
-                                        .catch((error: Error) => {
-                                            console.error(error.message);
-                                            setProjectOptionsStates(prevState => ({ ...prevState, error: error.message }));
-                                        });
-                                });
+                            <MultiSelect disabled={projectOptionsStates.isViewOnly} onChange={(selectedOptions: string[]) => {
+                                const deletedStatuses: Status[] = projectOptionsStates.statuses.filter((status) => !selectedOptions.includes(status.id!));
+                                const newStatuses: Status[] = projectOptionsStates.newStatuses.filter((status) => !selectedOptions.includes(status.id!));
+                                const statuses: Status[] = [...deletedStatuses, ...newStatuses, ...projectOptionsStates.statuses.filter((status) => !deletedStatuses.some((s) => s.id === status.id) && !newStatuses.some((s) => s.id === status.id))];
+                                setProjectOptionsStates((prevState) => ({ ...prevState, deletedStatuses: deletedStatuses.map((status) => status.id!) }));
+                                setProjectOptionsStates((prevState) => ({ ...prevState, newStatuses: newStatuses }));
+                                setProjectOptionsStates((prevState) => ({ ...prevState, statuses: statuses }));
+                                const project: Project = projectOptionsStates.project!;
+                                project.statuses = statuses.filter((status) => !deletedStatuses.some((s) => s.id === status.id));
+                                setProjectOptionsStates((prevState) => ({ ...prevState, project: project }));
                             }}>
-                                {projectOptionsStates.statuses.map((status) => (
-                                    <option key={status.id} value={status.id} style={{
-                                        color: status.color,
-                                        backgroundColor: status.backgroundColor,
-                                        width: "fit-content",
-                                    }}><span style={{
-                                        display: 'inline-block',
-                                        fontFamily: 'Font Awesome 5 Free',
-                                        fontWeight: '900',
-                                        content: '\f1f8',
-                                        fontSize: '14pt',
-                                        width: '14pt',
-                                        height: '14pt',
-                                    }}></span>{status.name}</option>
-                                ))}
-                            </Form.Control>
+                                <MultiSelect.Label>Statuses</MultiSelect.Label>
+                                <MultiSelect.Body>
+                                    {projectOptionsStates.statuses.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' })).map((status) => (
+                                        <MultiSelect.Option key={status.id} value={status.id!} isInitiallySelected={true} style={{
+                                            color: status.color,
+                                            backgroundColor: status.backgroundColor,
+                                            width: "fit-content",
+                                        }}><span className={'me-2'}>{status.name}</span></MultiSelect.Option>
+                                    ))}
+                                </MultiSelect.Body>
+                            </MultiSelect>
                             <Form.Label>New Status</Form.Label>
                             <Form.Control as="input" type="color" disabled={projectOptionsStates.isViewOnly} value={projectOptionsStates.statusColor} onChange={(e) => {
                                 if (projectOptionsStates.isViewOnly) {
@@ -377,17 +377,16 @@ function ProjectOptions(): JSX.Element {
                                     newStatus.color = projectOptionsStates.statusColor;
                                     newStatus.backgroundColor = projectOptionsStates.statusBackgroundColor;
                                     newStatus.projectId = projectId!;
-                                    statusService.CreateStatus(newStatus)
-                                        .then((result) => {
-                                            setProjectOptionsStates(prevState => ({ ...prevState, statuses: [...prevState.statuses, result] }));
-                                            projectOptionsStates.project!.statuses = projectOptionsStates.statuses;
-                                            (document.getElementById("statusName") as HTMLInputElement).value = "New Status Name";
-                                            (document.getElementById("statusDescription") as HTMLInputElement).value = "New Status Description";
-                                        })
-                                        .catch((error: Error) => {
-                                            console.error(error.message);
-                                            setProjectOptionsStates(prevState => ({ ...prevState, error: error.message }));
-                                        });
+                                    setProjectOptionsStates((prevState) => ({
+                                        ...prevState,
+                                        newStatuses: [...projectOptionsStates.newStatuses, newStatus],
+                                        statuses: [...projectOptionsStates.statuses, newStatus]
+                                    }));
+                                    const project: Project = projectOptionsStates.project!;
+                                    project.statuses = [...projectOptionsStates.statuses, newStatus];
+                                    setProjectOptionsStates((prevState) => ({ ...prevState, project: project }));
+                                    (document.getElementById("statusName") as HTMLInputElement).value = "New Status Name";
+                                    (document.getElementById("statusDescription") as HTMLInputElement).value = "New Status Description";
                                 }} className={projectOptionsStates.isViewOnly ? "create-icon-disabled" : "create-icon"} />
                                 <Form.Control id="statusName" as="input" type="text" placeholder="New Status Name" disabled={projectOptionsStates.isViewOnly} defaultValue={"New Status"} />
                                 <Form.Control id="statusDescription" as="input" type="text" placeholder="New Status Description" disabled={projectOptionsStates.isViewOnly} defaultValue={"New Status Description"} />
@@ -396,28 +395,28 @@ function ProjectOptions(): JSX.Element {
                     </div>
                     <div>
                         <Form.Group as={Col}>
-                            <Form.Label>Priorities</Form.Label>
-                            <Form.Control as="select" multiple disabled={projectOptionsStates.isViewOnly} onChange={(e) => {
-                                const selectedOptions = Array.from((e.target as unknown as HTMLSelectElement).selectedOptions).map((option) => option.value);
-                                projectOptionsStates.priorities.filter((priority) => selectedOptions.includes(priority.id!)).forEach((priority) => {
-                                    priorityService.DeletePriority(priority.id!)
-                                        .then(() => {
-                                            setProjectOptionsStates(prevState => ({ ...prevState, priorities: prevState.priorities.filter((p) => p.id !== priority.id) }));
-                                            projectOptionsStates.project!.priorities = projectOptionsStates.priorities;
-                                        })
-                                        .catch((error: Error) => {
-                                            console.error(error.message);
-                                            setProjectOptionsStates(prevState => ({ ...prevState, error: error.message }));
-                                        });
-                                });
-                            }} value={projectOptionsStates.priorities.map((priority) => priority.id!)}>
-                                {projectOptionsStates.priorities.map((priority) => (
-                                    <option key={priority.id} value={priority.id}><div style={{
-                                        color: priority.color,
-                                        backgroundColor: priority.backgroundColor
-                                    }}>{priority.name}</div></option>
-                                ))}
-                            </Form.Control>
+                            <MultiSelect disabled={projectOptionsStates.isViewOnly} onChange={(selectedOptions) => {
+                                const deletedPriorities: Priority[] = projectOptionsStates.priorities.filter((priority) => !selectedOptions.includes(priority.id!));
+                                const newPriorities: Priority[] = projectOptionsStates.newPriorities.filter((priority) => !selectedOptions.includes(priority.id!));
+                                const priorities: Priority[] = [...deletedPriorities, ...newPriorities, ...projectOptionsStates.priorities.filter((priority) => !deletedPriorities.some((p) => p.id === priority.id) && !newPriorities.some((p) => p.id === priority.id))];
+                                setProjectOptionsStates((prevState) => ({ ...prevState, deletedPriorities: deletedPriorities.map((priority) => priority.id!) }));
+                                setProjectOptionsStates((prevState) => ({ ...prevState, newPriorities: newPriorities }));
+                                setProjectOptionsStates((prevState) => ({ ...prevState, priorities: priorities }));
+                                const project: Project = projectOptionsStates.project!;
+                                project.priorities = priorities.filter((priority) => !deletedPriorities.some((p) => p.id === priority.id));
+                                setProjectOptionsStates((prevState) => ({ ...prevState, project: project }));
+                            }}>
+                                <MultiSelect.Label>Priorities</MultiSelect.Label>
+                                <MultiSelect.Body>
+                                    {projectOptionsStates.priorities.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' })).map((priority) => (
+                                        <MultiSelect.Option key={priority.id} value={priority.id!} isInitiallySelected={true} style={{
+                                            color: priority.color,
+                                            backgroundColor: priority.backgroundColor,
+                                            width: "fit-content",
+                                        }}><span className={'me-2'}>{priority.name}</span></MultiSelect.Option>
+                                    ))}
+                                </MultiSelect.Body>
+                            </MultiSelect>
                             <Form.Label>New Priority</Form.Label>
                             <Form.Control as="input" type="color" disabled={projectOptionsStates.isViewOnly} value={projectOptionsStates.priorityColor} onChange={(e) => {
                                 if (projectOptionsStates.isViewOnly) {
@@ -447,18 +446,19 @@ function ProjectOptions(): JSX.Element {
                                     newPriority.color = projectOptionsStates.priorityColor;
                                     newPriority.backgroundColor = projectOptionsStates.priorityBackgroundColor;
                                     newPriority.projectId = projectId!;
-                                    priorityService.CreatePriority(newPriority)
-                                        .then((result) => {
-                                            setProjectOptionsStates(prevState => ({ ...prevState, priorities: [...prevState.priorities, result] }));
-                                            projectOptionsStates.project!.priorities = projectOptionsStates.priorities;
-                                            (document.getElementById("priorityName") as HTMLInputElement).value = "New Priority Name";
-                                        })
-                                        .catch((error: Error) => {
-                                            console.error(error.message);
-                                            setProjectOptionsStates(prevState => ({ ...prevState, error: error.message }));
-                                        });
+                                    setProjectOptionsStates((prevState) => ({
+                                        ...prevState,
+                                        newPriorities: [...projectOptionsStates.newPriorities, newPriority],
+                                        priorities: [...projectOptionsStates.priorities, newPriority]
+                                    }));
+                                    const project: Project = projectOptionsStates.project!;
+                                    project.priorities = [...projectOptionsStates.statuses, newPriority];
+                                    setProjectOptionsStates((prevState) => ({ ...prevState, project: project }));
+                                    (document.getElementById("priorityName") as HTMLInputElement).value = "New Priority Name";
+                                    (document.getElementById("priorityDescription") as HTMLInputElement).value = "New Priority Description";
                                 }} className={projectOptionsStates.isViewOnly ? "create-icon-disabled" : "create-icon"} />
                                 <Form.Control id="priorityName" as="input" type="text" placeholder="New Priority Name" disabled={projectOptionsStates.isViewOnly} defaultValue={"New Priority"} />
+                                <Form.Control id="priorityDescription" as="input" type="text" placeholder="New Priority Description" disabled={projectOptionsStates.isViewOnly} defaultValue={"New Priority Description"} />
                             </div>
                         </Form.Group>
                     </div>
@@ -530,10 +530,54 @@ function ProjectOptions(): JSX.Element {
                         </Form.Group>
                     </div>
                     <div>
-                        <button type="button" onClick={() => {
+                        <button className="float-left mt-2" type="button" onClick={() => {
                             if (projectOptionsStates.isViewOnly) {
                                 return;
                             }
+
+                            projectOptionsStates.newStatuses.forEach((newStatus) => {
+                                statusService.CreateStatus(newStatus)
+                                    .then((result) => {
+                                        setProjectOptionsStates(prevState => ({ ...prevState, statuses: [...prevState.statuses, result] }));
+                                    })
+                                    .catch((error: Error) => {
+                                        console.error(error.message);
+                                        setProjectOptionsStates(prevState => ({ ...prevState, error: error.message }));
+                                    });
+                            });
+
+                            projectOptionsStates.newPriorities.forEach((newPriority) => {
+                                priorityService.CreatePriority(newPriority)
+                                    .then((result) => {
+                                        setProjectOptionsStates(prevState => ({ ...prevState, priorities: [...prevState.priorities, result] }));
+                                    })
+                                    .catch((error: Error) => {
+                                        console.error(error.message);
+                                        setProjectOptionsStates(prevState => ({ ...prevState, error: error.message }));
+                                    });
+                            });
+
+                            projectOptionsStates.deletedStatuses.forEach((status) => {
+                                statusService.DeleteStatus(status)
+                                    .then(() => {
+                                        setProjectOptionsStates(prevState => ({ ...prevState, statuses: prevState.statuses.filter((s) => s.id !== status) }));
+                                    })
+                                    .catch((error: Error) => {
+                                        console.error(error.message);
+                                        setProjectOptionsStates(prevState => ({ ...prevState, error: error.message }));
+                                    });
+                            });
+
+                            projectOptionsStates.deletedPriorities.forEach((priority) => {
+                                priorityService.DeletePriority(priority)
+                                    .then(() => {
+                                        setProjectOptionsStates(prevState => ({ ...prevState, priorities: prevState.priorities.filter((p) => p.id !== priority) }));
+                                    })
+                                    .catch((error: Error) => {
+                                        console.error(error.message);
+                                        setProjectOptionsStates(prevState => ({ ...prevState, error: error.message }));
+                                    });
+                            });
 
                             projectService.UpdateProject(projectOptionsStates.project!)
                                 .then(() => {

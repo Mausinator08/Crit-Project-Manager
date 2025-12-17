@@ -1,0 +1,15 @@
+@use '../../styles/Custom.scss' as *;
+@use '../../styles/Colors.scss' as *;
+
+.multi-select-box {
+	min-height: 100px;
+	overflow: auto;
+	border-radius: 6px;
+	background-color: #888888;
+	padding: 6px;
+}
+
+.multi-select-item {
+	padding: 2px;
+	border-radius: 6px;
+}

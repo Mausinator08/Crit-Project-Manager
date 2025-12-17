@@ -83,7 +83,7 @@ function ProjectTasks(): JSX.Element {
                         <hr />
                         <button className="float-right" type="button" onClick={() => setProjectTasksStates(prevState => ({ ...prevState, showSidePanel: false }))}>Close Project Options</button>
                         <Outlet />
-                        <button className="float-right" type="button" onClick={() => setProjectTasksStates(prevState => ({ ...prevState, showSidePanel: false }))}>Close Project Options</button>
+                        <button className="float-right mt-2" type="button" onClick={() => setProjectTasksStates(prevState => ({ ...prevState, showSidePanel: false }))}>Close Project Options</button>
                     </div>
                 ) : (
                     <div className="scrollable-panel-right">
