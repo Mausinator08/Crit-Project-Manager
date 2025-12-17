@@ -11,7 +11,7 @@ public class CustomField
         TaskId = taskId;
     }
 
-    private CustomField()
+    protected CustomField()
     {
         Value = string.Empty;
         CustomFieldTypeId = Guid.Empty;

@@ -4,6 +4,7 @@ namespace CritDTO.Models;
 
 public class Status
 {
+    [JsonConstructor]
     public Status(string name, string? description, string? backgroundColor, string? color, Guid projectId)
     {
         Name = name;
@@ -14,7 +15,7 @@ public class Status
         Tasks = new List<ProjectTask>();
     }
 
-    private Status()
+    protected Status()
     {
         Name = string.Empty;
         Tasks = new List<ProjectTask>();

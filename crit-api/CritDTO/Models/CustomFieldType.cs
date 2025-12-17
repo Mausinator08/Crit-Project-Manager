@@ -11,7 +11,7 @@ public class CustomFieldType
         CustomFields = new List<CustomField>();
     }
 
-    private CustomFieldType()
+    protected CustomFieldType()
     {
         Name = string.Empty;
         ProjectId = Guid.Empty;

@@ -4,6 +4,7 @@ namespace CritDTO.Models;
 
 public class Priority
 {
+    [JsonConstructor]
     public Priority(string name, string? backgroundColor, string? color, Guid projectId)
     {
         Name = name;
@@ -13,7 +14,7 @@ public class Priority
         Tasks = new List<ProjectTask>();
     }
 
-    private Priority()
+    protected Priority()
     {
         Name = string.Empty;
         Tasks = new List<ProjectTask>();
