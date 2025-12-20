@@ -62,8 +62,8 @@ This repository contains the Crit web application written in React and Typescrip
 If the CritDBContext changes, models change, columns even change, and etc... please run the following:
 
 1. Install dotnet-ef with `dotnet tool install -g dotnet-ef --version 8.0.20` after starting the devcontainer.
-2. To add a migration run `dotnet ef migrations add <migration-name> --project CritDataAccess --startup-project CritApi`.
-3. To remove (undo) the last migration run `dotnet ef migrations remove --project CritDataAccess --startup-project CritApi`.
+2. To add a migration run `dotnet ef migrations add <migration-name> --project Crit.Infrastructure --startup-project CritApi`.
+3. To remove (undo) the last migration run `dotnet ef migrations remove --project Crit.Infrastructure --startup-project CritApi`.
 4. Running the API will automatically apply the migrations to the target database.
 
 ## VSCode .vscode directory and files
