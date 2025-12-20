@@ -1,8 +1,8 @@
 using System.Text;
 using Crit.Application.RepositoryInterfaces;
 using Crit.Domain.Contexts;
-using Crit.Domain.Entities;
 using Crit.Domain.Identity;
+using Crit.Domain.Models;
 using Crit.Infrastructure.Repositories;
 using CritApi.Logging;
 using CritApi.Middleware;
@@ -75,7 +75,6 @@ builder.Services.AddDbContext<CritDbContext>(options =>
         options.UseAdminDatabase("postgres");
     });
     options.EnableSensitiveDataLogging();
-    options.UseLazyLoadingProxies();
 });
 
 builder.Services.AddIdentityCore<ApplicationUser>(setupAction =>
