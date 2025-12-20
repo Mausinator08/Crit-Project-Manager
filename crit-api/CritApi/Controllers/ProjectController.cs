@@ -1,6 +1,6 @@
 using Crit.Application.RepositoryInterfaces;
-using Crit.Domain.Entities;
-using Crit.Domain.Entities;
+using Crit.Domain.Models;
+using Crit.Domain.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
