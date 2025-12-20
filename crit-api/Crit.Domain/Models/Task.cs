@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 using Crit.Domain.BaseModels;
 
-namespace Crit.Domain.Entities;
+namespace Crit.Domain.Models;
 
 public class ProjectTask : AuditInformation
 {
@@ -16,20 +16,6 @@ public class ProjectTask : AuditInformation
         DateUpdated = now;
     }
 
-    [JsonConstructor]
-    public ProjectTask(Guid projectId, Guid createdByUserId)
-    {
-        ProjectId = projectId;
-        SubTasks = new List<ProjectTask>();
-        CustomFields = new List<CustomField>();
-        Comments = new List<Comment>();
-        DateTime now = DateTime.UtcNow;
-        DateCreated = now;
-        DateUpdated = now;
-        CreatedByUserId = createdByUserId;
-        UpdatedByUserId = createdByUserId;
-    }
-
     public Guid? Id { get; set; }
     public string? Title { get; set; }
     public string? Details { get; set; }
@@ -42,17 +28,17 @@ public class ProjectTask : AuditInformation
     public Guid? ParentTaskId { get; set; }
 
     [JsonIgnore]
-    public virtual List<CustomField> CustomFields { get; set; }
+    public List<CustomField> CustomFields { get; set; }
     [JsonIgnore]
-    public virtual Project? Project { get; set; }
+    public Project? Project { get; set; }
     [JsonIgnore]
-    public virtual Status? Status { get; set; }
+    public Status? Status { get; set; }
     [JsonIgnore]
-    public virtual Priority? Priority { get; set; }
+    public Priority? Priority { get; set; }
     [JsonIgnore]
-    public virtual List<ProjectTask> SubTasks { get; set; }
+    public List<ProjectTask> SubTasks { get; set; }
     [JsonIgnore]
-    public virtual ProjectTask? ParentTask { get; set; }
+    public ProjectTask? ParentTask { get; set; }
     [JsonIgnore]
-    public virtual List<Comment> Comments { get; set; }
+    public List<Comment> Comments { get; set; }
 }

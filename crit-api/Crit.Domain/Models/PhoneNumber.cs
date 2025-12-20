@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 using Crit.Domain.Enums;
 using Microsoft.AspNetCore.Identity;
 
-namespace Crit.Domain.Entities;
+namespace Crit.Domain.Models;
 
 public class PhoneNumber
 {
@@ -26,5 +26,5 @@ public class PhoneNumber
     public Guid? UserId { get; set; }
 
     [JsonIgnore]
-    public virtual Organization? Organization { get; set; }
+    public Organization? Organization { get; set; }
 }

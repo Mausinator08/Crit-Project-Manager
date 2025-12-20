@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Crit.Domain.Entities;
+namespace Crit.Domain.Models;
 
 public class OrganizationProject
 {
@@ -10,19 +10,10 @@ public class OrganizationProject
 		ProjectId = Guid.Empty;
 	}
 
-	[JsonConstructor]
-	public OrganizationProject(Guid organizationId, Guid projectId)
-	{
-		OrganizationId = organizationId;
-		ProjectId = projectId;
-	}
-
 	public Guid? Id { get; set; }
 	public Guid OrganizationId { get; set; }
 	public Guid ProjectId { get; set; }
 
-	[JsonIgnore]
-	public virtual Organization? Organization { get; set; }
-	[JsonIgnore]
-	public virtual Project? Project { get; set; }
+	public Organization? Organization { get; set; }
+	public Project? Project { get; set; }
 }

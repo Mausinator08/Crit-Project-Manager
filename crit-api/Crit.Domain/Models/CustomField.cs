@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Crit.Domain.Entities;
+namespace Crit.Domain.Models;
 
 public class CustomField
 {
@@ -24,7 +24,7 @@ public class CustomField
     public Guid TaskId { get; set; }
 
     [JsonIgnore]
-    public virtual ProjectTask? Task { get; set; }
+    public ProjectTask? Task { get; set; }
     [JsonIgnore]
-    public virtual CustomFieldType? CustomFieldType { get; set; }
+    public CustomFieldType? CustomFieldType { get; set; }
 }

@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Crit.Domain.Entities;
+namespace Crit.Domain.Models;
 
 public class CommentQuote
 {
@@ -10,19 +10,10 @@ public class CommentQuote
 		QuotedCommentId = Guid.Empty;
 	}
 
-	[JsonConstructor]
-	public CommentQuote(Guid commentId, Guid quotedCommentId)
-	{
-		CommentId = commentId;
-		QuotedCommentId = quotedCommentId;
-	}
-
 	public Guid? Id { get; set; }
 	public Guid CommentId { get; set; }
 	public Guid QuotedCommentId { get; set; }
 
-	[JsonIgnore]
-	public virtual Comment? Comment { get; set; }
-	[JsonIgnore]
-	public virtual Comment? QuotedComment { get; set; }
+	public Comment? Comment { get; set; }
+	public Comment? QuotedComment { get; set; }
 }

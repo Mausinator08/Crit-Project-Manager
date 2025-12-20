@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Identity;
 
-namespace Crit.Domain.Entities;
+namespace Crit.Domain.Models;
 
 public class Email
 {
@@ -12,5 +12,5 @@ public class Email
     public Guid OrganizationId { get; set; } = Guid.Empty;
 
     [JsonIgnore]
-    public virtual Organization? Organization { get; set; }
+    public Organization? Organization { get; set; }
 }

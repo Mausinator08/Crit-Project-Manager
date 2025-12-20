@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 using Crit.Domain.Identity;
 
-namespace Crit.Domain.Entities;
+namespace Crit.Domain.Models;
 
 public class Organization
 {
@@ -18,38 +18,24 @@ public class Organization
         OrganizationAffiliates = new List<OrganizationAffiliate>();
     }
 
-    [JsonConstructor]
-    public Organization(string name, Guid ownerUserId)
-    {
-        Name = name;
-        OwnerUserId = ownerUserId;
-        Emails = new List<Email>();
-        PhoneNumbers = new List<PhoneNumber>();
-        Projects = new List<Project>();
-        OrganizationProjects = new List<OrganizationProject>();
-        OrganizationAdmins = new List<OrganizationAdmin>();
-        OrganizationMembers = new List<OrganizationMember>();
-        OrganizationAffiliates = new List<OrganizationAffiliate>();
-    }
-
     public Guid? Id { get; set; }
     public string Name { get; set; }
     public Guid OwnerUserId { get; set; }
 
     [JsonIgnore]
-    public virtual List<Email> Emails { get; set; }
+    public List<Email> Emails { get; set; }
     [JsonIgnore]
-    public virtual List<PhoneNumber> PhoneNumbers { get; set; }
+    public List<PhoneNumber> PhoneNumbers { get; set; }
     [JsonIgnore]
-    public virtual List<Project> Projects { get; set; }
+    public List<Project> Projects { get; set; }
     [JsonIgnore]
-    public virtual ApplicationUser? Owner { get; set; }
+    public ApplicationUser? Owner { get; set; }
     [JsonIgnore]
-    public virtual List<OrganizationProject> OrganizationProjects { get; set; }
+    public List<OrganizationProject> OrganizationProjects { get; set; }
     [JsonIgnore]
-    public virtual List<OrganizationAdmin> OrganizationAdmins { get; set; }
+    public List<OrganizationAdmin> OrganizationAdmins { get; set; }
     [JsonIgnore]
-    public virtual List<OrganizationMember> OrganizationMembers { get; set; }
+    public List<OrganizationMember> OrganizationMembers { get; set; }
     [JsonIgnore]
-    public virtual List<OrganizationAffiliate> OrganizationAffiliates { get; set; }
+    public List<OrganizationAffiliate> OrganizationAffiliates { get; set; }
 }

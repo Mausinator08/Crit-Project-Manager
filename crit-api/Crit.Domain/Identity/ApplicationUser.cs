@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
-using Crit.Domain.Entities;
+using Crit.Domain.Models;
 using Microsoft.AspNetCore.Identity;
 
 namespace Crit.Domain.Identity;
@@ -32,20 +32,12 @@ public class ApplicationUser : IdentityUser<Guid>
 		ProjectAdmins = new List<ProjectAdmin>();
 	}
 
-	[JsonIgnore]
-	public virtual List<Organization> OwnedOrganizations { get; set; }
-	[JsonIgnore]
-	public virtual List<Project> Projects { get; set; }
-	[JsonIgnore]
-	public virtual List<MentionedUserComment> MentionedUserComments { get; set; }
-	[JsonIgnore]
-	public virtual List<OrganizationAdmin> OrganizationAdmins { get; set; }
-	[JsonIgnore]
-	public virtual List<OrganizationMember> OrganizationMembers { get; set; }
-	[JsonIgnore]
-	public virtual List<OrganizationAffiliate> OrganizationAffiliates { get; set; }
-	[JsonIgnore]
-	public virtual List<ProjectUser> ProjectUsers { get; set; }
-	[JsonIgnore]
-	public virtual List<ProjectAdmin> ProjectAdmins { get; set; }
+	public List<Organization> OwnedOrganizations { get; set; }
+	public List<Project> Projects { get; set; }
+	public List<MentionedUserComment> MentionedUserComments { get; set; }
+	public List<OrganizationAdmin> OrganizationAdmins { get; set; }
+	public List<OrganizationMember> OrganizationMembers { get; set; }
+	public List<OrganizationAffiliate> OrganizationAffiliates { get; set; }
+	public List<ProjectUser> ProjectUsers { get; set; }
+	public List<ProjectAdmin> ProjectAdmins { get; set; }
 }
