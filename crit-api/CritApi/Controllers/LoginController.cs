@@ -1,8 +1,8 @@
 using System.Text;
+using Crit.Application.RepositoryInterfaces;
+using Crit.Contracts.Identity;
+using Crit.Contracts.Models;
 using CritApi.Models;
-using CritBusinessLogic.RepositoryInterfaces;
-using CritDTO.Identity;
-using CritDTO.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;

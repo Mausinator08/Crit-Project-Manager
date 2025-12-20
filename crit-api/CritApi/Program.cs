@@ -1,11 +1,11 @@
 using System.Text;
+using Crit.Application;
+using Crit.Application.Repositories;
+using Crit.Application.RepositoryInterfaces;
+using Crit.Contracts.Identity;
+using Crit.Infrastructure.Contexts;
 using CritApi.Logging;
 using CritApi.Middleware;
-using CritBusinessLogic;
-using CritBusinessLogic.Repositories;
-using CritBusinessLogic.RepositoryInterfaces;
-using CritDataAccess.Contexts;
-using CritDTO.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Proxies;

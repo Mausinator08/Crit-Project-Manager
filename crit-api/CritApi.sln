@@ -5,11 +5,11 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CritApi", "CritApi\CritApi.csproj", "{EA0FB449-69C9-4C82-B124-4582102A0074}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CritDTO", "CritDTO\CritDTO.csproj", "{AED4BFF6-F7F9-4955-BDD1-98EF1C5844F5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crit.Contracts", "Crit.Contracts\Crit.Contracts.csproj", "{AED4BFF6-F7F9-4955-BDD1-98EF1C5844F5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CritDataAccess", "CritDataAccess\CritDataAccess.csproj", "{C3F5C987-92FC-4228-ABAD-B2C7BC4A6B42}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crit.Infrastructure", "Crit.Infrastructure\Crit.Infrastructure.csproj", "{C3F5C987-92FC-4228-ABAD-B2C7BC4A6B42}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CritBusinessLogic", "CritBusinessLogic\CritBusinessLogic.csproj", "{10EC706F-F499-40BC-BA0F-782E2F8346B1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crit.Application", "Crit.Application\Crit.Application.csproj", "{10EC706F-F499-40BC-BA0F-782E2F8346B1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

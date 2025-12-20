@@ -1,6 +1,6 @@
-using CritBusinessLogic.Models;
-using CritBusinessLogic.RepositoryInterfaces;
-using CritDTO.Models;
+using Crit.Application.Models;
+using Crit.Application.RepositoryInterfaces;
+using Crit.Contracts.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

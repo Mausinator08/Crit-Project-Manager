@@ -1,5 +1,5 @@
-using CritBusinessLogic;
-using CritDTO.Models;
+using Crit.Application;
+using Crit.Contracts.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

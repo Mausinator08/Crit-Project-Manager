@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
-using CritDTO.Models;
+using Crit.Contracts.Models;
 
 namespace CritApi.Models;
 
