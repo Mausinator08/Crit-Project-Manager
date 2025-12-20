@@ -1,11 +1,11 @@
-using Crit.Contracts.Identity;
-using Crit.Contracts.Models;
+using Crit.Domain.Entities;
+using Crit.Domain.Identity;
 using Crit.Infrastructure.ValueGenerators;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 
-namespace Crit.Infrastructure.Contexts;
+namespace Crit.Domain.Contexts;
 
 public class CritDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, Guid>, ICritDbContext
 {

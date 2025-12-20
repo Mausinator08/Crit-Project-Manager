@@ -1,8 +1,8 @@
-using Crit.Contracts.Models;
+using Crit.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 
-namespace Crit.Infrastructure.Contexts;
+namespace Crit.Domain.Contexts;
 
 public interface ICritDbContext
 {

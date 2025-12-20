@@ -1,4 +1,4 @@
-using Crit.Contracts.Models;
+using Crit.Domain.Entities;
 
 namespace Crit.Application.RepositoryInterfaces;
 

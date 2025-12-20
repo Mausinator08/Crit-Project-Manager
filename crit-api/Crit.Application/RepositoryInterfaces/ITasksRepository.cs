@@ -1,6 +1,6 @@
-﻿using Crit.Contracts.Models;
+﻿using Crit.Domain.Entities;
 
-namespace Crit.Application;
+namespace Crit.Domain.Entities;
 
 public interface ITasksRepository
 {

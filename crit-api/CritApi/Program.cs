@@ -1,9 +1,9 @@
 using System.Text;
-using Crit.Application;
-using Crit.Application.Repositories;
 using Crit.Application.RepositoryInterfaces;
-using Crit.Contracts.Identity;
-using Crit.Infrastructure.Contexts;
+using Crit.Domain.Contexts;
+using Crit.Domain.Entities;
+using Crit.Domain.Identity;
+using Crit.Infrastructure.Repositories;
 using CritApi.Logging;
 using CritApi.Middleware;
 using Microsoft.AspNetCore.Identity;

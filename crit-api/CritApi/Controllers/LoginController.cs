@@ -1,7 +1,7 @@
 using System.Text;
 using Crit.Application.RepositoryInterfaces;
-using Crit.Contracts.Identity;
-using Crit.Contracts.Models;
+using Crit.Domain.Entities;
+using Crit.Domain.Identity;
 using CritApi.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;

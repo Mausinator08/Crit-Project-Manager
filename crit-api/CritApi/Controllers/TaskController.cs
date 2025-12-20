@@ -1,5 +1,5 @@
-using Crit.Application;
-using Crit.Contracts.Models;
+using Crit.Domain.Entities;
+using Crit.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
