@@ -1,4 +1,4 @@
-using Crit.Domain.Entities;
+using Crit.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 

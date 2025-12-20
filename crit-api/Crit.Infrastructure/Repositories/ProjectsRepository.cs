@@ -1,9 +1,9 @@
 using System.Security.Cryptography.X509Certificates;
 using Crit.Application.RepositoryInterfaces;
 using Crit.Domain.Contexts;
-using Crit.Domain.Entities;
-using Crit.Domain.Entities;
 using Crit.Domain.Identity;
+using Crit.Domain.Models;
+using Crit.Domain.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;

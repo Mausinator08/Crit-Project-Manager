@@ -1,7 +1,7 @@
 using Crit.Application.RepositoryInterfaces;
 using Crit.Domain.Contexts;
-using Crit.Domain.Entities;
 using Crit.Domain.Identity;
+using Crit.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 

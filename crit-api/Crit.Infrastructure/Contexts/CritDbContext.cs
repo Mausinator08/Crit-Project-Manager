@@ -1,5 +1,5 @@
-using Crit.Domain.Entities;
 using Crit.Domain.Identity;
+using Crit.Domain.Models;
 using Crit.Infrastructure.ValueGenerators;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
