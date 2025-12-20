@@ -4,6 +4,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Crit.Domain\Crit.Domain.csproj" />
+    <ProjectReference Include="..\Crit.Contracts\Crit.Contracts.csproj" />
   </ItemGroup>
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>

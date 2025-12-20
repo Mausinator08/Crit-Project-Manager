@@ -1,5 +1,5 @@
-using Crit.Domain.Entities;
 using Crit.Domain.Identity;
+using Crit.Domain.Models;
 
 namespace Crit.Application.RepositoryInterfaces;
 
