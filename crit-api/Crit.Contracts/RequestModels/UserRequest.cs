@@ -2,28 +2,28 @@ using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 using Crit.Contracts.Enums;
 
-namespace CritApi.Models;
+namespace Crit.Contracts.RequestModels;
 
-public class User
+public class UserRequest
 {
     [JsonConstructor]
-    public User(string userName, string email, string? password = null, string? twoFactorCode = null, string? twoFactorRecoveryCode = null)
+    public UserRequest(string userName, string email, string? password = null, string? twoFactorCode = null, string? twoFactorRecoveryCode = null)
     {
-        UserName = userName;
+        UserRequestName = userName;
         Email = email;
         Password = password;
         TwoFactorCode = twoFactorCode;
         TwoFactorRecoveryCode = twoFactorRecoveryCode;
     }
 
-    public User(string userName, string email)
+    public UserRequest(string userName, string email)
     {
-        UserName = userName;
+        UserRequestName = userName;
         Email = email;
     }
 
     public Guid? Id { get; set; }
-    public string? UserName { get; set; }
+    public string? UserRequestName { get; set; }
 
     [EmailAddress(ErrorMessage = "Invalid Email")]
     public string? Email { get; set; }

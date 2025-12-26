@@ -1,15 +1,11 @@
 using System.Text.Json.Serialization;
-using Microsoft.AspNetCore.Identity;
 
-namespace Crit.Domain.Models;
+namespace Crit.Contracts.ResponseModels;
 
-public class Email
+public class EmailResponse
 {
     public Guid? Id { get; set; }
     public Guid? UserId { get; set; }
-    [ProtectedPersonalData]
     public string? EmailAddress { get; set; }
     public Guid OrganizationId { get; set; } = Guid.Empty;
-
-    public Organization? Organization { get; set; }
 }

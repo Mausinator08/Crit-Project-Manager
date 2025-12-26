@@ -1,12 +1,11 @@
 using System.Text.Json.Serialization;
-using Crit.Domain.Enums;
-using Microsoft.AspNetCore.Identity;
+using Crit.Contracts.Enums;
 
-namespace Crit.Domain.Models;
+namespace Crit.Contracts.ResponseModels;
 
-public class PhoneNumber
+public class PhoneNumberResponse
 {
-    public PhoneNumber()
+    public PhoneNumberResponse()
     {
         Type = PhoneNumberType.Mobile;
         CountryCode = "+1";
@@ -16,14 +15,9 @@ public class PhoneNumber
 
     public Guid? Id { get; set; }
     public PhoneNumberType Type { get; set; }
-    [PersonalData]
     public string CountryCode { get; set; }
-    [PersonalData]
     public string Number { get; set; }
-    [PersonalData]
     public string? Extension { get; set; }
     public Guid OrganizationId { get; set; }
     public Guid? UserId { get; set; }
-
-    public Organization? Organization { get; set; }
 }

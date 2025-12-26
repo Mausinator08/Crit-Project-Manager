@@ -32,28 +32,16 @@ public class Project : AuditInformation
     public Guid OwningOrganizationId { get; set; }
     public Guid ProjectOwnerUserId { get; set; }
 
-    [JsonIgnore]
     public Organization? OwningOrganization { get; set; }
-    [JsonIgnore]
     public ApplicationUser? ProjectOwner { get; set; }
-    [JsonIgnore]
     public List<Status> Statuses { get; set; }
-    [JsonIgnore]
     public List<Priority> Priorities { get; set; }
-    [JsonIgnore]
     public List<CustomFieldType> CustomFieldTypes { get; set; }
-    [JsonIgnore]
     public List<ProjectTask> Tasks { get; set; }
-    [JsonIgnore]
     public List<Organization> Organizations { get; set; }
-    [JsonIgnore]
     public List<CustomFieldType> HiddenCustomFieldTypes { get; set; }
-    [JsonIgnore]
     public List<Comment> Comments { get; set; }
-    [JsonIgnore]
     public List<OrganizationProject> OrganizationProjects { get; set; }
-    [JsonIgnore]
     public List<ProjectUser> ProjectUsers { get; set; }
-    [JsonIgnore]
     public List<ProjectAdmin> ProjectAdmins { get; set; }
 }

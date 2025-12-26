@@ -4,7 +4,7 @@ namespace Crit.Application.RepositoryInterfaces;
 
 public interface IOrganizationRepository
 {
-    Task<Organization> CreateFirstOrganization(Organization organization);
+    Task<Organization> CreateFirstOrganization(Organization organization);  // TODO: ***MOVE THIS TO SERVICE***
     Task<List<Organization>> GetAllOrganizations();
     Task<List<Organization>> GetAllOrganizationsForProjectId(Guid projectId);
     Task<List<Organization>> GetAllOrganizationsForUserId(Guid userId);

@@ -1,10 +1,7 @@
-using System.Security.Cryptography.X509Certificates;
 using Crit.Application.RepositoryInterfaces;
 using Crit.Domain.Contexts;
 using Crit.Domain.Identity;
 using Crit.Domain.Models;
-using Crit.Domain.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
@@ -94,7 +91,7 @@ public class ProjectsRepository : IProjectsRepository
         }
     }
 
-    public async Task<Project> CreateProject(ProjectRequest project)
+    public async Task<Project> CreateProject(Project project)
     {
         try
         {
@@ -115,44 +112,42 @@ public class ProjectsRepository : IProjectsRepository
                 throw new Exception("Organization ID is not valid.");
             }
 
-            Project newProject = new Project(project.Name, project.Description, project.OwningOrganizationId != null && project.OwningOrganizationId != Guid.Empty ? project.OwningOrganizationId.Value : organization.Id.Value, applicationUser.Id);
-
             if (_critDbContext == null)
             {
                 throw new Exception("Crit database context is not initialized.");
             }
 
-            EntityEntry<Project>? savedProj = _critDbContext.Projects.Add(newProject);
+            EntityEntry<Project>? savedProj = _critDbContext.Projects.Add(project);
 
             if (savedProj == null || savedProj.Entity == null)
             {
-                throw new Exception($"The project {newProject.Name} did not save correctly.");
+                throw new Exception($"The project {project.Name} did not save correctly.");
             }
 
             if (savedProj.Entity.Id == null || savedProj.Entity.Id == Guid.Empty)
             {
-                throw new Exception($"The project {newProject.Name} did not generate the Id correctly.");
+                throw new Exception($"The project {project.Name} did not generate the Id correctly.");
             }
 
 
-            _critDbContext.ProjectUsers.Add(new ProjectUser(savedProj.Entity.Id.Value, applicationUser.Id));
-            _critDbContext.ProjectAdmins.Add(new ProjectAdmin(savedProj.Entity.Id.Value, applicationUser.Id));
+            _critDbContext.ProjectUsers.Add(new ProjectUser() { Id = savedProj.Entity.Id, UserId = applicationUser.Id });
+            _critDbContext.ProjectAdmins.Add(new ProjectAdmin() { Id = savedProj.Entity.Id, AdminId = applicationUser.Id });
 
-            foreach (Guid userId in project.ProjectUserIds)
+            foreach (Guid userId in project.ProjectUsers.Select(pu => pu.UserId).ToList())
             {
-                _critDbContext.ProjectUsers.Add(new ProjectUser(savedProj.Entity.Id.Value, userId));
+                _critDbContext.ProjectUsers.Add(new ProjectUser() { Id = savedProj.Entity.Id, UserId = userId });
             }
 
-            foreach (Guid adminId in project.ProjectAdminUserIds)
+            foreach (Guid adminId in project.ProjectAdmins.Select(pa => pa.AdminId).ToList())
             {
-                _critDbContext.ProjectUsers.Add(new ProjectUser(savedProj.Entity.Id.Value, adminId));
+                _critDbContext.ProjectAdmins.Add(new ProjectAdmin() { Id = savedProj.Entity.Id.Value, AdminId = adminId });
             }
 
-            _critDbContext.OrganizationProjects.Add(new OrganizationProject(savedProj.Entity.OwningOrganizationId, savedProj.Entity.Id.Value));
+            _critDbContext.OrganizationProjects.Add(new OrganizationProject() { Id = savedProj.Entity.OwningOrganizationId, ProjectId = savedProj.Entity.Id.Value });
 
-            foreach (Guid organizationId in project.OrganizationIds)
+            foreach (Guid? organizationId in project.Organizations.Select(o => o.Id).ToList())
             {
-                _critDbContext.OrganizationProjects.Add(new OrganizationProject(organizationId, savedProj.Entity.Id.Value));
+                _critDbContext.OrganizationProjects.Add(new OrganizationProject() { Id = organizationId, ProjectId = savedProj.Entity.Id.Value });
             }
 
             int savedChanges = await _critDbContext.SaveChangesAsync();
@@ -162,7 +157,7 @@ public class ProjectsRepository : IProjectsRepository
                 throw new Exception("Project failed to save.");
             }
 
-            return newProject;
+            return project;
         }
         catch (Exception ex)
         {

@@ -1,13 +1,12 @@
 using System.Text.Json.Serialization;
 
-namespace Crit.Domain.Models;
+namespace Crit.Contracts.ResponseModels;
 
-public class Priority
+public class PriorityResponse
 {
-    protected Priority()
+    protected PriorityResponse()
     {
         Name = string.Empty;
-        Tasks = new List<ProjectTask>();
         ProjectId = Guid.Empty;
     }
 
@@ -17,7 +16,4 @@ public class Priority
     public string? Color { get; set; }
     public Guid ProjectId { get; set; }
     public Guid? TaskId { get; set; }
-
-    public Project? Project { get; set; }
-    public List<ProjectTask> Tasks { get; set; }
 }

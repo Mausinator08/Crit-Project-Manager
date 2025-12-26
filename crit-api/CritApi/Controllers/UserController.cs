@@ -1,7 +1,8 @@
 using Crit.Application.RepositoryInterfaces;
+using Crit.Contracts.RequestModels;
+using Crit.Contracts.ResponseModels;
 using Crit.Domain.Identity;
 using Crit.Domain.Models;
-using CritApi.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -9,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CritApi.Controllers;
 
+// TODO: ***REFACTOR TO USE SERVICES***
 [ApiController]
 [Route("api/[controller]")]
 [Authorize()]

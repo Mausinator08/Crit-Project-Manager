@@ -19,8 +19,6 @@ public class Status
     public Guid ProjectId { get; set; }
     public Guid? TaskId { get; set; }
 
-    [JsonIgnore]
     public Project? Project { get; set; }
-    [JsonIgnore]
     public List<ProjectTask> Tasks { get; set; }
 }

@@ -20,7 +20,6 @@
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.11" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Crit.Contracts\Crit.Contracts.csproj" />
     <ProjectReference Include="..\Crit.Application\Crit.Application.csproj" />
   </ItemGroup>
 </Project>

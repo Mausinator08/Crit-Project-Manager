@@ -20,6 +20,7 @@ public class OrganizationRepository : IOrganizationRepository
         _projectsRepository = projectsRepository;
     }
 
+    // TODO: ***MOVE THIS TO SERVICE***
     public async Task<Organization> CreateFirstOrganization(Organization organization)
     {
         try
@@ -56,9 +57,9 @@ public class OrganizationRepository : IOrganizationRepository
                 throw new Exception($"The project {organization.Name} did not generate the Id correctly.");
             }
 
-            _critDbContext.OrganizationAdmins.Add(new OrganizationAdmin(savedOrganization.Entity.Id.Value, organization.OwnerUserId));
-            _critDbContext.OrganizationMembers.Add(new OrganizationMember(savedOrganization.Entity.Id.Value, organization.OwnerUserId));
-            _critDbContext.OrganizationAffiliates.Add(new OrganizationAffiliate(savedOrganization.Entity.Id.Value, organization.OwnerUserId));
+            _critDbContext.OrganizationAdmins.Add(new OrganizationAdmin() { Id = savedOrganization.Entity.Id, AdminUserId = organization.OwnerUserId });
+            _critDbContext.OrganizationMembers.Add(new OrganizationMember() { Id = savedOrganization.Entity.Id, MemberUserId = organization.OwnerUserId });
+            _critDbContext.OrganizationAffiliates.Add(new OrganizationAffiliate() { Id = savedOrganization.Entity.Id, AffiliateUserId = organization.OwnerUserId });
 
             int savedChanges = await _critDbContext.SaveChangesAsync();
 
@@ -271,9 +272,9 @@ public class OrganizationRepository : IOrganizationRepository
                 throw new Exception($"The project {organization.Name} did not generate the Id correctly.");
             }
 
-            _critDbContext.OrganizationAdmins.Add(new OrganizationAdmin(savedOrganization.Entity.Id.Value, organization.OwnerUserId));
-            _critDbContext.OrganizationMembers.Add(new OrganizationMember(savedOrganization.Entity.Id.Value, organization.OwnerUserId));
-            _critDbContext.OrganizationAffiliates.Add(new OrganizationAffiliate(savedOrganization.Entity.Id.Value, organization.OwnerUserId));
+            _critDbContext.OrganizationAdmins.Add(new OrganizationAdmin() { Id = savedOrganization.Entity.Id, AdminUserId = organization.OwnerUserId });
+            _critDbContext.OrganizationMembers.Add(new OrganizationMember() { Id = savedOrganization.Entity.Id, MemberUserId = organization.OwnerUserId });
+            _critDbContext.OrganizationAffiliates.Add(new OrganizationAffiliate() { Id = savedOrganization.Entity.Id, AffiliateUserId = organization.OwnerUserId });
 
             int savedChanges = await _critDbContext.SaveChangesAsync();
 
@@ -311,8 +312,8 @@ public class OrganizationRepository : IOrganizationRepository
 
             List<Organization> organizationsQuery = _critDbContext.Organizations.AsNoTracking().AsEnumerable().Where(o =>
             o.Id == organization.Id &&
-            o.OrganizationAdmins.Where(a => organization.OrganizationAdmins.Any(ou => ou.AdminUserId == a.AdminUserId)).Any() ||
-            o.OrganizationMembers.Where(m => organization.OrganizationMembers.Any(ou => ou.MemberUserId == m.MemberUserId)).Any()).ToList();
+            o.OrganizationAdmins.Any(a => organization.OrganizationAdmins.Any(ou => ou.AdminUserId == a.AdminUserId)) ||
+            o.OrganizationMembers.Any(m => organization.OrganizationMembers.Any(ou => ou.MemberUserId == m.MemberUserId))).ToList();
 
             if (organizationsQuery.Any())
             {

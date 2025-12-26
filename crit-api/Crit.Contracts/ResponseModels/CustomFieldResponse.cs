@@ -1,17 +1,17 @@
 using System.Text.Json.Serialization;
 
-namespace Crit.Domain.Models;
+namespace Crit.Contracts.ResponseModels;
 
-public class CustomField
+public class CustomFieldResponse
 {
-    public CustomField(string name, string value, Guid typeId, Guid taskId)
+    public CustomFieldResponse(string name, string value, Guid typeId, Guid taskId)
     {
         CustomFieldTypeId = typeId;
         Value = value;
         TaskId = taskId;
     }
 
-    protected CustomField()
+    protected CustomFieldResponse()
     {
         Value = string.Empty;
         CustomFieldTypeId = Guid.Empty;
@@ -22,7 +22,4 @@ public class CustomField
     public Guid CustomFieldTypeId { get; set; }
     public string Value { get; set; }
     public Guid TaskId { get; set; }
-
-    public ProjectTask? Task { get; set; }
-    public CustomFieldType? CustomFieldType { get; set; }
 }

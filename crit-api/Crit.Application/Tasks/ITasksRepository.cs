@@ -1,6 +1,6 @@
 ﻿using Crit.Domain.Models;
 
-namespace Crit.Domain.Models;
+namespace Crit.Application.RepositoryInterfaces;
 
 public interface ITasksRepository
 {

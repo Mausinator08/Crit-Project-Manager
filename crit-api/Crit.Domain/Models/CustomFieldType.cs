@@ -23,10 +23,7 @@ public class CustomFieldType
     public Guid ProjectId { get; set; }
     public Guid? HiddenProjectId { get; set; }
 
-    [JsonIgnore]
     public Project? Project { get; set; }
-    [JsonIgnore]
     public Project? HiddenProject { get; set; }
-    [JsonIgnore]
     public List<CustomField> CustomFields { get; set; }
 }

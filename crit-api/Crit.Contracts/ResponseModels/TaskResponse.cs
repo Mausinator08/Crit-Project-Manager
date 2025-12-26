@@ -1,16 +1,15 @@
 using System.Text.Json.Serialization;
-using Crit.Domain.BaseModels;
 
-namespace Crit.Domain.Models;
+namespace Crit.Contracts.ResponseModels;
 
-public class ProjectTask : AuditInformation
+public class ProjectTaskResponse : AuditInformationResponse
 {
-    public ProjectTask()
+    public ProjectTaskResponse()
     {
         ProjectId = Guid.Empty;
-        SubTasks = new List<ProjectTask>();
-        CustomFields = new List<CustomField>();
-        Comments = new List<Comment>();
+        SubTasks = new List<ProjectTaskResponse>();
+        CustomFields = new List<CustomFieldResponse>();
+        Comments = new List<CommentResponse>();
         DateTime now = DateTime.UtcNow;
         DateCreated = now;
         DateUpdated = now;
@@ -27,11 +26,9 @@ public class ProjectTask : AuditInformation
     public DateTime? DueDate { get; set; }
     public Guid? ParentTaskId { get; set; }
 
-    public List<CustomField> CustomFields { get; set; }
-    public Project? Project { get; set; }
-    public Status? Status { get; set; }
-    public Priority? Priority { get; set; }
-    public List<ProjectTask> SubTasks { get; set; }
-    public ProjectTask? ParentTask { get; set; }
-    public List<Comment> Comments { get; set; }
+    public List<CustomFieldResponse> CustomFields { get; set; }
+    public StatusResponse? Status { get; set; }
+    public PriorityResponse? Priority { get; set; }
+    public List<ProjectTaskResponse> SubTasks { get; set; }
+    public List<CommentResponse> Comments { get; set; }
 }

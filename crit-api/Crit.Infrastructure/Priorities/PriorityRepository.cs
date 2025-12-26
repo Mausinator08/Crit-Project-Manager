@@ -1,7 +1,6 @@
 using Crit.Application.RepositoryInterfaces;
 using Crit.Domain.Contexts;
 using Crit.Domain.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
 namespace Crit.Infrastructure.Repositories;

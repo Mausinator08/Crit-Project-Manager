@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Crit.Domain.Identity;
 
-[Table("Users")]
 public class ApplicationUser : IdentityUser<Guid>
 {
 	public ApplicationUser() : base()

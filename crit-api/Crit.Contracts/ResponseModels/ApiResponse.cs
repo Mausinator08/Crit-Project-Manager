@@ -1,11 +1,11 @@
 using System.Text.Json.Serialization;
 
-namespace CritApi.Models;
+namespace Crit.Contracts.ResponseModels;
 
-public class ApiResult
+public class ApiResponse
 {
     [JsonConstructor]
-    public ApiResult(string? message, List<string>? errors, object? data = default)
+    public ApiResponse(string? message, List<string>? errors, object? data = default)
     {
         Message = message;
         if (errors != null)

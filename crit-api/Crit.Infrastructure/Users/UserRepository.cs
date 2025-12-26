@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Crit.Infrastructure.Repositories;
 
+// TODO: ***MOVE TO SERVICE! ALSO, MOVE CRUD OPS FROM API CONTROLLER TO HERE.***
 public class UserRepository : IUserRepository
 {
     private readonly UserManager<ApplicationUser> _userManager;
