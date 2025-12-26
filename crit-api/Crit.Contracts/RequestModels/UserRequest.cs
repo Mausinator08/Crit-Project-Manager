@@ -9,7 +9,7 @@ public class UserRequest
     [JsonConstructor]
     public UserRequest(string userName, string email, string? password = null, string? twoFactorCode = null, string? twoFactorRecoveryCode = null)
     {
-        UserRequestName = userName;
+        UserName = userName;
         Email = email;
         Password = password;
         TwoFactorCode = twoFactorCode;
@@ -18,12 +18,12 @@ public class UserRequest
 
     public UserRequest(string userName, string email)
     {
-        UserRequestName = userName;
+        UserName = userName;
         Email = email;
     }
 
     public Guid? Id { get; set; }
-    public string? UserRequestName { get; set; }
+    public string? UserName { get; set; }
 
     [EmailAddress(ErrorMessage = "Invalid Email")]
     public string? Email { get; set; }

@@ -1,5 +1,7 @@
 using System.Text;
+using Crit.Application.Logins;
 using Crit.Application.RepositoryInterfaces;
+using Crit.Contracts.Enums;
 using Crit.Contracts.RequestModels;
 using Crit.Contracts.ResponseModels;
 using Crit.Domain.Identity;
@@ -23,6 +25,7 @@ public class LoginController : ControllerBase
     private readonly IOrganizationRepository _organizationRepository;
     private readonly IEmailRepository _emailRepository;
     private readonly IPhoneNumberRepository _phoneNumberRepository;
+    private readonly ILoginService _loginService;
     public LoginController(
         UserManager<ApplicationUser> userManager,
         RoleManager<ApplicationRole> roleManager,
@@ -31,7 +34,8 @@ public class LoginController : ControllerBase
         IUserRepository userRepository,
         IOrganizationRepository organizationRepository,
         IEmailRepository emailRepository,
-        IPhoneNumberRepository phoneNumberRepository)
+        IPhoneNumberRepository phoneNumberRepository,
+        ILoginService loginService)
     {
         _userRepository = userRepository;
         _logger = logger;
@@ -41,271 +45,19 @@ public class LoginController : ControllerBase
         _organizationRepository = organizationRepository;
         _emailRepository = emailRepository;
         _phoneNumberRepository = phoneNumberRepository;
+        _loginService = loginService;
     }
 
     [HttpPost]
     [Route("Register")]
-    [ProducesResponseType<object>(StatusCodes.Status200OK)]
+    [ProducesResponseType<LoginResponse>(StatusCodes.Status200OK)]
     [ProducesErrorResponseType(typeof(string))]
-    public async Task<IActionResult> Register([FromBody] User user)
+    public async Task<IActionResult> Register([FromBody] UserRequest user)
     {
         try
         {
-            if (user == null)
-            {
-                return BadRequest("Invalid user data.");
-            }
-
-            if (user.Password == null)
-            {
-                return BadRequest("Password is required.");
-            }
-
-            ApplicationUser appUser = new ApplicationUser() { UserName = user.UserName, Email = user.Email };
-
-            if (appUser.UserName != null && await _userManager.FindByNameAsync(appUser.UserName) != null)
-            {
-                return BadRequest("User already exists.");
-            }
-
-            if (!_userManager.Users.Any() && !(await _userManager.GetUsersInRoleAsync("SuperAdmin")).Any())
-            {
-                IdentityResult result = await _userManager.CreateAsync(appUser, user.Password);
-
-                if (!result.Succeeded)
-                {
-                    StringBuilder stringBuilder = new StringBuilder();
-                    foreach (IdentityError error in result.Errors)
-                    {
-                        stringBuilder.AppendLine(error.Description);
-                    }
-
-                    throw new Exception("Failed to create user.\n" + stringBuilder.ToString());
-                }
-
-                if (string.IsNullOrWhiteSpace(user.Organization))
-                {
-                    return BadRequest("Organization name is required.");
-                }
-
-                Organization organization = await _organizationRepository.CreateOrganization(new Organization(user.Organization, appUser.Id));
-
-                if (organization == null || organization.Id == null || organization.Id == Guid.Empty)
-                {
-                    throw new Exception("Failed to create organization.");
-                }
-
-                Email email = await _emailRepository.CreateEmail(new Email()
-                {
-                    EmailAddress = user.Email,
-                    OrganizationId = organization.Id.Value,
-                    Organization = organization,
-                    UserId = appUser.Id
-                });
-
-                PhoneNumber phoneNumber = await _phoneNumberRepository.CreatePhoneNumber(new PhoneNumber()
-                {
-                    Number = user.PhoneNumber ?? string.Empty,
-                    OrganizationId = organization.Id.Value,
-                    Organization = organization,
-                    CountryCode = user.CountryCode ?? "+1",
-                    Extension = user.Extension,
-                    Type = user.PhoneType.HasValue ? user.PhoneType.Value : PhoneNumberType.Mobile,
-                    UserId = appUser.Id
-                });
-
-                if (string.IsNullOrWhiteSpace(user.Organization))
-                {
-                    return BadRequest("Organization name is required.");
-                }
-
-                IdentityResult createRoleResult = await _roleManager.CreateAsync(new ApplicationRole() { Name = "SuperAdmin" });
-
-                if (!createRoleResult.Succeeded)
-                {
-                    StringBuilder stringBuilder = new StringBuilder();
-                    foreach (IdentityError error in result.Errors)
-                    {
-                        stringBuilder.AppendLine(error.Description);
-                    }
-
-                    throw new Exception("Failed to create SuperAdmin role.");
-                }
-
-                createRoleResult = await _roleManager.CreateAsync(new ApplicationRole() { Name = "OrganizationOwner" });
-
-                if (!createRoleResult.Succeeded)
-                {
-                    StringBuilder stringBuilder = new StringBuilder();
-                    foreach (IdentityError error in result.Errors)
-                    {
-                        stringBuilder.AppendLine(error.Description);
-                    }
-
-                    throw new Exception("Failed to create OrganizationOwner role.");
-                }
-
-                createRoleResult = await _roleManager.CreateAsync(new ApplicationRole() { Name = "OrganizationAdmin" });
-
-                if (!createRoleResult.Succeeded)
-                {
-                    StringBuilder stringBuilder = new StringBuilder();
-                    foreach (IdentityError error in result.Errors)
-                    {
-                        stringBuilder.AppendLine(error.Description);
-                    }
-
-                    throw new Exception("Failed to create OrganizationAdmin role.");
-                }
-
-                createRoleResult = await _roleManager.CreateAsync(new ApplicationRole() { Name = "ProjectOwner" });
-
-                if (!createRoleResult.Succeeded)
-                {
-                    StringBuilder stringBuilder = new StringBuilder();
-                    foreach (IdentityError error in result.Errors)
-                    {
-                        stringBuilder.AppendLine(error.Description);
-                    }
-
-                    throw new Exception("Failed to create ProjectOwner role.");
-                }
-
-                createRoleResult = await _roleManager.CreateAsync(new ApplicationRole() { Name = "ProjectAdmin" });
-
-                if (!createRoleResult.Succeeded)
-                {
-                    StringBuilder stringBuilder = new StringBuilder();
-                    foreach (IdentityError error in result.Errors)
-                    {
-                        stringBuilder.AppendLine(error.Description);
-                    }
-
-                    throw new Exception("Failed to create ProjectAdmin role.");
-                }
-
-                createRoleResult = await _roleManager.CreateAsync(new ApplicationRole() { Name = "User" });
-
-                if (!createRoleResult.Succeeded)
-                {
-                    StringBuilder stringBuilder = new StringBuilder();
-                    foreach (IdentityError error in result.Errors)
-                    {
-                        stringBuilder.AppendLine(error.Description);
-                    }
-
-                    throw new Exception("Failed to create User role.");
-                }
-
-                IdentityResult roleResult = await _userManager.AddToRoleAsync(appUser, "SuperAdmin");
-
-                if (!roleResult.Succeeded)
-                {
-                    StringBuilder stringBuilder = new StringBuilder();
-                    foreach (IdentityError error in result.Errors)
-                    {
-                        stringBuilder.AppendLine(error.Description);
-                    }
-
-                    throw new Exception("Failed to create user with SuperAdmin role.");
-                }
-
-                roleResult = await _userManager.AddToRoleAsync(appUser, "OrganizationOwner");
-
-                if (!roleResult.Succeeded)
-                {
-                    StringBuilder stringBuilder = new StringBuilder();
-                    foreach (IdentityError error in result.Errors)
-                    {
-                        stringBuilder.AppendLine(error.Description);
-                    }
-
-                    throw new Exception("Failed to create user with OrganizationOwner role.");
-                }
-            }
-            else
-            {
-                IdentityResult result = await _userManager.CreateAsync(appUser, user.Password);
-
-                if (!result.Succeeded)
-                {
-                    StringBuilder stringBuilder = new StringBuilder();
-                    foreach (IdentityError error in result.Errors)
-                    {
-                        stringBuilder.AppendLine(error.Description);
-                    }
-
-                    throw new Exception("Failed to create user.\n" + stringBuilder.ToString());
-                }
-
-                if (string.IsNullOrWhiteSpace(user.Organization))
-                {
-                    return BadRequest("Organization name is required.");
-                }
-
-                Organization? organization = null;
-                List<Organization> organizationQuery = (await _organizationRepository.GetAllOrganizations()).Where(o => o.Name == user.Organization).ToList();
-
-                if (!organizationQuery.Any())
-                {
-                    organization = await _organizationRepository.CreateOrganization(new Organization(user.Organization, appUser.Id));
-
-                    IdentityResult roleResult = await _userManager.AddToRoleAsync(appUser, "OrganizationOwner");
-
-                    if (!roleResult.Succeeded)
-                    {
-                        StringBuilder stringBuilder = new StringBuilder();
-                        foreach (IdentityError error in result.Errors)
-                        {
-                            stringBuilder.AppendLine(error.Description);
-                        }
-
-                        throw new Exception("Failed to create user with User role.");
-                    }
-                }
-                else
-                {
-                    organization = organizationQuery.First();
-
-                    IdentityResult roleResult = await _userManager.AddToRoleAsync(appUser, "User");
-
-                    if (!roleResult.Succeeded)
-                    {
-                        StringBuilder stringBuilder = new StringBuilder();
-                        foreach (IdentityError error in result.Errors)
-                        {
-                            stringBuilder.AppendLine(error.Description);
-                        }
-
-                        throw new Exception("Failed to create user with User role.");
-                    }
-                }
-
-                if (organization == null || organization.Id == null || organization.Id == Guid.Empty)
-                {
-                    throw new Exception("Failed to get or create organization.");
-                }
-
-                Email email = await _emailRepository.CreateEmail(new Email()
-                {
-                    EmailAddress = user.Email,
-                    OrganizationId = organization.Id.Value,
-                    Organization = organization,
-                    UserId = appUser.Id
-                });
-
-                PhoneNumber phoneNumber = await _phoneNumberRepository.CreatePhoneNumber(new PhoneNumber()
-                {
-                    Number = user.PhoneNumber ?? string.Empty,
-                    OrganizationId = organization.Id.Value,
-                    Organization = organization,
-                    CountryCode = user.CountryCode ?? "+1",
-                    Extension = user.Extension,
-                    Type = user.PhoneType.HasValue ? user.PhoneType.Value : PhoneNumberType.Mobile
-                });
-            }
-
-            return Ok(new { userName = appUser.UserName, message = $"Welcome to Crit! Enjoy your stay, {appUser.UserName}!" });
+            LoginResponse response = await _loginService.RegisterAsync(user);
+            return GetLoginResponse(response);
         }
         catch (Exception ex)
         {
@@ -318,51 +70,12 @@ public class LoginController : ControllerBase
     [Route("Login")]
     [ProducesResponseType<object>(StatusCodes.Status200OK)]
     [ProducesErrorResponseType(typeof(string))]
-    public async Task<IActionResult> Login([FromBody] User user, [FromQuery] bool? useCookies)
+    public async Task<IActionResult> Login([FromBody] UserRequest user, [FromQuery] bool? useCookies)
     {
         try
         {
-            if (user == null)
-            {
-                return BadRequest("Invalid user data.");
-            }
-
-            bool isPersistent = useCookies == true;
-
-            // Simulate user authentication
-            if (string.IsNullOrEmpty(user.UserName))
-            {
-                return BadRequest("Username is required.");
-            }
-
-            ApplicationUser? applicationUser = await _userManager.FindByNameAsync(user.UserName);
-            if (applicationUser != null)
-            {
-                Microsoft.AspNetCore.Identity.SignInResult result = await _signInManager.PasswordSignInAsync(applicationUser, user.Password ?? string.Empty, isPersistent, false);
-
-                if (result.RequiresTwoFactor)
-                {
-                    if (!string.IsNullOrWhiteSpace(user.TwoFactorCode))
-                    {
-                        result = await _signInManager.TwoFactorAuthenticatorSignInAsync(user.TwoFactorCode, isPersistent, isPersistent);
-                    }
-                    else if (!string.IsNullOrWhiteSpace(user.TwoFactorRecoveryCode))
-                    {
-                        result = await _signInManager.TwoFactorRecoveryCodeSignInAsync(user.TwoFactorRecoveryCode);
-                    }
-                }
-
-                if (!result.Succeeded)
-                {
-                    return Unauthorized(result.ToString());
-                }
-
-                return Ok(new { userName = applicationUser.UserName, message = "You have logged in." });
-            }
-            else
-            {
-                return Unauthorized("Invalid credentials.");
-            }
+            LoginResponse response = await _loginService.LoginAsync(user, useCookies);
+            return GetLoginResponse(response);
         }
         catch (Exception ex)
         {
@@ -431,6 +144,28 @@ public class LoginController : ControllerBase
         {
             _logger.LogException(ex);
             return StatusCode(StatusCodes.Status500InternalServerError, "Error logging in.");
+        }
+    }
+
+    private IActionResult GetLoginResponse(LoginResponse response)
+    {
+        if (response.ErrorType.HasValue)
+        {
+            return response.ErrorType.Value switch
+            {
+                LoginErrorType.NullUser => BadRequest(response.Message),
+                LoginErrorType.NullPassword => BadRequest(response.Message),
+                LoginErrorType.UserExists => BadRequest(response.Message),
+                LoginErrorType.MissingOrganizationName => BadRequest(response.Message),
+                LoginErrorType.InvalidCredentials => Unauthorized(response.Message),
+                LoginErrorType.Unauthorized => Unauthorized(response.Message),
+                LoginErrorType.NullUserName => BadRequest(response.Message),
+                _ => throw new NotImplementedException()
+            };
+        }
+        else
+        {
+            return Ok(response);
         }
     }
 }
