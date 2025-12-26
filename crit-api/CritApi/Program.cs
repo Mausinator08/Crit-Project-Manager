@@ -84,6 +84,7 @@ builder.Services.AddIdentityCore<ApplicationUser>(setupAction =>
     setupAction.Password.RequireUppercase = true;
     setupAction.Password.RequireNonAlphanumeric = true;
     setupAction.Password.RequiredLength = 8;
+    setupAction.Stores.ProtectPersonalData = true;
 })
 .AddRoles<ApplicationRole>()
 .AddEntityFrameworkStores<CritDbContext>()
