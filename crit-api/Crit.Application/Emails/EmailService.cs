@@ -28,30 +28,20 @@ public class EmailService : IEmailService
 		return _mapperService.ConvertTo<Email, EmailResponse>(await _emailRepository.GetEmailById(emailId));
 	}
 
-	public async Task<EmailResponse?> CreateEmail(CreateEmailRequest email)
+	public async Task<EmailResponse> CreateEmail(CreateEmailRequest email)
 	{
 		if ((await _emailRepository.GetEmailByAddress(email.EmailAddress)) != null)
 		{
-			throw new InvalidOperationException($"The email {email.EmailAddress} already exists.");
+			throw new InvalidOperationException($"Failed to create email. The email {email.EmailAddress} already exists.");
 		}
 
-		Email? createdEmail = await _emailRepository.CreateEmail(_mapperService.ConvertTo<CreateEmailRequest, Email>(email));
-
-		if (createdEmail == null)
-		{
-			return null;
-		}
+		Email createdEmail = await _emailRepository.CreateEmail(_mapperService.ConvertTo<CreateEmailRequest, Email>(email));
 
 		return _mapperService.ConvertTo<Email, EmailResponse>(createdEmail);
 	}
 
 	public async Task UpdateEmail(Guid emailId, UpdateEmailRequest email)
 	{
-		if (email.EmailAddress != null && (await _emailRepository.GetEmailByAddress(email.EmailAddress)) != null)
-		{
-
-		}
-
 		Email emailToUpdate = await _emailRepository.GetEmailById(emailId);
 
 		emailToUpdate.EmailAddress = email.EmailAddress ?? emailToUpdate.EmailAddress;

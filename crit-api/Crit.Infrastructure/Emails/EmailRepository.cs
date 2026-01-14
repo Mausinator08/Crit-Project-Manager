@@ -2,6 +2,7 @@ using Crit.Application.RepositoryInterfaces;
 using Crit.Domain.Models;
 using Crit.Infrastructure.Contexts;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace Crit.Infrastructure.Repositories;
 
@@ -14,19 +15,24 @@ public class EmailRepository : IEmailRepository
         _critDbContext = critDbContext;
     }
 
-    public async Task<Email?> CreateEmail(Email email)
+    public async Task<Email> CreateEmail(Email email)
     {
-        Email? newEmail = new Email()
+        Email newEmail = new Email()
         {
             OrganizationId = email.OrganizationId,
             EmailAddress = email.EmailAddress,
             UserId = email.UserId
         };
 
-        await _critDbContext.Emails.AddAsync(newEmail);
-        await _critDbContext.SaveChangesAsync();
+        EntityEntry<Email> createdEmail = await _critDbContext.Emails.AddAsync(newEmail);
+        int savedChanges = await _critDbContext.SaveChangesAsync();
 
-        return newEmail;
+        if (savedChanges <= 0)
+        {
+            throw new Exception("Failed to create Email.");
+        }
+
+        return createdEmail.Entity;
     }
 
     public async Task DeleteEmail(Guid emailId)
@@ -38,7 +44,12 @@ public class EmailRepository : IEmailRepository
         }
 
         _critDbContext.Emails.Remove(email);
-        await _critDbContext.SaveChangesAsync();
+        int savedChanges = await _critDbContext.SaveChangesAsync();
+
+        if (savedChanges <= 0)
+        {
+            throw new Exception("Failed to delete Email.");
+        }
     }
 
     public async Task<Email> GetEmailById(Guid emailId)
@@ -59,17 +70,12 @@ public class EmailRepository : IEmailRepository
 
     public async Task UpdateEmail(Email email)
     {
-        Email? existingEmail = await _critDbContext.Emails.FindAsync(email.Id);
-        if (existingEmail == null)
+        _critDbContext.Emails.Update(email);
+        int savedChanges = await _critDbContext.SaveChangesAsync();
+
+        if (savedChanges <= 0)
         {
-            throw new Exception("Email not found");
+            throw new Exception("Failed to save Email.");
         }
-
-        existingEmail.EmailAddress = email.EmailAddress;
-        existingEmail.UserId = email.UserId;
-
-        _critDbContext.Emails.Update(existingEmail);
-        await _critDbContext.SaveChangesAsync();
     }
-
 }
