@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crit.Application", "Crit.Ap
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crit.Domain", "Crit.Domain\Crit.Domain.csproj", "{525E98CC-193E-4385-8A56-BDEDCBB803B3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crit.Abstractions", "Crit.Abstractions\Crit.Abstractions.csproj", "{0F888F11-88DA-4F1C-B8EA-B76EE1631283}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -83,6 +85,18 @@ Global
 		{525E98CC-193E-4385-8A56-BDEDCBB803B3}.Release|x64.Build.0 = Release|Any CPU
 		{525E98CC-193E-4385-8A56-BDEDCBB803B3}.Release|x86.ActiveCfg = Release|Any CPU
 		{525E98CC-193E-4385-8A56-BDEDCBB803B3}.Release|x86.Build.0 = Release|Any CPU
+		{0F888F11-88DA-4F1C-B8EA-B76EE1631283}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0F888F11-88DA-4F1C-B8EA-B76EE1631283}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0F888F11-88DA-4F1C-B8EA-B76EE1631283}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{0F888F11-88DA-4F1C-B8EA-B76EE1631283}.Debug|x64.Build.0 = Debug|Any CPU
+		{0F888F11-88DA-4F1C-B8EA-B76EE1631283}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{0F888F11-88DA-4F1C-B8EA-B76EE1631283}.Debug|x86.Build.0 = Debug|Any CPU
+		{0F888F11-88DA-4F1C-B8EA-B76EE1631283}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0F888F11-88DA-4F1C-B8EA-B76EE1631283}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0F888F11-88DA-4F1C-B8EA-B76EE1631283}.Release|x64.ActiveCfg = Release|Any CPU
+		{0F888F11-88DA-4F1C-B8EA-B76EE1631283}.Release|x64.Build.0 = Release|Any CPU
+		{0F888F11-88DA-4F1C-B8EA-B76EE1631283}.Release|x86.ActiveCfg = Release|Any CPU
+		{0F888F11-88DA-4F1C-B8EA-B76EE1631283}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

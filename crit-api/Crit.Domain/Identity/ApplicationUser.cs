@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Text.Json.Serialization;
 using Crit.Domain.Models;
 using Microsoft.AspNetCore.Identity;
 

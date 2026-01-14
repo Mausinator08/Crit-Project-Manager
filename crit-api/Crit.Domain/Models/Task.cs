@@ -1,9 +1,8 @@
-using System.Text.Json.Serialization;
-using Crit.Domain.BaseModels;
 
+using Crit.Domain.Models;
 namespace Crit.Domain.Models;
 
-public class ProjectTask : AuditInformation
+public class ProjectTask
 {
     public ProjectTask()
     {
@@ -11,9 +10,6 @@ public class ProjectTask : AuditInformation
         SubTasks = new List<ProjectTask>();
         CustomFields = new List<CustomField>();
         Comments = new List<Comment>();
-        DateTime now = DateTime.UtcNow;
-        DateCreated = now;
-        DateUpdated = now;
     }
 
     public Guid? Id { get; set; }

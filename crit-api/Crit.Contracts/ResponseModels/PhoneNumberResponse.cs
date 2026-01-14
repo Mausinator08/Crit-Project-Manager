@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
+using Crit.Abstractions.Types;
 using Crit.Contracts.Enums;
-using Crit.Domain.Enums;
 
 namespace Crit.Contracts.ResponseModels;
 

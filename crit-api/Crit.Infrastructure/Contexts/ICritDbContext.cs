@@ -2,7 +2,7 @@ using Crit.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 
-namespace Crit.Domain.Contexts;
+namespace Crit.Infrastructure.Contexts;
 
 public interface ICritDbContext
 {

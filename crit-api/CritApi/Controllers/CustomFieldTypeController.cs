@@ -1,5 +1,5 @@
+using Crit.Abstractions.Models;
 using Crit.Application.RepositoryInterfaces;
-using Crit.Domain.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

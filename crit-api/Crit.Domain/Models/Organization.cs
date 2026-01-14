@@ -1,6 +1,5 @@
-using System.Text.Json.Serialization;
-using Crit.Domain.Identity;
 
+using Crit.Domain.Identity;
 namespace Crit.Domain.Models;
 
 public class Organization

@@ -1,6 +1,9 @@
-using Crit.Application.RepositoryInterfaces;
-using Crit.Domain.Models;
+using System.Security.Claims;
+using Crit.Abstractions.Identity;
+using Crit.Application.Organizations;
+using Crit.Contracts.ResponseModels;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CritApi.Controllers;
@@ -11,44 +14,26 @@ namespace CritApi.Controllers;
 public class OrganizationController : ControllerBase
 {
     private readonly Logging.IFileLogger _logger;
-    private readonly IOrganizationRepository _organizationRepository;
-    public OrganizationController(Logging.IFileLogger logger, IOrganizationRepository organizationRepository)
+    private readonly IOrganizationService _organizationService;
+    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly UserManager<ApplicationUser> _userManager;
+    public OrganizationController(Logging.IFileLogger logger, IOrganizationService organizationService, IHttpContextAccessor httpContextAccessor, UserManager<ApplicationUser> userManager)
     {
         _logger = logger;
-        _organizationRepository = organizationRepository;
-    }
-
-    [HttpPost]
-    [Route("CreateFirstOrganization")]
-    [ProducesResponseType<Organization>(StatusCodes.Status201Created)]
-    [ProducesErrorResponseType(typeof(string))]
-    public async Task<IActionResult> CreateFirstOrganization([FromBody] Organization organization)
-    {
-        try
-        {
-            if (organization == null)
-            {
-                return BadRequest("Invalid organization data.");
-            }
-
-            Organization? createdOrganization = await _organizationRepository.CreateFirstOrganization(organization);
-            return CreatedAtAction(nameof(GetOrganization), new { organizationId = createdOrganization.Id }, createdOrganization);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogException(ex);
-            return StatusCode(StatusCodes.Status500InternalServerError, $"Error creating organization: {ex.Message}");
-        }
+        _organizationService = organizationService;
+        _httpContextAccessor = httpContextAccessor;
+        _userManager = userManager;
     }
 
     [HttpGet]
-    [ProducesResponseType<List<Organization>>(StatusCodes.Status200OK)]
+    [Route("GetAllOrganizationsForLoggedInUser")]
+    [ProducesResponseType<List<OrganizationResponse>>(StatusCodes.Status200OK)]
     [ProducesErrorResponseType(typeof(string))]
-    public async Task<IActionResult> GetAllOrganizations()
+    public async Task<IActionResult> GetAllOrganizationsForLoggedInUser()
     {
         try
         {
-            return Ok(await _organizationRepository.GetAllOrganizations());
+            return Ok(await _organizationService.GetAllOrganizationsForLoggedInUser());
         }
         catch (Exception ex)
         {
@@ -65,7 +50,7 @@ public class OrganizationController : ControllerBase
     {
         try
         {
-            return Ok(await _organizationRepository.GetAllOrganizationsForProjectId(projectId));
+            return Ok(await _organizationService.GetAllOrganizationsForProjectId(projectId));
         }
         catch (Exception ex)
         {
@@ -82,7 +67,7 @@ public class OrganizationController : ControllerBase
     {
         try
         {
-            return Ok(await _organizationRepository.GetAllOrganizationsForUserId(userId));
+            return Ok(await _organizationService.GetAllOrganizationsForUserId(userId));
         }
         catch (Exception ex)
         {
@@ -99,7 +84,7 @@ public class OrganizationController : ControllerBase
     {
         try
         {
-            return Ok(await _organizationRepository.GetOrganizationByUserId(userId));
+            return Ok(await _organizationService.GetOrganizationByUserId(userId));
         }
         catch (Exception ex)
         {
@@ -116,7 +101,7 @@ public class OrganizationController : ControllerBase
     {
         try
         {
-            Organization? organization = await _organizationRepository.GetOrganization(organizationId);
+            Organization? organization = await _organizationService.GetOrganization(organizationId);
             if (organization == null || organization.Id == null || organization.Id == Guid.Empty)
             {
                 return NotFound($"Organization with ID {organizationId} not found.");
@@ -143,7 +128,7 @@ public class OrganizationController : ControllerBase
                 return BadRequest("Invalid organization data.");
             }
 
-            Organization? createdOrganization = await _organizationRepository.CreateOrganization(organization);
+            Organization? createdOrganization = await _organizationService.CreateOrganization(organization);
             return CreatedAtAction(nameof(GetOrganization), new { organizationId = createdOrganization.Id }, createdOrganization);
         }
         catch (Exception ex)
@@ -165,7 +150,7 @@ public class OrganizationController : ControllerBase
                 return BadRequest("Invalid organization data.");
             }
 
-            await _organizationRepository.UpdateOrganization(organization);
+            await _organizationService.UpdateOrganization(organization);
             return NoContent();
         }
         catch (Exception ex)
@@ -183,13 +168,62 @@ public class OrganizationController : ControllerBase
     {
         try
         {
-            await _organizationRepository.DeleteOrganization(organizationId);
+            await _organizationService.DeleteOrganization(organizationId);
             return NoContent();
         }
         catch (Exception ex)
         {
             _logger.LogException(ex);
             return StatusCode(StatusCodes.Status500InternalServerError, $"Error deleting organization: {ex.Message}");
+        }
+    }
+
+    private async Task<OrganizationResponse?> GetLoggedInUserOrganization()
+    {
+        try
+        {
+            ClaimsPrincipal? user = null;
+
+            if (_httpContextAccessor.HttpContext?.User?.Identity?.IsAuthenticated == true)
+            {
+                user = _httpContextAccessor.HttpContext.User;
+            }
+
+            if (user == null)
+            {
+                throw new ArgumentNullException(nameof(user));
+            }
+
+            ApplicationUser? applicationUser = await _userManager.GetUserAsync(user);
+
+            if (applicationUser == null)
+            {
+                throw new ArgumentNullException(nameof(applicationUser));
+            }
+
+            List<Organization> organizationsMemberQuery = await _critDbContext.Organizations.AsNoTracking().Where(o => o.OrganizationMembers.Any(ou => ou.MemberUserId == applicationUser.Id)).ToListAsync();
+            List<Organization> organizationsAdminQuery = await _critDbContext.Organizations.AsNoTracking().Where(o => o.OrganizationAdmins.Any(ou => ou.AdminUserId == applicationUser.Id)).ToListAsync();
+
+            Organization? organization = null;
+
+            if (organizationsMemberQuery.Any())
+            {
+                organization = organizationsMemberQuery.First();
+            }
+            else if (organizationsAdminQuery.Any())
+            {
+                organization = organizationsAdminQuery.First();
+            }
+            else
+            {
+                throw new AuthenticationException("User is not a member of any organization.");
+            }
+
+            return organization;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Could not get logged in user organization.", ex);
         }
     }
 }

@@ -1,11 +1,11 @@
-using System.Text;
+using System.Security.Claims;
 using Crit.Application.Logins;
 using Crit.Application.RepositoryInterfaces;
+using Crit.Application.Users;
 using Crit.Contracts.Enums;
 using Crit.Contracts.RequestModels;
 using Crit.Contracts.ResponseModels;
 using Crit.Domain.Identity;
-using Crit.Domain.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -20,24 +20,26 @@ public class LoginController : ControllerBase
     private readonly Logging.IFileLogger _logger;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly SignInManager<ApplicationUser> _signInManager;
-    private readonly IUserRepository _userRepository;
     private readonly RoleManager<ApplicationRole> _roleManager;
     private readonly IOrganizationRepository _organizationRepository;
     private readonly IEmailRepository _emailRepository;
     private readonly IPhoneNumberRepository _phoneNumberRepository;
     private readonly ILoginService _loginService;
+    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly ICurrentUserService _currentUserService;
+
     public LoginController(
         UserManager<ApplicationUser> userManager,
         RoleManager<ApplicationRole> roleManager,
         SignInManager<ApplicationUser> signInManager,
         Logging.IFileLogger logger,
-        IUserRepository userRepository,
         IOrganizationRepository organizationRepository,
         IEmailRepository emailRepository,
         IPhoneNumberRepository phoneNumberRepository,
-        ILoginService loginService)
+        ILoginService loginService,
+        IHttpContextAccessor httpContextAccessor,
+        ICurrentUserService currentUserService)
     {
-        _userRepository = userRepository;
         _logger = logger;
         _userManager = userManager;
         _roleManager = roleManager;
@@ -46,13 +48,15 @@ public class LoginController : ControllerBase
         _emailRepository = emailRepository;
         _phoneNumberRepository = phoneNumberRepository;
         _loginService = loginService;
+        _httpContextAccessor = httpContextAccessor;
+        _currentUserService = currentUserService;
     }
 
     [HttpPost]
     [Route("Register")]
     [ProducesResponseType<LoginResponse>(StatusCodes.Status200OK)]
     [ProducesErrorResponseType(typeof(string))]
-    public async Task<IActionResult> Register([FromBody] UserRequest user)
+    public async Task<IActionResult> Register([FromBody] CreateUserRequest user)
     {
         try
         {
@@ -68,9 +72,9 @@ public class LoginController : ControllerBase
 
     [HttpPost]
     [Route("Login")]
-    [ProducesResponseType<object>(StatusCodes.Status200OK)]
+    [ProducesResponseType<LoginResponse>(StatusCodes.Status200OK)]
     [ProducesErrorResponseType(typeof(string))]
-    public async Task<IActionResult> Login([FromBody] UserRequest user, [FromQuery] bool? useCookies)
+    public async Task<IActionResult> Login([FromBody] CreateUserRequest user, [FromQuery] bool? useCookies)
     {
         try
         {
@@ -94,7 +98,7 @@ public class LoginController : ControllerBase
         {
             if (User.Identity != null && User.Identity.IsAuthenticated)
             {
-                ApplicationUser? applicationUser = await _userRepository.GetLoggedInUser();
+                ApplicationUser? applicationUser = await _currentUserService.GetLoggedInUserAsync();
 
                 if (applicationUser == null)
                 {
@@ -127,7 +131,7 @@ public class LoginController : ControllerBase
         {
             if (User.Identity != null && User.Identity.IsAuthenticated)
             {
-                ApplicationUser? applicationUser = await _userRepository.GetLoggedInUser();
+                ApplicationUser? applicationUser = await _currentUserService.GetLoggedInUserAsync();
 
                 if (applicationUser == null)
                 {
@@ -143,7 +147,7 @@ public class LoginController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogException(ex);
-            return StatusCode(StatusCodes.Status500InternalServerError, "Error logging in.");
+            return StatusCode(StatusCodes.Status500InternalServerError, "Error logging out.");
         }
     }
 

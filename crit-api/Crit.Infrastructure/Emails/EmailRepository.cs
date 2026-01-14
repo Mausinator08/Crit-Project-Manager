@@ -1,6 +1,7 @@
 using Crit.Application.RepositoryInterfaces;
-using Crit.Domain.Contexts;
 using Crit.Domain.Models;
+using Crit.Infrastructure.Contexts;
+using Microsoft.EntityFrameworkCore;
 
 namespace Crit.Infrastructure.Repositories;
 
@@ -13,85 +14,62 @@ public class EmailRepository : IEmailRepository
         _critDbContext = critDbContext;
     }
 
-    public async Task<Email> CreateEmail(Email email)
+    public async Task<Email?> CreateEmail(Email email)
     {
-        try
+        Email? newEmail = new Email()
         {
-            var newEmail = new Email()
-            {
-                OrganizationId = email.OrganizationId,
-                EmailAddress = email.EmailAddress,
-                UserId = email.UserId
-            };
+            OrganizationId = email.OrganizationId,
+            EmailAddress = email.EmailAddress,
+            UserId = email.UserId
+        };
 
-            await _critDbContext.Emails.AddAsync(newEmail);
-            await _critDbContext.SaveChangesAsync();
+        await _critDbContext.Emails.AddAsync(newEmail);
+        await _critDbContext.SaveChangesAsync();
 
-            return newEmail;
-        }
-        catch (Exception e)
-        {
-            throw new Exception("Error creating email", e);
-        }
+        return newEmail;
     }
 
     public async Task DeleteEmail(Guid emailId)
     {
-        try
+        Email? email = await _critDbContext.Emails.FindAsync(emailId);
+        if (email == null)
         {
-            var email = await _critDbContext.Emails.FindAsync(emailId);
-            if (email == null)
-            {
-                throw new Exception("Email not found");
-            }
+            throw new Exception("Email not found");
+        }
 
-            _critDbContext.Emails.Remove(email);
-            await _critDbContext.SaveChangesAsync();
-        }
-        catch (Exception e)
-        {
-            throw new Exception("Error deleting email", e);
-        }
+        _critDbContext.Emails.Remove(email);
+        await _critDbContext.SaveChangesAsync();
     }
 
     public async Task<Email> GetEmailById(Guid emailId)
     {
-        try
+        Email? email = await _critDbContext.Emails.FindAsync(emailId);
+        if (email == null)
         {
-            var email = await _critDbContext.Emails.FindAsync(emailId);
-            if (email == null)
-            {
-                throw new Exception("Email not found");
-            }
+            throw new Exception("Email not found");
+        }
 
-            return email;
-        }
-        catch (Exception e)
-        {
-            throw new Exception("Error getting email", e);
-        }
+        return email;
+    }
+
+    public async Task<Email?> GetEmailByAddress(string address)
+    {
+        return await _critDbContext.Emails.FirstOrDefaultAsync(e => e.EmailAddress == address);
     }
 
     public async Task UpdateEmail(Email email)
     {
-        try
+        Email? existingEmail = await _critDbContext.Emails.FindAsync(email.Id);
+        if (existingEmail == null)
         {
-            var existingEmail = await _critDbContext.Emails.FindAsync(email.Id);
-            if (existingEmail == null)
-            {
-                throw new Exception("Email not found");
-            }
-
-            existingEmail.EmailAddress = email.EmailAddress;
-            existingEmail.UserId = email.UserId;
-
-            _critDbContext.Emails.Update(existingEmail);
-            await _critDbContext.SaveChangesAsync();
+            throw new Exception("Email not found");
         }
-        catch (Exception e)
-        {
-            throw new Exception("Error updating email", e);
-        }
+
+        existingEmail.EmailAddress = email.EmailAddress;
+        existingEmail.UserId = email.UserId;
+
+        _critDbContext.Emails.Update(existingEmail);
+        await _critDbContext.SaveChangesAsync();
     }
 
 }

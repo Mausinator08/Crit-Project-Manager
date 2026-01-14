@@ -1,4 +1,4 @@
-﻿using Crit.Domain.Models;
+﻿using Crit.Abstractions.Models;
 
 namespace Crit.Application.RepositoryInterfaces;
 

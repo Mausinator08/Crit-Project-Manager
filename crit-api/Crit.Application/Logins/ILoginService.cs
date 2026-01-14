@@ -5,6 +5,6 @@ namespace Crit.Application.Logins;
 
 public interface ILoginService
 {
-	Task<LoginResponse> RegisterAsync(UserRequest user);
-	Task<LoginResponse> LoginAsync(UserRequest user, bool? useCookies);
+	Task<LoginResponse> RegisterAsync(CreateUserRequest user);
+	Task<LoginResponse> LoginAsync(CreateUserRequest user, bool? useCookies);
 }

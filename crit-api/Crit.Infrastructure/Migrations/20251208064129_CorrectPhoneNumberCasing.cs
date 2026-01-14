@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace Crit.Domain.Migrations
+namespace Crit.Abstractions.Migrations
 {
     /// <inheritdoc />
     public partial class CorrectPhoneNumberCasing : Migration

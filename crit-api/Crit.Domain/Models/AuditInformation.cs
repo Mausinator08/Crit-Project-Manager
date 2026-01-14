@@ -1,4 +1,4 @@
-namespace Crit.Domain.BaseModels;
+namespace Crit.Domain.Models;
 
 public class AuditInformation
 {

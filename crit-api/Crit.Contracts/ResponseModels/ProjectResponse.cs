@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Crit.Contracts.ResponseModels;
 
-public class ProjectResponse : AuditInformationResponse
+public class ProjectResponse
 {
     public ProjectResponse()
     {
@@ -17,9 +17,6 @@ public class ProjectResponse : AuditInformationResponse
         Comments = new List<CommentResponse>();
         ProjectUsers = new List<ProjectUserResponse>();
         ProjectAdmins = new List<ProjectAdminResponse>();
-        DateTime now = DateTime.UtcNow;
-        DateCreated = now;
-        DateUpdated = now;
     }
 
     public Guid? Id { get; set; }

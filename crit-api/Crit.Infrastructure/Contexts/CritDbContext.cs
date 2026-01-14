@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 
-namespace Crit.Domain.Contexts;
+namespace Crit.Infrastructure.Contexts;
 
 public class CritDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, Guid>, ICritDbContext
 {
@@ -147,10 +147,6 @@ public class CritDbContext : IdentityDbContext<ApplicationUser, ApplicationRole,
             entity.Property(table => table.Description).HasColumnName("Description").IsRequired(false);
             entity.Property(table => table.OwningOrganizationId).HasColumnName("OwningOrganizationId").IsRequired(true);
             entity.Property(table => table.ProjectOwnerUserId).HasColumnName("ProjectOwnerUserId").IsRequired(true);
-            entity.Property(table => table.CreatedByUserId).HasColumnName("CreatedByUserId").IsRequired(true);
-            entity.Property(table => table.DateCreated).HasColumnName("DateCreated").IsRequired(true);
-            entity.Property(table => table.DateUpdated).HasColumnName("DateUpdated").IsRequired(true);
-            entity.Property(table => table.UpdatedByUserId).HasColumnName("UpdatedByUserId").IsRequired(true);
         });
 
         modelBuilder.Entity<Project>()

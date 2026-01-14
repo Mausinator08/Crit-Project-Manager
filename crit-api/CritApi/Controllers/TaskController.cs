@@ -1,5 +1,5 @@
-using Crit.Domain.Models;
-using Crit.Domain.Models;
+using Crit.Abstractions.Models;
+using Crit.Abstractions.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

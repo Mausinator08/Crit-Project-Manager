@@ -1,6 +1,6 @@
+using Crit.Abstractions.Contexts;
+using Crit.Abstractions.Models;
 using Crit.Application.RepositoryInterfaces;
-using Crit.Domain.Contexts;
-using Crit.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Crit.Infrastructure.Repositories;

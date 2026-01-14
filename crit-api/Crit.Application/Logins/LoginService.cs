@@ -1,11 +1,11 @@
 using System.Text;
-using Crit.Application.RepositoryInterfaces;
+using Crit.Application.Emails;
+using Crit.Application.Organizations;
+using Crit.Contracts.Emails;
 using Crit.Contracts.Enums;
 using Crit.Contracts.RequestModels;
 using Crit.Contracts.ResponseModels;
-using Crit.Domain.Enums;
 using Crit.Domain.Identity;
-using Crit.Domain.Models;
 using Microsoft.AspNetCore.Identity;
 
 namespace Crit.Application.Logins;
@@ -14,30 +14,27 @@ public class LoginService : ILoginService
 {
 	private readonly UserManager<ApplicationUser> _userManager;
 	private readonly SignInManager<ApplicationUser> _signInManager;
-	private readonly IUserRepository _userRepository;
 	private readonly RoleManager<ApplicationRole> _roleManager;
-	private readonly IOrganizationRepository _organizationRepository;
-	private readonly IEmailRepository _emailRepository;
-	private readonly IPhoneNumberRepository _phoneNumberRepository;
+	private readonly IOrganizationService _organizationService;
+	private readonly IEmailService _emailService;
+	private readonly IPhoneNumberService _phoneNumberService;
 	public LoginService(
 		UserManager<ApplicationUser> userManager,
 		RoleManager<ApplicationRole> roleManager,
 		SignInManager<ApplicationUser> signInManager,
-		IUserRepository userRepository,
-		IOrganizationRepository organizationRepository,
-		IEmailRepository emailRepository,
-		IPhoneNumberRepository phoneNumberRepository)
+		IOrganizationService organizationService,
+		IEmailService emailService,
+		IPhoneNumberService phoneNumberService)
 	{
-		_userRepository = userRepository;
 		_userManager = userManager;
 		_roleManager = roleManager;
 		_signInManager = signInManager;
-		_organizationRepository = organizationRepository;
-		_emailRepository = emailRepository;
-		_phoneNumberRepository = phoneNumberRepository;
+		_organizationService = organizationService;
+		_emailService = emailService;
+		_phoneNumberService = phoneNumberService;
 	}
 
-	public async Task<LoginResponse> RegisterAsync(UserRequest user)
+	public async Task<LoginResponse> RegisterAsync(CreateUserRequest user)
 	{
 		if (user == null)
 		{
@@ -92,29 +89,39 @@ public class LoginService : ILoginService
 				};
 			}
 
-			Organization organization = await _organizationRepository.CreateOrganization(new Organization() { Name = user.Organization, OwnerUserId = appUser.Id });
+			OrganizationResponse? organization = await _organizationService.CreateOrganization(new CreateOrganizationRequest()
+			{
+				Name = user.Organization,
+				OwnerUserId = appUser.Id,
+				CountryCode = user.CountryCode,
+				Email = user.Email,
+				Extension = user.Extension,
+				NumberType = user.PhoneType,
+				PhoneNumber = user.PhoneNumber,
+				OrganizationAdminIds = new List<Guid>([appUser.Id]),
+				OrganizationMemberIds = new List<Guid>([appUser.Id]),
+				OrganizationAffiliateIds = new List<Guid>([appUser.Id])
+			});
 
 			if (organization == null || organization.Id == null || organization.Id == Guid.Empty)
 			{
 				throw new Exception("Failed to create organization.");
 			}
 
-			Email email = await _emailRepository.CreateEmail(new Email()
+			EmailResponse? email = await _emailService.CreateEmail(new CreateEmailRequest()
 			{
 				EmailAddress = user.Email,
 				OrganizationId = organization.Id.Value,
-				Organization = organization,
 				UserId = appUser.Id
 			});
 
-			PhoneNumber phoneNumber = await _phoneNumberRepository.CreatePhoneNumber(new PhoneNumber()
+			PhoneNumberResponse? phoneNumber = await _phoneNumberService.CreatePhoneNumber(new CreatePhoneNumberRequest()
 			{
 				Number = user.PhoneNumber ?? string.Empty,
 				OrganizationId = organization.Id.Value,
-				Organization = organization,
 				CountryCode = user.CountryCode ?? "+1",
 				Extension = user.Extension,
-				Type = user.PhoneType.HasValue ? user.PhoneType.Value : PhoneNumberType.Mobile,
+				Type = user.PhoneType,
 				UserId = appUser.Id
 			});
 
@@ -255,12 +262,23 @@ public class LoginService : ILoginService
 				};
 			}
 
-			Organization? organization = null;
-			List<Organization> organizationQuery = (await _organizationRepository.GetAllOrganizations()).Where(o => o.Name == user.Organization).ToList();
+			OrganizationResponse? organization = await _organizationService.GetOrganizationByName(user.Organization);
 
-			if (!organizationQuery.Any())
+			if (organization == null)
 			{
-				organization = await _organizationRepository.CreateOrganization(new Organization() { Name = user.Organization, OwnerUserId = appUser.Id });
+				organization = await _organizationService.CreateOrganization(new CreateOrganizationRequest()
+				{
+					Name = user.Organization,
+					OwnerUserId = appUser.Id,
+					CountryCode = user.CountryCode,
+					Email = user.Email,
+					Extension = user.Extension,
+					NumberType = user.PhoneType,
+					PhoneNumber = user.PhoneNumber,
+					OrganizationAdminIds = new List<Guid>([appUser.Id]),
+					OrganizationMemberIds = new List<Guid>([appUser.Id]),
+					OrganizationAffiliateIds = new List<Guid>([appUser.Id])
+				});
 
 				IdentityResult roleResult = await _userManager.AddToRoleAsync(appUser, "OrganizationOwner");
 
@@ -277,8 +295,6 @@ public class LoginService : ILoginService
 			}
 			else
 			{
-				organization = organizationQuery.First();
-
 				IdentityResult roleResult = await _userManager.AddToRoleAsync(appUser, "User");
 
 				if (!roleResult.Succeeded)
@@ -298,22 +314,21 @@ public class LoginService : ILoginService
 				throw new Exception("Failed to get or create organization.");
 			}
 
-			Email email = await _emailRepository.CreateEmail(new Email()
+			EmailResponse? email = await _emailService.CreateEmail(new CreateEmailRequest()
 			{
 				EmailAddress = user.Email,
 				OrganizationId = organization.Id.Value,
-				Organization = organization,
 				UserId = appUser.Id
 			});
 
-			PhoneNumber phoneNumber = await _phoneNumberRepository.CreatePhoneNumber(new PhoneNumber()
+			PhoneNumberResponse? phoneNumber = await _phoneNumberService.CreatePhoneNumber(new CreatePhoneNumberRequest()
 			{
 				Number = user.PhoneNumber ?? string.Empty,
 				OrganizationId = organization.Id.Value,
-				Organization = organization,
 				CountryCode = user.CountryCode ?? "+1",
 				Extension = user.Extension,
-				Type = user.PhoneType.HasValue ? user.PhoneType.Value : PhoneNumberType.Mobile
+				Type = user.PhoneType,
+				UserId = appUser.Id
 			});
 		}
 
@@ -324,7 +339,7 @@ public class LoginService : ILoginService
 		};
 	}
 
-	public async Task<LoginResponse> LoginAsync(UserRequest user, bool? useCookies)
+	public async Task<LoginResponse> LoginAsync(CreateUserRequest user, bool? useCookies)
 	{
 		if (user == null)
 		{
@@ -338,6 +353,8 @@ public class LoginService : ILoginService
 		bool isPersistent = useCookies == true;
 
 		// Simulate user authentication
+
+
 		if (string.IsNullOrEmpty(user.UserName))
 		{
 			return new LoginResponse()
@@ -350,7 +367,7 @@ public class LoginService : ILoginService
 		ApplicationUser? applicationUser = await _userManager.FindByNameAsync(user.UserName);
 		if (applicationUser != null)
 		{
-			Microsoft.AspNetCore.Identity.SignInResult result = await _signInManager.PasswordSignInAsync(applicationUser, user.Password ?? string.Empty, isPersistent, false);
+			SignInResult result = await _signInManager.PasswordSignInAsync(applicationUser, user.Password ?? string.Empty, isPersistent, false);
 
 			if (result.RequiresTwoFactor)
 			{

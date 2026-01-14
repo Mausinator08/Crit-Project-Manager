@@ -1,5 +1,3 @@
-using System.Text.Json.Serialization;
-
 namespace Crit.Contracts.ResponseModels;
 
 public class EmailResponse

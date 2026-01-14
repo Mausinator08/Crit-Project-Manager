@@ -1,7 +1,5 @@
-using System.Text.Json.Serialization;
-using Crit.Domain.Enums;
+using Crit.Abstractions.Types;
 using Microsoft.AspNetCore.Identity;
-
 namespace Crit.Domain.Models;
 
 public class PhoneNumber
@@ -17,9 +15,9 @@ public class PhoneNumber
     public Guid? Id { get; set; }
     public PhoneNumberType Type { get; set; }
     [PersonalData]
-    public string CountryCode { get; set; }
+    public string? CountryCode { get; set; }
     [PersonalData]
-    public string Number { get; set; }
+    public string? Number { get; set; }
     [PersonalData]
     public string? Extension { get; set; }
     public Guid OrganizationId { get; set; }

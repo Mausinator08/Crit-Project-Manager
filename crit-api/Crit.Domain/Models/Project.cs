@@ -1,10 +1,8 @@
-using System.Text.Json.Serialization;
-using Crit.Domain.BaseModels;
-using Crit.Domain.Identity;
 
+using Crit.Domain.Identity;
 namespace Crit.Domain.Models;
 
-public class Project : AuditInformation
+public class Project
 {
     public Project()
     {
@@ -21,9 +19,6 @@ public class Project : AuditInformation
         OrganizationProjects = new List<OrganizationProject>();
         ProjectUsers = new List<ProjectUser>();
         ProjectAdmins = new List<ProjectAdmin>();
-        DateTime now = DateTime.UtcNow;
-        DateCreated = now;
-        DateUpdated = now;
     }
 
     public Guid? Id { get; set; }

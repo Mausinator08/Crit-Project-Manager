@@ -1,9 +1,6 @@
-using System.Text.Json.Serialization;
-using Crit.Domain.BaseModels;
-
 namespace Crit.Domain.Models;
 
-public class Comment : AuditInformation
+public class Comment
 {
 	public Comment()
 	{
@@ -12,9 +9,6 @@ public class Comment : AuditInformation
 		ProjectId = Guid.Empty;
 		QuotedComments = new List<CommentQuote>();
 		MentionedUsers = new List<MentionedUserComment>();
-		DateTime now = DateTime.UtcNow;
-		DateCreated = now;
-		DateUpdated = now;
 	}
 
 	public Guid? Id { get; set; }

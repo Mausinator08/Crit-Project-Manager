@@ -1,14 +1,14 @@
 using System.Text;
+using Crit.Abstractions.Contexts;
+using Crit.Abstractions.Identity;
+using Crit.Application.Mappers;
 using Crit.Application.RepositoryInterfaces;
-using Crit.Domain.Contexts;
-using Crit.Domain.Identity;
-using Crit.Domain.Models;
+using Crit.Application.Users;
 using Crit.Infrastructure.Repositories;
 using CritApi.Logging;
 using CritApi.Middleware;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Proxies;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -143,7 +143,6 @@ if (logPath == null)
 
 builder.Services.AddSingleton<IFileLogger, FileLogger>(x => new FileLogger(logPath));
 
-builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IProjectsRepository, ProjectsRepository>();
 builder.Services.AddScoped<ITasksRepository, TasksRepository>();
 builder.Services.AddScoped<IOrganizationRepository, OrganizationRepository>();
@@ -153,6 +152,15 @@ builder.Services.AddScoped<IStatusRepository, StatusRepository>();
 builder.Services.AddScoped<IPriorityRepository, PriorityRepository>();
 builder.Services.AddScoped<ICustomFieldTypeRepository, CustomFieldTypeRepository>();
 builder.Services.AddScoped<ICustomFieldRepository, CustomFieldRepository>();
+
+builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
+builder.Services.AddSingleton<IMapperService, MapperService>();
+
+builder.Services.Scan(scan => scan
+    .FromAssemblies(typeof(MapperService).Assembly /* or your mapper assembly */)
+    .AddClasses(c => c.AssignableTo(typeof(IMapper<,>)))
+    .AsImplementedInterfaces()
+    .WithSingletonLifetime());
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddControllers();
