@@ -96,22 +96,15 @@ public class LoginController : ControllerBase
     {
         try
         {
-            if (User.Identity != null && User.Identity.IsAuthenticated)
-            {
-                ApplicationUser? applicationUser = await _currentUserService.GetLoggedInUserAsync();
+            ApplicationUser? applicationUser = await _currentUserService.GetLoggedInUserAsync();
 
-                if (applicationUser == null)
-                {
-                    await _signInManager.SignOutAsync().ConfigureAwait(false);
-                    return Ok(new { message = "User is not logged in. Returning to login.", authenticated = false });
-                }
-
-                return Ok(new { message = $"Welcome to Crit, {applicationUser.UserName}!", authenticated = true });
-            }
-            else
+            if (applicationUser == null)
             {
-                return Ok(new { message = "User is not authenticated. Please login.", authenticated = false });
+                await _signInManager.SignOutAsync().ConfigureAwait(false);
+                return Ok(new { message = "User is not logged in. Returning to login.", authenticated = false });
             }
+
+            return Ok(new { message = $"Welcome to Crit, {applicationUser.UserName}!", authenticated = true });
         }
         catch (Exception ex)
         {
@@ -129,20 +122,15 @@ public class LoginController : ControllerBase
     {
         try
         {
-            if (User.Identity != null && User.Identity.IsAuthenticated)
+            ApplicationUser? applicationUser = await _currentUserService.GetLoggedInUserAsync();
+
+            if (applicationUser == null)
             {
-                ApplicationUser? applicationUser = await _currentUserService.GetLoggedInUserAsync();
-
-                if (applicationUser == null)
-                {
-                    return Unauthorized("User is not logged in.");
-                }
-
-                await _signInManager.SignOutAsync().ConfigureAwait(false);
-                return Ok("You have logged out successfully.");
+                return Unauthorized("User is not logged in.");
             }
 
-            return Unauthorized("User is not logged in.");
+            await _signInManager.SignOutAsync().ConfigureAwait(false);
+            return Ok("You have logged out successfully.");
         }
         catch (Exception ex)
         {
