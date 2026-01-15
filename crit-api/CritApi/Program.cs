@@ -1,9 +1,12 @@
 using System.Text;
-using Crit.Abstractions.Contexts;
-using Crit.Abstractions.Identity;
+using Crit.Application.Emails;
+using Crit.Application.Logins;
 using Crit.Application.Mappers;
+using Crit.Application.Organizations;
 using Crit.Application.RepositoryInterfaces;
 using Crit.Application.Users;
+using Crit.Domain.Identity;
+using Crit.Infrastructure.Contexts;
 using Crit.Infrastructure.Repositories;
 using CritApi.Logging;
 using CritApi.Middleware;
@@ -153,7 +156,11 @@ builder.Services.AddScoped<IPriorityRepository, PriorityRepository>();
 builder.Services.AddScoped<ICustomFieldTypeRepository, CustomFieldTypeRepository>();
 builder.Services.AddScoped<ICustomFieldRepository, CustomFieldRepository>();
 
+builder.Services.AddScoped<ILoginService, LoginService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IOrganizationService, OrganizationService>();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
+
 builder.Services.AddSingleton<IMapperService, MapperService>();
 
 builder.Services.Scan(scan => scan
