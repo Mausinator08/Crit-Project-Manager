@@ -6,7 +6,9 @@ namespace Crit.Application.Organizations;
 public interface IOrganizationService
 {
 	Task<List<OrganizationResponse>> GetAllOrganizationsForLoggedInUser();
+	Task<List<OrganizationResponse>> GetAllOrganizationsForUserId(Guid userId);
 	Task<OrganizationResponse?> GetPrimaryOrganizationForLoggedInUser();
+	Task<OrganizationResponse?> GetPrimaryOrganizationForUserId(Guid userId);
 	Task<bool> AnyOrganizationsByName(string name);
 	Task<OrganizationResponse?> GetOrganizationByName(string organizationName);
 	Task<List<OrganizationResponse>> GetAllOrganizationsForProjectId(Guid projectId);

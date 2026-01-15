@@ -44,6 +44,13 @@ public class OrganizationService : IOrganizationService
 		return new List<OrganizationResponse>();
 	}
 
+	public async Task<List<OrganizationResponse>> GetAllOrganizationsForUserId(Guid userId)
+	{
+		List<Organization> organizations = await _organizationRepository.GetAllOrganizationsForUserId(userId);
+
+		return _mapperService.ConvertListTo<Organization, OrganizationResponse>(organizations);
+	}
+
 	public async Task<bool> AnyOrganizationsByName(string name)
 	{
 		return await _organizationRepository.AnyOrganizationsByName(name);
@@ -71,6 +78,25 @@ public class OrganizationService : IOrganizationService
 
 			// It is invalid for a user to not be part of an organization of some sort. Even if the organization is simply the user themself.
 			throw new InvalidOperationException($"{loggedInAppUser.UserName} is logged in but does not have a primary organization.");
+		}
+
+		return null;
+	}
+
+	public async Task<OrganizationResponse?> GetPrimaryOrganizationForUserId(Guid userId)
+	{
+		Organization? organizationAdmin = await _organizationRepository.GetOrganizationByAdminUserId(userId);
+		Organization? organizationMember = await _organizationRepository.GetOrganizationByMemberUserId(userId);
+
+		if (organizationAdmin != null)
+		{
+			// If user is an admin of an organization, then no need to continue to checking for member, for an admin is a member.
+			return _mapperService.ConvertTo<Organization, OrganizationResponse>(organizationAdmin);
+		}
+
+		if (organizationMember != null)
+		{
+			return _mapperService.ConvertTo<Organization, OrganizationResponse>(organizationMember);
 		}
 
 		return null;

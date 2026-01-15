@@ -80,6 +80,11 @@ public class CustomFieldTypeController : ControllerBase
     {
         try
         {
+            if (customFieldType == null || customFieldTypeId == Guid.Empty)
+            {
+                return BadRequest("Invalid organization data.");
+            }
+
             CustomFieldTypeResponse? updatedCustomFieldType = await _customFieldTypeService.UpdateCustomFieldType(customFieldTypeId, customFieldType);
             return Ok(updatedCustomFieldType);
         }

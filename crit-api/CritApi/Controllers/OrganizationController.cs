@@ -1,7 +1,9 @@
 using System.Security.Claims;
-using Crit.Abstractions.Identity;
 using Crit.Application.Organizations;
+using Crit.Application.Users;
+using Crit.Contracts.RequestModels;
 using Crit.Contracts.ResponseModels;
+using Crit.Domain.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -15,14 +17,12 @@ public class OrganizationController : ControllerBase
 {
     private readonly Logging.IFileLogger _logger;
     private readonly IOrganizationService _organizationService;
-    private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly UserManager<ApplicationUser> _userManager;
-    public OrganizationController(Logging.IFileLogger logger, IOrganizationService organizationService, IHttpContextAccessor httpContextAccessor, UserManager<ApplicationUser> userManager)
+    private readonly ICurrentUserService _userService;
+    public OrganizationController(Logging.IFileLogger logger, IOrganizationService organizationService, CurrentUserService userService)
     {
         _logger = logger;
         _organizationService = organizationService;
-        _httpContextAccessor = httpContextAccessor;
-        _userManager = userManager;
+        _userService = userService;
     }
 
     [HttpGet]
@@ -44,7 +44,7 @@ public class OrganizationController : ControllerBase
 
     [HttpGet]
     [Route("GetAllOrganizationsForProjectId/{projectId}")]
-    [ProducesResponseType<List<Organization>>(StatusCodes.Status200OK)]
+    [ProducesResponseType<List<OrganizationResponse>>(StatusCodes.Status200OK)]
     [ProducesErrorResponseType(typeof(string))]
     public async Task<IActionResult> GetAllOrganizationsForProjectId([FromRoute] Guid projectId)
     {
@@ -61,7 +61,7 @@ public class OrganizationController : ControllerBase
 
     [HttpGet]
     [Route("GetAllOrganizationsForUserId/{userId}")]
-    [ProducesResponseType<List<Organization>>(StatusCodes.Status200OK)]
+    [ProducesResponseType<List<OrganizationResponse>>(StatusCodes.Status200OK)]
     [ProducesErrorResponseType(typeof(string))]
     public async Task<IActionResult> GetAllOrganizationsForUserId([FromRoute] Guid userId)
     {
@@ -78,13 +78,13 @@ public class OrganizationController : ControllerBase
 
     [HttpGet]
     [Route("GetOrganizationByUserId/{userId}")]
-    [ProducesResponseType<Organization>(StatusCodes.Status200OK)]
+    [ProducesResponseType<OrganizationResponse>(StatusCodes.Status200OK)]
     [ProducesErrorResponseType(typeof(string))]
     public async Task<IActionResult> GetOrganizationByUserId([FromRoute] Guid userId)
     {
         try
         {
-            return Ok(await _organizationService.GetOrganizationByUserId(userId));
+            return Ok(await _organizationService.GetPrimaryOrganizationForUserId(userId));
         }
         catch (Exception ex)
         {
@@ -95,13 +95,13 @@ public class OrganizationController : ControllerBase
 
     [HttpGet]
     [Route("{organizationId}")]
-    [ProducesResponseType<Organization>(StatusCodes.Status200OK)]
+    [ProducesResponseType<OrganizationResponse>(StatusCodes.Status200OK)]
     [ProducesErrorResponseType(typeof(string))]
     public async Task<IActionResult> GetOrganization(Guid organizationId)
     {
         try
         {
-            Organization? organization = await _organizationService.GetOrganization(organizationId);
+            OrganizationResponse? organization = await _organizationService.GetOrganization(organizationId);
             if (organization == null || organization.Id == null || organization.Id == Guid.Empty)
             {
                 return NotFound($"Organization with ID {organizationId} not found.");
@@ -117,9 +117,9 @@ public class OrganizationController : ControllerBase
     }
 
     [HttpPost]
-    [ProducesResponseType<Organization>(StatusCodes.Status201Created)]
+    [ProducesResponseType<OrganizationResponse>(StatusCodes.Status201Created)]
     [ProducesErrorResponseType(typeof(string))]
-    public async Task<IActionResult> CreateOrganization([FromBody] Organization organization)
+    public async Task<IActionResult> CreateOrganization([FromBody] CreateOrganizationRequest organization)
     {
         try
         {
@@ -128,7 +128,7 @@ public class OrganizationController : ControllerBase
                 return BadRequest("Invalid organization data.");
             }
 
-            Organization? createdOrganization = await _organizationService.CreateOrganization(organization);
+            OrganizationResponse? createdOrganization = await _organizationService.CreateOrganization(organization);
             return CreatedAtAction(nameof(GetOrganization), new { organizationId = createdOrganization.Id }, createdOrganization);
         }
         catch (Exception ex)
@@ -139,19 +139,19 @@ public class OrganizationController : ControllerBase
     }
 
     [HttpPut]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [Route("{organizationId}")]
+    [ProducesResponseType<OrganizationResponse>(StatusCodes.Status200OK)]
     [ProducesErrorResponseType(typeof(string))]
-    public async Task<IActionResult> UpdateOrganization([FromBody] Organization organization)
+    public async Task<IActionResult> UpdateOrganization([FromRoute] Guid organizationId, [FromBody] UpdateOrganizationRequest organization)
     {
         try
         {
-            if (organization == null || organization.Id == null || organization.Id == Guid.Empty)
+            if (organization == null || organizationId == Guid.Empty)
             {
                 return BadRequest("Invalid organization data.");
             }
 
-            await _organizationService.UpdateOrganization(organization);
-            return NoContent();
+            return Ok(await _organizationService.UpdateOrganization(organizationId, organization));
         }
         catch (Exception ex)
         {
@@ -178,48 +178,22 @@ public class OrganizationController : ControllerBase
         }
     }
 
-    private async Task<OrganizationResponse?> GetLoggedInUserOrganization()
+    [HttpGet]
+    [Route("GetLoggedInUserOrganization")]
+    [ProducesResponseType<OrganizationResponse>(StatusCodes.Status200OK)]
+    [ProducesErrorResponseType(typeof(string))]
+    public async Task<IActionResult> GetLoggedInUserOrganization()
     {
         try
         {
-            ClaimsPrincipal? user = null;
+            OrganizationResponse? organization = await _organizationService.GetPrimaryOrganizationForLoggedInUser();
 
-            if (_httpContextAccessor.HttpContext?.User?.Identity?.IsAuthenticated == true)
+            if (organization == null)
             {
-                user = _httpContextAccessor.HttpContext.User;
+                return NotFound("An organization for the currently logged in user could not be found.");
             }
 
-            if (user == null)
-            {
-                throw new ArgumentNullException(nameof(user));
-            }
-
-            ApplicationUser? applicationUser = await _userManager.GetUserAsync(user);
-
-            if (applicationUser == null)
-            {
-                throw new ArgumentNullException(nameof(applicationUser));
-            }
-
-            List<Organization> organizationsMemberQuery = await _critDbContext.Organizations.AsNoTracking().Where(o => o.OrganizationMembers.Any(ou => ou.MemberUserId == applicationUser.Id)).ToListAsync();
-            List<Organization> organizationsAdminQuery = await _critDbContext.Organizations.AsNoTracking().Where(o => o.OrganizationAdmins.Any(ou => ou.AdminUserId == applicationUser.Id)).ToListAsync();
-
-            Organization? organization = null;
-
-            if (organizationsMemberQuery.Any())
-            {
-                organization = organizationsMemberQuery.First();
-            }
-            else if (organizationsAdminQuery.Any())
-            {
-                organization = organizationsAdminQuery.First();
-            }
-            else
-            {
-                throw new AuthenticationException("User is not a member of any organization.");
-            }
-
-            return organization;
+            return Ok(organization);
         }
         catch (Exception ex)
         {
