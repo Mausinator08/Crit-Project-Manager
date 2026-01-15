@@ -119,7 +119,7 @@ public class OrganizationService : IOrganizationService
 		return organization != null ? _mapperService.ConvertTo<Organization, OrganizationResponse>(organization) : null;
 	}
 
-	public async Task<OrganizationResponse?> CreateOrganization(CreateOrganizationRequest organization)
+	public async Task<OrganizationResponse> CreateOrganization(CreateOrganizationRequest organization)
 	{
 		if (string.IsNullOrWhiteSpace(organization.Name))
 		{
@@ -140,12 +140,12 @@ public class OrganizationService : IOrganizationService
 			throw new InvalidOperationException($"Admin and/or member user for organization {organization.Name} is already in another organization. Consider adding the user as an affiliate.");
 		}
 
-		Organization? createdOrganization = await _organizationRepository.CreateOrganization(_mapperService.ConvertTo<CreateOrganizationRequest, Organization>(organization));
+		Organization createdOrganization = await _organizationRepository.CreateOrganization(_mapperService.ConvertTo<CreateOrganizationRequest, Organization>(organization));
 
-		return createdOrganization != null ? _mapperService.ConvertTo<Organization, OrganizationResponse>(createdOrganization) : null;
+		return _mapperService.ConvertTo<Organization, OrganizationResponse>(createdOrganization);
 	}
 
-	public async Task UpdateOrganization(Guid id, UpdateOrganizationRequest organization)
+	public async Task<OrganizationResponse> UpdateOrganization(Guid id, UpdateOrganizationRequest organization)
 	{
 		List<Organization> existingOrganizations = await _organizationRepository.GetAllOrganizations();
 
@@ -269,7 +269,8 @@ public class OrganizationService : IOrganizationService
 			}
 		}
 
-		await _organizationRepository.UpdateOrganization(organizationToUpdate);
+		Organization updatedOrganization = await _organizationRepository.UpdateOrganization(organizationToUpdate);
+		return _mapperService.ConvertTo<Organization, OrganizationResponse>(updatedOrganization);
 	}
 
 	public async Task DeleteOrganization(Guid organizationId)

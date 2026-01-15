@@ -113,7 +113,7 @@ public class OrganizationRepository : IOrganizationRepository
         return organizationsQuery.First();
     }
 
-    public async Task<Organization?> CreateOrganization(Organization organization)
+    public async Task<Organization> CreateOrganization(Organization organization)
     {
         if (organization == null)
         {
@@ -146,15 +146,22 @@ public class OrganizationRepository : IOrganizationRepository
         return savedOrganization.Entity;
     }
 
-    public async Task UpdateOrganization(Organization organization)
+    public async Task<Organization> UpdateOrganization(Organization organization)
     {
         if (organization.Id == null || organization.Id == Guid.Empty)
         {
             throw new ArgumentNullException(nameof(organization), "Organization must have a valid id.");
         }
 
-        _critDbContext.Organizations.Update(organization);
-        await _critDbContext.SaveChangesAsync();
+        EntityEntry<Organization> updatedOrganization = _critDbContext.Organizations.Update(organization);
+        int savedChanges = await _critDbContext.SaveChangesAsync();
+
+        if (savedChanges <= 0)
+        {
+            throw new Exception("Failed to save organization.");
+        }
+
+        return updatedOrganization.Entity;
     }
 
     public async Task DeleteOrganization(Guid organizationId)
@@ -174,6 +181,11 @@ public class OrganizationRepository : IOrganizationRepository
         Organization organization = organizationsQuery.First();
 
         _critDbContext.Organizations.Remove(organization);
-        await _critDbContext.SaveChangesAsync();
+        int savedChanges = await _critDbContext.SaveChangesAsync();
+
+        if (savedChanges <= 0)
+        {
+            throw new Exception("Failed to delete organization.");
+        }
     }
 }

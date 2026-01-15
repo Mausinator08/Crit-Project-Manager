@@ -39,9 +39,9 @@ public class PhoneNumberService : IPhoneNumberService
 		return _mapperService.ConvertTo<PhoneNumber, PhoneNumberResponse>(createdPhoneNumber);
 	}
 
-	public async Task UpdatePhoneNumber(Guid phoneNumberId, UpdatePhoneNumberRequest phoneNumber)
+	public async Task<PhoneNumberResponse> UpdatePhoneNumber(Guid phoneNumberId, UpdatePhoneNumberRequest phoneNumber)
 	{
-		Domain.Models.PhoneNumber phoneNumberToUpdate = await _phoneNumberRepository.GetPhoneNumberById(phoneNumberId);
+		PhoneNumber phoneNumberToUpdate = await _phoneNumberRepository.GetPhoneNumberById(phoneNumberId);
 
 		phoneNumberToUpdate.Number = phoneNumber.Number ?? phoneNumberToUpdate.Number;
 		phoneNumberToUpdate.Extension = phoneNumber.Extension ?? phoneNumberToUpdate.Extension;
@@ -50,7 +50,9 @@ public class PhoneNumberService : IPhoneNumberService
 		phoneNumberToUpdate.OrganizationId = phoneNumber.OrganizationId ?? phoneNumberToUpdate.OrganizationId;
 		phoneNumberToUpdate.UserId = phoneNumber.UserId ?? phoneNumberToUpdate.UserId;
 
-		await _phoneNumberRepository.UpdatePhoneNumber(phoneNumberToUpdate);
+		PhoneNumber updatedPhoneNumber = await _phoneNumberRepository.UpdatePhoneNumber(phoneNumberToUpdate);
+
+		return _mapperService.ConvertTo<PhoneNumber, PhoneNumberResponse>(updatedPhoneNumber);
 	}
 
 	public async Task DeletePhoneNumber(Guid phoneNumberId)

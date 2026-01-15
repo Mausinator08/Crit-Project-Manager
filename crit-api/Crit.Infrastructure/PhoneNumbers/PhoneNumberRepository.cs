@@ -28,7 +28,7 @@ public class PhoneNumberRepository : IPhoneNumberRepository
 
     public async Task<PhoneNumber> GetPhoneNumberById(Guid phoneNumberId)
     {
-        PhoneNumber? phoneNumber = await _critDbContext.PhoneNumbers.FindAsync(phoneNumberId);
+        PhoneNumber? phoneNumber = await _critDbContext.PhoneNumbers.AsNoTracking().FirstOrDefaultAsync(pn => pn.Id == phoneNumberId);
         if (phoneNumber == null)
         {
             throw new Exception("Phone number not found");
@@ -39,7 +39,7 @@ public class PhoneNumberRepository : IPhoneNumberRepository
 
     public async Task<PhoneNumber?> GetPhoneNumberByNumber(string number)
     {
-        return await _critDbContext.PhoneNumbers.FirstOrDefaultAsync(e => e.Number == number);
+        return await _critDbContext.PhoneNumbers.AsNoTracking().FirstOrDefaultAsync(e => e.Number == number);
     }
 
     public async Task<PhoneNumber> CreatePhoneNumber(PhoneNumber phoneNumber)
@@ -66,15 +66,17 @@ public class PhoneNumberRepository : IPhoneNumberRepository
         return createdPhoneNumber.Entity;
     }
 
-    public async Task UpdatePhoneNumber(PhoneNumber phoneNumber)
+    public async Task<PhoneNumber> UpdatePhoneNumber(PhoneNumber phoneNumber)
     {
-        _critDbContext.PhoneNumbers.Update(phoneNumber);
+        EntityEntry<PhoneNumber> updatedPhoneNumber = _critDbContext.PhoneNumbers.Update(phoneNumber);
         int savedChanges = await _critDbContext.SaveChangesAsync();
 
         if (savedChanges <= 0)
         {
             throw new Exception("Failed to save Phone Number.");
         }
+
+        return updatedPhoneNumber.Entity;
     }
 
     public async Task DeletePhoneNumber(Guid phoneNumberId)

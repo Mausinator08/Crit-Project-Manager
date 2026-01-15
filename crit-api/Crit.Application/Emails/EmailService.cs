@@ -40,7 +40,7 @@ public class EmailService : IEmailService
 		return _mapperService.ConvertTo<Email, EmailResponse>(createdEmail);
 	}
 
-	public async Task UpdateEmail(Guid emailId, UpdateEmailRequest email)
+	public async Task<EmailResponse> UpdateEmail(Guid emailId, UpdateEmailRequest email)
 	{
 		Email emailToUpdate = await _emailRepository.GetEmailById(emailId);
 
@@ -48,7 +48,9 @@ public class EmailService : IEmailService
 		emailToUpdate.OrganizationId = email.OrganizationId ?? emailToUpdate.OrganizationId;
 		emailToUpdate.UserId = email.UserId ?? emailToUpdate.UserId;
 
-		await _emailRepository.UpdateEmail(emailToUpdate);
+		Email updatedEmail = await _emailRepository.UpdateEmail(emailToUpdate);
+
+		return _mapperService.ConvertTo<Email, EmailResponse>(updatedEmail);
 	}
 
 	public async Task DeleteEmail(Guid emailId)

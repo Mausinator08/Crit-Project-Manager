@@ -9,6 +9,6 @@ public interface IPhoneNumberRepository
     Task<PhoneNumber> GetPhoneNumberByUserId(Guid userId);
     Task<PhoneNumber?> GetPhoneNumberByNumber(string number);
     Task<PhoneNumber> CreatePhoneNumber(PhoneNumber phoneNumber);
-    Task UpdatePhoneNumber(PhoneNumber phoneNumber);
+    Task<PhoneNumber> UpdatePhoneNumber(PhoneNumber phoneNumber);
     Task DeletePhoneNumber(Guid phoneNumberId);
 }

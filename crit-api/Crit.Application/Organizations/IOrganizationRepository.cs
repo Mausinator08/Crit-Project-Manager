@@ -11,7 +11,7 @@ public interface IOrganizationRepository
     Task<Organization?> GetOrganizationByAdminUserId(Guid userId);
     Task<Organization?> GetOrganizationByMemberUserId(Guid userId);
     Task<Organization?> GetOrganization(Guid organizationId);
-    Task<Organization?> CreateOrganization(Organization organization);
-    Task UpdateOrganization(Organization organization);
+    Task<Organization> CreateOrganization(Organization organization);
+    Task<Organization> UpdateOrganization(Organization organization);
     Task DeleteOrganization(Guid organizationId);
 }

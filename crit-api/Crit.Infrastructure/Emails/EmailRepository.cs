@@ -15,6 +15,22 @@ public class EmailRepository : IEmailRepository
         _critDbContext = critDbContext;
     }
 
+    public async Task<Email> GetEmailById(Guid emailId)
+    {
+        Email? email = await _critDbContext.Emails.AsNoTracking().FirstOrDefaultAsync(e => e.Id == emailId);
+        if (email == null)
+        {
+            throw new Exception("Email not found");
+        }
+
+        return email;
+    }
+
+    public async Task<Email?> GetEmailByAddress(string address)
+    {
+        return await _critDbContext.Emails.AsNoTracking().FirstOrDefaultAsync(e => e.EmailAddress == address);
+    }
+
     public async Task<Email> CreateEmail(Email email)
     {
         Email newEmail = new Email()
@@ -35,6 +51,19 @@ public class EmailRepository : IEmailRepository
         return createdEmail.Entity;
     }
 
+    public async Task<Email> UpdateEmail(Email email)
+    {
+        EntityEntry<Email> updatedEmail = _critDbContext.Emails.Update(email);
+        int savedChanges = await _critDbContext.SaveChangesAsync();
+
+        if (savedChanges <= 0)
+        {
+            throw new Exception("Failed to save Email.");
+        }
+
+        return updatedEmail.Entity;
+    }
+
     public async Task DeleteEmail(Guid emailId)
     {
         Email? email = await _critDbContext.Emails.FindAsync(emailId);
@@ -49,33 +78,6 @@ public class EmailRepository : IEmailRepository
         if (savedChanges <= 0)
         {
             throw new Exception("Failed to delete Email.");
-        }
-    }
-
-    public async Task<Email> GetEmailById(Guid emailId)
-    {
-        Email? email = await _critDbContext.Emails.FindAsync(emailId);
-        if (email == null)
-        {
-            throw new Exception("Email not found");
-        }
-
-        return email;
-    }
-
-    public async Task<Email?> GetEmailByAddress(string address)
-    {
-        return await _critDbContext.Emails.FirstOrDefaultAsync(e => e.EmailAddress == address);
-    }
-
-    public async Task UpdateEmail(Email email)
-    {
-        _critDbContext.Emails.Update(email);
-        int savedChanges = await _critDbContext.SaveChangesAsync();
-
-        if (savedChanges <= 0)
-        {
-            throw new Exception("Failed to save Email.");
         }
     }
 }

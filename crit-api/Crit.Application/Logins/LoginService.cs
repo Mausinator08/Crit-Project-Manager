@@ -90,7 +90,7 @@ public class LoginService : ILoginService
 				};
 			}
 
-			OrganizationResponse? organization = await _organizationService.CreateOrganization(new CreateOrganizationRequest()
+			OrganizationResponse organization = await _organizationService.CreateOrganization(new CreateOrganizationRequest()
 			{
 				Name = user.Organization,
 				OwnerUserId = appUser.Id,
@@ -104,19 +104,19 @@ public class LoginService : ILoginService
 				OrganizationAffiliateIds = new List<Guid>([appUser.Id])
 			});
 
-			if (organization == null || organization.Id == null || organization.Id == Guid.Empty)
+			if (organization.Id == null || organization.Id == Guid.Empty)
 			{
 				throw new Exception("Failed to create organization.");
 			}
 
-			EmailResponse? email = await _emailService.CreateEmail(new CreateEmailRequest()
+			EmailResponse email = await _emailService.CreateEmail(new CreateEmailRequest()
 			{
 				EmailAddress = user.Email,
 				OrganizationId = organization.Id.Value,
 				UserId = appUser.Id
 			});
 
-			PhoneNumberResponse? phoneNumber = await _phoneNumberService.CreatePhoneNumber(new CreatePhoneNumberRequest()
+			PhoneNumberResponse phoneNumber = await _phoneNumberService.CreatePhoneNumber(new CreatePhoneNumberRequest()
 			{
 				Number = user.PhoneNumber ?? string.Empty,
 				OrganizationId = organization.Id.Value,
@@ -315,14 +315,14 @@ public class LoginService : ILoginService
 				throw new Exception("Failed to get or create organization.");
 			}
 
-			EmailResponse? email = await _emailService.CreateEmail(new CreateEmailRequest()
+			EmailResponse email = await _emailService.CreateEmail(new CreateEmailRequest()
 			{
 				EmailAddress = user.Email,
 				OrganizationId = organization.Id.Value,
 				UserId = appUser.Id
 			});
 
-			PhoneNumberResponse? phoneNumber = await _phoneNumberService.CreatePhoneNumber(new CreatePhoneNumberRequest()
+			PhoneNumberResponse phoneNumber = await _phoneNumberService.CreatePhoneNumber(new CreatePhoneNumberRequest()
 			{
 				Number = user.PhoneNumber ?? string.Empty,
 				OrganizationId = organization.Id.Value,

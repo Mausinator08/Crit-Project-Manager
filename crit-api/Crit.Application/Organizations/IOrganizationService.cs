@@ -12,7 +12,7 @@ public interface IOrganizationService
 	Task<List<OrganizationResponse>> GetAllOrganizationsForProjectId(Guid projectId);
 	Task<OrganizationResponse?> GetOwningOrganizationForProjectId(Guid projectId);
 	Task<OrganizationResponse?> GetOrganization(Guid organizationId);
-	Task<OrganizationResponse?> CreateOrganization(CreateOrganizationRequest organization);
-	Task UpdateOrganization(Guid id, UpdateOrganizationRequest organization);
+	Task<OrganizationResponse> CreateOrganization(CreateOrganizationRequest organization);
+	Task<OrganizationResponse> UpdateOrganization(Guid id, UpdateOrganizationRequest organization);
 	Task DeleteOrganization(Guid organizationId);
 }

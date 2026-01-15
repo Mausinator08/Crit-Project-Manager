@@ -1,7 +1,8 @@
-using Crit.Abstractions.Contexts;
-using Crit.Abstractions.Models;
 using Crit.Application.RepositoryInterfaces;
+using Crit.Domain.Models;
+using Crit.Infrastructure.Contexts;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace Crit.Infrastructure.Repositories;
 
@@ -15,124 +16,106 @@ public class CustomFieldTypeRepository : ICustomFieldTypeRepository
 
     public async Task<List<CustomFieldType>> GetAllCustomFieldTypes(Guid projectId)
     {
-        try
+        if (_critDbContext == null)
         {
-            if (_critDbContext == null)
-            {
-                throw new InvalidOperationException("CritDbContext is not initialized.");
-            }
-
-            if (projectId == Guid.Empty)
-            {
-                throw new ArgumentException("Project ID cannot be null or empty.", nameof(projectId));
-            }
-
-            List<CustomFieldType> customFieldTypes = await _critDbContext.CustomFieldTypes.AsNoTracking().Where(status => status.ProjectId == projectId).ToListAsync();
-            return customFieldTypes;
+            throw new InvalidOperationException("CritDbContext is not initialized.");
         }
-        catch (Exception ex)
+
+        if (projectId == Guid.Empty)
         {
-            throw new Exception($"Error retrieving custom field types.", ex);
+            throw new ArgumentException("Project ID cannot be null or empty.", nameof(projectId));
         }
+
+        List<CustomFieldType> customFieldTypes = await _critDbContext.CustomFieldTypes.AsNoTracking().Where(status => status.ProjectId == projectId).ToListAsync();
+        return customFieldTypes;
     }
 
     public async Task<CustomFieldType> GetCustomFieldType(Guid customFieldTypeId)
     {
-        try
+        if (_critDbContext == null)
         {
-            if (_critDbContext == null)
-            {
-                throw new InvalidOperationException("CritDbContext is not initialized.");
-            }
-
-            if (customFieldTypeId == Guid.Empty)
-            {
-                throw new ArgumentException("Custom Field Type ID cannot be null or empty.", nameof(customFieldTypeId));
-            }
-
-            List<CustomFieldType> customFieldType = await _critDbContext.CustomFieldTypes.AsNoTracking().Where(customFieldType => customFieldType.Id == customFieldTypeId).ToListAsync();
-            if (!customFieldType.Any())
-            {
-                throw new KeyNotFoundException($"Custom Field Type with ID {customFieldTypeId} not found.");
-            }
-
-            return customFieldType.First();
+            throw new InvalidOperationException("CritDbContext is not initialized.");
         }
-        catch (Exception ex)
+
+        if (customFieldTypeId == Guid.Empty)
         {
-            throw new Exception($"Error retrieving Custom Field Type with ID {customFieldTypeId}.", ex);
+            throw new ArgumentException("Custom Field Type ID cannot be null or empty.", nameof(customFieldTypeId));
         }
+
+        List<CustomFieldType> customFieldType = await _critDbContext.CustomFieldTypes.AsNoTracking().Where(customFieldType => customFieldType.Id == customFieldTypeId).ToListAsync();
+        if (!customFieldType.Any())
+        {
+            throw new KeyNotFoundException($"Custom Field Type with ID {customFieldTypeId} not found.");
+        }
+
+        return customFieldType.First();
     }
 
     public async Task<CustomFieldType> CreateCustomFieldType(CustomFieldType customFieldType)
     {
-        try
+        if (_critDbContext == null)
         {
-            if (_critDbContext == null)
-            {
-                throw new InvalidOperationException("CritDbContext is not initialized.");
-            }
-
-            if (customFieldType == null)
-            {
-                throw new ArgumentNullException(nameof(customFieldType), "Custom Field Type cannot be null.");
-            }
-
-            await _critDbContext.CustomFieldTypes.AddAsync(customFieldType);
-            await _critDbContext.SaveChangesAsync();
-            return customFieldType;
+            throw new InvalidOperationException("CritDbContext is not initialized.");
         }
-        catch (Exception ex)
+
+        if (customFieldType == null)
         {
-            throw new Exception("Error creating Custom Field Type.", ex);
+            throw new ArgumentNullException(nameof(customFieldType), "Custom Field Type cannot be null.");
         }
+
+        EntityEntry<CustomFieldType> createdCustomFieldType = await _critDbContext.CustomFieldTypes.AddAsync(customFieldType);
+        int savedChanges = await _critDbContext.SaveChangesAsync();
+
+        if (savedChanges <= 0)
+        {
+            throw new Exception("Failed to create Custom Field Type.");
+        }
+
+        return createdCustomFieldType.Entity;
     }
 
     public async Task<CustomFieldType> UpdateCustomFieldType(CustomFieldType customFieldType)
     {
-        try
+        if (_critDbContext == null)
         {
-            if (_critDbContext == null)
-            {
-                throw new InvalidOperationException("CritDbContext is not initialized.");
-            }
-
-            if (customFieldType == null)
-            {
-                throw new ArgumentNullException(nameof(customFieldType), "Custom Field Type cannot be null.");
-            }
-
-            _critDbContext.CustomFieldTypes.Update(customFieldType);
-            await _critDbContext.SaveChangesAsync();
-            return customFieldType;
+            throw new InvalidOperationException("CritDbContext is not initialized.");
         }
-        catch (Exception ex)
+
+        if (customFieldType == null)
         {
-            throw new Exception("Error updating Custom Field Type.", ex);
+            throw new ArgumentNullException(nameof(customFieldType), "Custom Field Type cannot be null.");
         }
+
+        EntityEntry<CustomFieldType> updatedCustomFieldType = _critDbContext.CustomFieldTypes.Update(customFieldType);
+        int savedChanges = await _critDbContext.SaveChangesAsync();
+
+        if (savedChanges <= 0)
+        {
+            throw new Exception("Failed to save Custom Field Type.");
+        }
+
+        return updatedCustomFieldType.Entity;
     }
 
     public async Task DeleteCustomFieldType(Guid customFieldTypeId)
     {
-        try
+        if (_critDbContext == null)
         {
-            if (_critDbContext == null)
-            {
-                throw new InvalidOperationException("CritDbContext is not initialized.");
-            }
-
-            if (customFieldTypeId == Guid.Empty)
-            {
-                throw new ArgumentException("Custom Field Type ID cannot be null or empty.", nameof(customFieldTypeId));
-            }
-
-            CustomFieldType customFieldType = await GetCustomFieldType(customFieldTypeId);
-            _critDbContext.CustomFieldTypes.Remove(customFieldType);
-            await _critDbContext.SaveChangesAsync();
+            throw new InvalidOperationException("CritDbContext is not initialized.");
         }
-        catch (Exception ex)
+
+        if (customFieldTypeId == Guid.Empty)
         {
-            throw new Exception($"Error deleting Custom Field Type with ID {customFieldTypeId}.", ex);
+            throw new ArgumentException("Custom Field Type ID cannot be null or empty.", nameof(customFieldTypeId));
+        }
+
+        CustomFieldType customFieldType = await GetCustomFieldType(customFieldTypeId);
+        _critDbContext.CustomFieldTypes.Remove(customFieldType);
+        int savedChanges = await _critDbContext.SaveChangesAsync();
+
+        if (savedChanges <= 0)
+        {
+            throw new Exception("Failed to delete Custom Field Type.");
         }
     }
 }
