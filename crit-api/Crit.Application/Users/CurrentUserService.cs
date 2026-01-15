@@ -26,7 +26,7 @@ public class CurrentUserService : ICurrentUserService
 			ApplicationUser? loggedInUser = null;
 			ClaimsPrincipal? user = _httpContextAccessor.HttpContext?.User;
 
-			if (user != null && user?.Identity?.IsAuthenticated == true)
+			if (user != null && user.Identity != null && user?.Identity?.IsAuthenticated == true)
 			{
 				loggedInUser = await _userManager.GetUserAsync(user);
 			}
