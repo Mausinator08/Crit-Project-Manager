@@ -1,5 +1,7 @@
-using Crit.Abstractions.Models;
+using Crit.Application.CustomFieldTypes;
 using Crit.Application.RepositoryInterfaces;
+using Crit.Contracts.RequestModels;
+using Crit.Contracts.ResponseModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,23 +13,23 @@ namespace CritApi.Controllers;
 public class CustomFieldTypeController : ControllerBase
 {
     private readonly Logging.IFileLogger _logger;
-    private readonly ICustomFieldTypeRepository _customFieldTypeRepository;
+    private readonly ICustomFieldTypeService _customFieldTypeService;
 
-    public CustomFieldTypeController(Logging.IFileLogger logger, ICustomFieldTypeRepository customFieldTypeRepository)
+    public CustomFieldTypeController(Logging.IFileLogger logger, ICustomFieldTypeService customFieldTypeService)
     {
         _logger = logger;
-        _customFieldTypeRepository = customFieldTypeRepository;
+        _customFieldTypeService = customFieldTypeService;
     }
 
     [HttpGet]
     [Route("GetAllCustomFieldTypes/{projectId}")]
-    [ProducesResponseType<List<CustomFieldType>>(StatusCodes.Status200OK)]
+    [ProducesResponseType<List<CustomFieldTypeResponse>>(StatusCodes.Status200OK)]
     [ProducesErrorResponseType(typeof(string))]
     public async Task<IActionResult> GetAllCustomFieldTypes([FromRoute] Guid projectId)
     {
         try
         {
-            return Ok(await _customFieldTypeRepository.GetAllCustomFieldTypes(projectId));
+            return Ok(await _customFieldTypeService.GetAllCustomFieldTypes(projectId));
         }
         catch (Exception ex)
         {
@@ -38,13 +40,13 @@ public class CustomFieldTypeController : ControllerBase
 
     [HttpGet]
     [Route("{customFieldTypeId}")]
-    [ProducesResponseType<CustomFieldType>(StatusCodes.Status200OK)]
+    [ProducesResponseType<CustomFieldTypeResponse>(StatusCodes.Status200OK)]
     [ProducesErrorResponseType(typeof(string))]
     public async Task<IActionResult> GetCustomFieldType([FromRoute] Guid customFieldTypeId)
     {
         try
         {
-            return Ok(await _customFieldTypeRepository.GetCustomFieldType(customFieldTypeId));
+            return Ok(await _customFieldTypeService.GetCustomFieldType(customFieldTypeId));
         }
         catch (Exception ex)
         {
@@ -54,13 +56,13 @@ public class CustomFieldTypeController : ControllerBase
     }
 
     [HttpPost]
-    [ProducesResponseType<CustomFieldType>(StatusCodes.Status200OK)]
+    [ProducesResponseType<CustomFieldTypeResponse>(StatusCodes.Status200OK)]
     [ProducesErrorResponseType(typeof(string))]
-    public async Task<IActionResult> CreateCustomFieldType([FromBody] CustomFieldType customFieldType)
+    public async Task<IActionResult> CreateCustomFieldType([FromBody] CreateCustomFieldTypeRequest customFieldType)
     {
         try
         {
-            var createdCustomFieldType = await _customFieldTypeRepository.CreateCustomFieldType(customFieldType);
+            CustomFieldTypeResponse? createdCustomFieldType = await _customFieldTypeService.CreateCustomFieldType(customFieldType);
             return Ok(createdCustomFieldType);
         }
         catch (Exception ex)
@@ -71,13 +73,14 @@ public class CustomFieldTypeController : ControllerBase
     }
 
     [HttpPut]
-    [ProducesResponseType<CustomFieldType>(StatusCodes.Status200OK)]
+    [Route("{customFieldTypeId}")]
+    [ProducesResponseType<CustomFieldTypeResponse>(StatusCodes.Status200OK)]
     [ProducesErrorResponseType(typeof(string))]
-    public async Task<IActionResult> UpdateCustomFieldType([FromBody] CustomFieldType customFieldType)
+    public async Task<IActionResult> UpdateCustomFieldType([FromRoute] Guid customFieldTypeId, [FromBody] UpdateCustomFieldTypeRequest customFieldType)
     {
         try
         {
-            var updatedCustomFieldType = await _customFieldTypeRepository.UpdateCustomFieldType(customFieldType);
+            CustomFieldTypeResponse? updatedCustomFieldType = await _customFieldTypeService.UpdateCustomFieldType(customFieldTypeId, customFieldType);
             return Ok(updatedCustomFieldType);
         }
         catch (Exception ex)
@@ -95,7 +98,7 @@ public class CustomFieldTypeController : ControllerBase
     {
         try
         {
-            await _customFieldTypeRepository.DeleteCustomFieldType(customFieldTypeId);
+            await _customFieldTypeService.DeleteCustomFieldType(customFieldTypeId);
             return NoContent();
         }
         catch (Exception ex)
