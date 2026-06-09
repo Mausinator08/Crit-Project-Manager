@@ -1,6 +1,9 @@
 
+using Crit.Domain.Entities;
 using Crit.Domain.Identity;
-namespace Crit.Domain.Models;
+using Crit.Domain.Modules.ProjectManagement.Entities;
+
+namespace Crit.Domain.Modules.OrganizationManagement.Entities;
 
 public class Organization
 {

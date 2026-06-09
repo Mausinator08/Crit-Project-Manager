@@ -1,4 +1,4 @@
-namespace Crit.Domain.Models;
+namespace Crit.Domain.Modules.ProjectManagement.Entities;
 
 public class Priority
 {

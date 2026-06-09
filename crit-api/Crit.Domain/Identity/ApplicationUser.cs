@@ -1,4 +1,6 @@
-using Crit.Domain.Models;
+using Crit.Domain.Entities;
+using Crit.Domain.Modules.OrganizationManagement.Entities;
+using Crit.Domain.Modules.ProjectManagement.Entities;
 using Microsoft.AspNetCore.Identity;
 
 namespace Crit.Domain.Identity;

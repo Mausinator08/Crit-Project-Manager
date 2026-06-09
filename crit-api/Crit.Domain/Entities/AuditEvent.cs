@@ -1,6 +1,6 @@
-namespace Crit.Domain.Models;
+namespace Crit.Domain.Entities;
 
-public class AuditInformation
+public class AuditEvent : ICreatedAuditInfo, IUpdatedAuditInfo
 {
     public Guid CreatedByUserId { get; set; } = Guid.Empty;
     public Guid UpdatedByUserId { get; set; } = Guid.Empty;

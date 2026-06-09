@@ -1,6 +1,8 @@
 
 using Crit.Domain.Identity;
-namespace Crit.Domain.Models;
+using Crit.Domain.Modules.OrganizationManagement.Entities;
+
+namespace Crit.Domain.Entities;
 
 public class OrganizationMember
 {

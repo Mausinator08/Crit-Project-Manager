@@ -1,6 +1,7 @@
+using Crit.Domain.Modules.OrganizationManagement.Entities;
 using Microsoft.AspNetCore.Identity;
 
-namespace Crit.Domain.Models;
+namespace Crit.Domain.Entities;
 
 public class Email
 {

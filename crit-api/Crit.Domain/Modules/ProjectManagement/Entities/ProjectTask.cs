@@ -1,13 +1,13 @@
 
-using Crit.Domain.Models;
-namespace Crit.Domain.Models;
+
+namespace Crit.Domain.Modules.ProjectManagement.Entities;
 
 public class ProjectTask
 {
     public ProjectTask()
     {
         ProjectId = Guid.Empty;
-        SubTasks = new List<ProjectTask>();
+        SubProjectTasks = new List<ProjectTask>();
         CustomFields = new List<CustomField>();
         Comments = new List<Comment>();
     }
@@ -21,13 +21,13 @@ public class ProjectTask
     public Guid? PriorityId { get; set; }
     public int? Complexity { get; set; }
     public DateTime? DueDate { get; set; }
-    public Guid? ParentTaskId { get; set; }
+    public Guid? ParentProjectTaskId { get; set; }
 
     public List<CustomField> CustomFields { get; set; }
     public Project? Project { get; set; }
     public Status? Status { get; set; }
     public Priority? Priority { get; set; }
-    public List<ProjectTask> SubTasks { get; set; }
-    public ProjectTask? ParentTask { get; set; }
+    public List<ProjectTask> SubProjectTasks { get; set; }
+    public ProjectTask? ParentProjectTask { get; set; }
     public List<Comment> Comments { get; set; }
 }
