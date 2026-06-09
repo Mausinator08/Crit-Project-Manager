@@ -10,12 +10,13 @@ using Crit.Infrastructure.Contexts;
 using Crit.Infrastructure.Repositories;
 using CritApi.Logging;
 using CritApi.Middleware;
+using FastEndpoints;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+builder.Services.AddFastEndpoints();
 
 StringBuilder? connectionString = new StringBuilder();
 string? userNameEnvVar = builder.Configuration.GetValue<string>("PostgreSQL:Username");
@@ -161,16 +162,7 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IOrganizationService, OrganizationService>();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 
-builder.Services.AddSingleton<IMapperService, MapperService>();
-
-builder.Services.Scan(scan => scan
-    .FromAssemblies(typeof(MapperService).Assembly /* or your mapper assembly */)
-    .AddClasses(c => c.AssignableTo(typeof(IMapper<,>)))
-    .AsImplementedInterfaces()
-    .WithSingletonLifetime());
-
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -199,5 +191,5 @@ app.UseRouting();
 app.UseCookiePolicy();
 app.UseAuthentication();
 app.UseAuthorization();
-app.MapControllers();
-app.Run();
+app.UseFastEndpoints();
+await app.RunAsync();
