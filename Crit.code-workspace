@@ -20,6 +20,7 @@
 		"editor.trimAutoWhitespace": true,
 		"omnisharp.autoStart": false,
 		"dotnet.server.internalOmniSharpOnlyRestoreEnabled": false,
-		"dotnet.projects.useProjectToolsServer": false
+		"dotnet.projects.useProjectToolsServer": false,
+		"editor.tabSize": 2
 	}
 }
