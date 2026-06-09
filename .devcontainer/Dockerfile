@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/devcontainers/dotnet:1-8.0
+FROM mcr.microsoft.com/devcontainers/dotnet:1-10.0
 
 # Always operate as root inside the container for Windows bind mounts
 USER root

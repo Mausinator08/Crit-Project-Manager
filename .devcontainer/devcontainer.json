@@ -28,8 +28,8 @@
 				"csharp.server.runtime": "net",
 				"dotnet.sdk.enablePreviewVersions": false,
 				"dotnetAcquisitionExtension.enableSdkPreview": false,
-				"dotnetAcquisitionExtension.requiredVersion": "8.0",
-				"dotnet.runtime": "8.0"
+				"dotnetAcquisitionExtension.requiredVersion": "10.0",
+				"dotnet.runtime": "10.0"
 			}
 		}
 	},
