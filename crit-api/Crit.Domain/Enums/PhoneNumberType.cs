@@ -1,4 +1,4 @@
-namespace Crit.Abstractions.Types;
+namespace Crit.Domain.Enums;
 
 public enum PhoneNumberType
 {
