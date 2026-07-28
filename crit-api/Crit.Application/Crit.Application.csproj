@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
-    <PackageReference Include="FastEndpoints" Version="8.1.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.3.9" />
+    <PackageReference Include="FastEndpoints" Version="8.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.3.11" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Crit.Domain\Crit.Domain.csproj" />
