@@ -19,12 +19,13 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddFastEndpoints();
 
 StringBuilder? connectionString = new StringBuilder();
-string? userNameEnvVar = builder.Configuration.GetValue<string>("PostgreSQL:Username");
-string? passwordEnvVar = builder.Configuration.GetValue<string>("PostgreSQL:Password");
+builder.Configuration.AddEnvironmentVariables();
+string? userName = builder.Configuration.GetValue<string>("CritApiPostgreSQL:Username");
+string? password = builder.Configuration.GetValue<string>("CritApiPostgreSQL:Password");
 // Can be name of server or an IP address.
-string? serverName = builder.Configuration.GetValue<string>("PostgreSQL:ServerName");
-int? port = builder.Configuration.GetValue<int>("PostgreSQL:Port");
-string? database = builder.Configuration.GetValue<string>("PostgreSQL:Database");
+string? serverName = builder.Configuration.GetValue<string>("CritApiPostgreSQL:ServerName");
+int? port = builder.Configuration.GetValue<int>("CritApiPostgreSQL:Port");
+string? database = builder.Configuration.GetValue<string>("CritApiPostgreSQL:Database");
 
 if (serverName == null)
 {
@@ -36,7 +37,7 @@ if (database == null)
     throw new Exception("A database was not configured.");
 }
 
-if (userNameEnvVar != null && passwordEnvVar != null)
+if (userName != null && password != null)
 {
     connectionString.Append("Host=")
     .Append(serverName)
@@ -45,11 +46,11 @@ if (userNameEnvVar != null && passwordEnvVar != null)
     .Append(";Database=")
     .Append(database)
     .Append(";Username=")
-    .Append(Environment.GetEnvironmentVariable(userNameEnvVar))
+    .Append(userName)
     .Append(";Password=")
-    .Append(Environment.GetEnvironmentVariable(passwordEnvVar));
+    .Append(password);
 }
-else if (userNameEnvVar != null && passwordEnvVar == null)
+else if (userName != null && password == null)
 {
     connectionString.Append("Host=")
     .Append(serverName)
@@ -58,9 +59,9 @@ else if (userNameEnvVar != null && passwordEnvVar == null)
     .Append(";Database=")
     .Append(database)
     .Append(";Username=")
-    .Append(Environment.GetEnvironmentVariable(userNameEnvVar));
+    .Append(userName);
 }
-else if (userNameEnvVar == null && passwordEnvVar != null)
+else if (userName == null && password != null)
 {
     throw new Exception("Cannot connect to PostgreSQL DB with a password and no user name.");
 }

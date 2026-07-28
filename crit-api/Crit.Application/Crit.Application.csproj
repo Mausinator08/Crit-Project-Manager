@@ -2,6 +2,7 @@
   <ItemGroup>
     <PackageReference Include="FastEndpoints" Version="8.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.3.11" />
+    <PackageReference Include="System.Security.Cryptography.Xml" Version="10.0.10" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Crit.Domain\Crit.Domain.csproj" />
